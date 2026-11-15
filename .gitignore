@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+*.auth-token
+.env
+.pytest_cache/

@@ -1,191 +1,138 @@
 ﻿# Dropnet
 
-**Scattered fraud complaints → one connected case.** Dropnet reads victims' complaints (free Russian text),
-puts every phone, card, IBAN, phishing link, scammer alias and money transfer into an embedded **Relate** graph,
-and shows an investigator which complaints are one gang — with the path and the victim's own words as evidence.
+**Scam reports arrive one at a time. The scams don't.** Dropnet puts 296,273 real phone-scam complaints into an
+embedded **Relate** graph and finds the number pools behind them — the rented number ranges a blocklist of single
+numbers can never keep up with — while refusing to blame the innocent people whose numbers get spoofed.
 
-> ⚠️ **All data in this repository is synthetic.** Phones use the fictional range `+7 799 0xx xx xx`, cards the test
-> BIN `400000` (stored masked), IBANs start with `KZ00`, domains end in `.example` / `.test`. No real people.
+**Try it without installing anything:** open `docs/index.html` via GitHub Pages (Settings → Pages → branch, `/docs`).
+Relate runs in your browser as WebAssembly and loads the 200 biggest real pools in about a second.
 
 ---
 
 ## Use case
 
-In Kazakhstan, internet and phone fraud is **57 % of all registered fraud** (13.1k cases in Jan–Jul 2026, per the
-Committee on Legal Statistics as reported by 24.kz). The schemes are well known — "bank security calls", "move your
-savings to a safe account", phishing "loan status" SMS, fake police threats, marketplace prepayments, money mules
-recruited at ATMs.
+Every day ~13,000 Americans report unwanted calls to the FTC. Each report names one caller number. Analysts at
+carriers, regulators and anti-fraud teams block numbers — and lose, because:
 
-The problem is that **complaints arrive one at a time, in different cities, to different officers**. A pensioner in
-Pavlodar, a student in Almaty and a shop owner in Astana each file a report. Nobody sees that all three paid the
-same mule card, that the "bank" called them from the same pool of SIM cards, or that the money from four different
-cards ends up on one cash-out card two transfers later. **The fraud is only visible in the relationships.**
+* **92.1 % of the 248,930 reported numbers were reported exactly once.** Scammers rotate numbers faster than
+  blocklists grow.
+* **36.8 % of reports come from a number faked to carry the victim's own area code** ("neighbor spoofing"; 82 % for
+  medical robocalls). Those numbers belong to innocent people.
 
-Dropnet is a tool for an **anti-fraud analyst or investigator**:
-
-* paste a new complaint → in under a second see *"part of CAMP-0020: 45 complaints, 3 regions, 64.5M KZT — via card
-  `4000 00** **** 7763`"* with the evidence path and quotes;
-* open a campaign → see the money tree (victims → mule cards → transit → cash-out) and click any link to read the
-  sentence it came from;
-* export a **case file** (Markdown/HTML) with accounts to freeze, phones to subpoena, domains to take down;
-* let an **AI agent** (Claude Code, any MCP client) investigate the same graph through MCP.
-
-Relationships that matter:
+The relationship that matters is **Number → Block (NPA-NXX, the first six digits)**. Rented number ranges show up as
+*pools*: many different reported numbers in one block, the same scam types, victims in dozens of states. A pool is
+visible only in the graph — never in a single report.
 
 | relationship | why it matters |
 |---|---|
-| `Complaint -[:PAID_TO]-> Card/Account` | two victims paying one account = one gang (a *mule*) |
-| `Card -[:FORWARDED_TO]-> Card` (1–3 hops) | different mule cards that drain into one *cash-out* card |
-| `Complaint -[:CONTACTED_BY]-> Phone` | SIM pools re-used across victims and regions |
-| `Complaint -[:VISITED]-> Url -[:ON_DOMAIN]-> Domain` | one phishing site behind many "loan status" SMS |
-| `Complaint -[:MENTIONS_PERSONA]-> Persona` + same tactic | gangs re-use aliases ("Erlan from financial monitoring") |
-| `Complaint -[:SIMILAR_SCRIPT {score}]-> Complaint` | the same script retold by victims who kept no numbers |
-| `Extraction -[:FROM]-> Complaint`, `-[:FOUND]-> entity` | **provenance**: every link points back to a quote |
+| `(Report)-[:FROM_NUMBER]->(Number)-[:IN_BLOCK]->(Block)` | one-off numbers that share a rented range |
+| `(Report)-[:ABOUT]->(Subject)`, `-[:VICTIM_IN]->(State)`, `-[:VICTIM_AREA]->(AreaCode)` | scam type, reach, and spoofing (caller area = victim area) |
+| `(FtcCampaign)-[:USES_BLOCK]->(Block)` | a pool: the unit worth blocking |
+| `(Rule)-[:BLOCKS]->(Block or Number)` | what-if rules, written in a transaction and rolled back |
 
-A **hub filter** catches the classic false positive: a legitimate number (a marketplace's support line) mentioned in
-complaints of many different tactics and regions is marked `hub = true` and never used as evidence. Without it,
-everything collapses into one giant "campaign" (see results: F1 drops to 0.34).
+## Results on real data (temporal hold-out)
+
+Rules are learned from reports filed **before 2026-11-02** (192,653) and scored on the **103,620 reports filed after**
+— numbers the rules could not have seen.
+
+| rule set | rules | later reports caught |
+|---|---:|---:|
+| block every number ever reported | 163,606 | 6.2 % |
+| classic blocklist: numbers with ≥ 2 reports | 11,968 | 4.3 % |
+| **Dropnet: those numbers + 3,681 pool blocks** | 15,649 | **22.0 %** |
+
+**5× the coverage** of the blocklist with a comparable number of rules; **17,532** of Dropnet's catches came from numbers
+nobody had reported before. Pools are built from *non-spoofed* reports only, so Dropnet never recommends blocking the
+local ranges spoofers hide in (the 1,358 spoofed calls it still catches sit inside genuine pools).
+Reproduce: `python -m dropnet ftc-eval`.
 
 ## How it uses Relate
 
-- **Mode: single file** — `data/dropnet.rl`.
-- **Why this mode:** the whole investigation is one portable artifact. Judges (or a colleague) clone the repo and open
-  the same graph we built — no server, no import step. A single file is also how an analyst would hand a case to
-  another team. The web app never writes to it: it works on a copy in `data/live/` (git-ignored) so the committed
-  snapshot and the evaluation stay reproducible.
-- **What the graph models:** 250 complaints, their extracted identifiers (149 phones, 67 cards, 44 accounts, 35 URLs on
-  9 domains, aliases), bank transfers between cards, tactics, regions, banks, 7 detected campaigns, 1,033 provenance
-  nodes and 1,230 script-similarity edges.
+- **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,
+  96,126 blocks, 1,531,971 relationships, 6,146 campaigns (6,091 pools, 55 repeat numbers). A second file, `data/dropnet.rl`, holds the free-text module.
+- **Why this mode:** the investigation is one portable artifact — judges and colleagues open exactly the graph we built,
+  and a single campaign can be handed over as its *own* `.rl` file (`Download case`). Built in a directory store,
+  then compacted with `relate clone --to-snapshot-format parquet` (150 MB → 40 MB) so it fits a git repo.
+- **What the graph models:** reports, numbers, NPA-NXX blocks, area codes, states, scam types, pool/repeat campaigns —
+  plus, in the second module, free-text complaints, cards, IBANs, phishing domains, aliases and money transfers.
 
-Relate features we rely on:
-
-| feature | where |
+| Relate feature | where |
 |---|---|
-| embedded Python engine (`relate-db`), no server | `dropnet/store.py` |
-| single-file store + read-only opens for analysis | `data/dropnet.rl`, `store.open_store(read_only=True)` |
-| `UNWIND` + `MERGE` batch loading | `dropnet/load.py` |
-| variable-length paths `[:FORWARDED_TO*0..3]` (money trails) | `dropnet/link.py`, `dropnet/tools.py` |
-| `shortestPath` with node predicates (evidence path that avoids hubs) | `tools.explain_link` |
-| **vector index** + `db.index.vector.queryNodes` inside a `MATCH` (hybrid vector + graph) | `link.add_similarity`, `ingest._add_similar` |
-| Relate's error classification for safe retries / user-facing errors | web API |
-| **MCP**: Relate's native `relate serve --mcp stdio --read-only` *and* our own MCP server | `.mcp.json` |
+| embedded Python engine (`relate-db`), range indexes, `UNWIND`/`MERGE` batch load (296k reports in ~2 min) | `dropnet/ftc/load.py` |
+| campaign detection as Cypher aggregations over the graph | `dropnet/ftc/campaigns.py` |
+| **explicit transaction + rollback** for what-if blocking rules | `dropnet/ftc/whatif.py` |
+| one campaign → its own single-file store | `whatif.export_case` |
+| `relate clone --to-snapshot-format parquet` compaction | `dropnet/ftc/build.py` |
+| **WebAssembly build** in the browser demo (in-memory, ~1 s load) | `docs/app.js` |
+| vector index + `db.index.vector.queryNodes`, `shortestPath`, variable-length money trails | free-text module |
+| **MCP**: our server + Relate's native `relate serve --mcp stdio --read-only` | `.mcp.json` |
 
 ## Setup and run
 
-Prerequisites: **Python 3.10+** (developed and tested on Python 3.14, Windows 11). No API key, no database server,
-no model download.
+Python **3.10+** (tested on 3.14, Windows 11). No API key, no database server.
 
 ```bash
 git clone <this repo> && cd dropnet
 python -m venv .venv
 # Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
 pip install -e .
-python -m dropnet serve          # → http://127.0.0.1:8000
+python -m dropnet serve        # → http://127.0.0.1:8000  (opens on "Real reports (FTC)")
 ```
 
-That's it: the graph is already in the repo. In the UI, click a sample on **New complaint** (e.g. *Known mule card*)
-and press **Link it**.
-
-Other commands:
+Then: pick a pool, click a number, run **What-if**, check `833-766-1884`, download a case as `.rl`.
 
 ```bash
-python -m dropnet investigate CMP-0160        # which campaign is behind this complaint + case file
-python -m dropnet case CAMP-0026 --html --out case.html
-python -m dropnet ingest "Звонили с 8 799 012 34 56 ... перевела на карту 4000 00** **** 7763" --region Pavlodar
-python -m dropnet build                       # regenerate data and rebuild data/dropnet.rl (deterministic, ~2 s)
-python -m dropnet eval --hard --ablations     # linking quality on held-out seeds (see Results)
-python -m dropnet serve --reset               # start the UI from a fresh copy of the snapshot (do this after `build` or `git pull`)
-pip install -e ".[dev]" && pytest             # 146 tests
+python -m dropnet ftc-eval                 # the hold-out table above, recomputed from data/ftc.rl
+python -m dropnet ftc-build --fetch        # re-download the FTC files and rebuild (needs the Relate CLI to compact)
+python -m dropnet site                     # refresh the browser demo data in docs/
+pip install -e ".[dev]" && pytest          # 184 tests
 ```
 
-### Investigate with an AI agent (MCP)
+### With an AI agent
 
-`.mcp.json` registers two MCP servers for Claude Code (or any MCP host) opened in this folder. **Start Claude Code
-from a terminal where the venv is activated**, so the `dropnet` command (installed by `pip install -e .`) is on PATH.
+Start Claude Code **from the activated venv** in this folder:
 
-* **`dropnet`** — `dropnet mcp`: `find_campaign`, `explain_link`, `top_mules`, `similar_scripts`,
-  `build_case`, `read_cypher` (read-only), `get_schema`, `list_campaigns`. If `dropnet serve` is running it proxies to
-  it, so the agent sees complaints you ingested a second ago; otherwise it opens the snapshot read-only.
-* **`relate-native`** — Relate's own MCP server on the snapshot (`read_cypher`, `get_schema`); needs the
-  [Relate CLI](https://relatedb.ai/docs/get-started/install).
-
-The skill `.claude/skills/dropnet-investigator/SKILL.md` teaches the agent the schema, six Cypher recipes and the rule
-*"every claim cites node ids, a path and a victim quote"*. Try: *"Who is behind CMP-0160 and what should we freeze
-first?"*
-
-> Using the Relate CLI directly on the snapshot? Always pass `--read-only`, e.g.
-> `relate query "MATCH (k:Campaign) RETURN k.id, k.size" --database data/dropnet.rl --read-only` — a writable open
-> checkpoints (rewrites) the file.
+* **MCP** (`.mcp.json`): `assess_number`, `ftc_campaigns`, `whatif_block`, `ftc_summary` (+ the free-text tools) via
+  `dropnet mcp`; Relate's own MCP server on the snapshot via `relate-native`.
+* **Hook** (`.claude/settings.json`, `UserPromptSubmit`): whenever a prompt mentions a phone number, the agent receives
+  the graph's evidence about it *and* the spoofing caution before it answers (0.75 s). Ask *"Should we block
+  833-766-1884?"* — the agent learns it sits in a 27-number pool reported 1,202 times in 50 states, and is told not to
+  call the owner of a one-off local number a scammer.
 
 ## Where the data lives
 
 | path | what |
 |---|---|
-| `data/dropnet.rl` | **the Relate store** (single file, committed) |
-| `data/raw/complaints.jsonl` | the 250 synthetic complaints (Russian text + English gloss) |
-| `data/raw/bank_transfers.jsonl` | synthetic card-to-card transfers |
-| `data/raw/ground_truth.json` | which complaints the generator planted in which campaign (used only by `eval`) |
-| `data/live/dropnet.rl` | working copy the web app writes to (git-ignored, created on `serve`) |
+| `data/ftc.rl` | **the Relate store** — real FTC reports (single file, committed) |
+| `data/ftc/raw/*.csv.gz` | the 25 daily FTC files as downloaded (US public data) |
+| `data/ftc/eval.json` | the hold-out result |
+| `docs/data/graph.json` | the slice the browser demo loads into Relate WASM |
+| `data/dropnet.rl`, `data/raw/` | second module: free-text complaints (synthetic, Russian) |
+| `data/live/` | working copies the app writes to (git-ignored) |
 
-## Results
+## Second module: free-text complaints, any language
 
-Pairwise precision / recall / F1 of "these two complaints are the same campaign" against the generator's ground truth.
-Thresholds were tuned on seed 1 only; the numbers below are on **held-out seeds 2–5** (250 complaints each).
-The *hard* variant adds typos, paraphrases, an extra script-only campaign and victims who lost the number or card.
+Real reports name a number; many victims write a story instead. The second module turns free text (demo: synthetic
+Russian complaints) into a graph of phones, cards, IBANs, phishing domains, scammer aliases and bank transfers, links
+complaints through shared identifiers and **money trails up to three transfers deep**, attaches victims who kept no
+numbers by script similarity (Relate vector index), and writes case files with an evidence path and the victim's own
+quote for every link. Tabs *New complaint*, *Campaigns*, *Inbox* and *Query the graph*.
 
-| variant | mean F1 (seeds 2–5) | what it shows |
-|---|---:|---|
-| full system | **1.000** | |
-| hard data | **1.000** | complaints with no identifiers are attached by script similarity |
-| without vectors | 0.956 | the script-only campaign is missed |
-| without money trails (`FORWARDED_TO`) | 0.910 | campaigns whose victims paid *different* mule cards fall apart |
-| without hub filter | 0.335 | one legitimate support number glues unrelated gangs together |
+## What we learned about Relate 1.0.1 (shared for the team)
 
-Synthetic data is easier than reality — the value of the table is the ablations: each relationship type carries
-part of the answer, and removing any one of them visibly breaks the result.
-
-## How it works
-
-```
-complaints.jsonl ─► extract (regex + lexicon + alias gazetteer, with character spans)
-                 ─► embed (hashed char 3-5-grams, 256-d, no model download)
-                 ─► load into Relate (UNWIND/MERGE)            ─► data/dropnet.rl
-                 ─► link: strong pairs (shared phone / domain / payee within 3 FORWARDED_TO hops / alias+tactic)
-                          minus hubs, union-find → campaigns;
-                          loose complaints attach by ≥2 script votes (≥0.80); script-only campaigns need ≥0.90
-                 ─► campaigns get stable ids (CAMP- + earliest complaint), card roles (mule / cashout)
-
-web / MCP / CLI ─► one read-only query layer (dropnet/tools.py) ─► case files with evidence paths and quotes
-ingest          ─► incremental: attached | bridge (links two campaigns) | new_campaign | unlinked (+ closest scripts)
-```
-
-## Project layout
-
-```
-dropnet/synth/      synthetic data generator (deterministic, seeded)
-dropnet/extract/    rule-based extraction + normalizers
-dropnet/embed.py    script vectors
-dropnet/load.py     write to Relate
-dropnet/link.py     campaigns, hubs, card roles
-dropnet/tools.py    read-only query layer (+ guarded read_cypher)
-dropnet/report.py   case files
-dropnet/ingest.py   live ingest
-dropnet/web/        FastAPI + single-page UI (cytoscape.js)
-dropnet/mcp_server.py
-tests/              146 tests (pytest)
-docs/               design, implementation plan, demo script
-```
+* `UNWIND $list AS x MATCH (:Number {number: x})` did not use the range index on a 249k-node label (21 s for 60
+  lookups); anchoring on an indexed node first took 0.03 s.
+* In the WASM build a per-row property `MATCH` costs ~0.5 ms and `MERGE` inside `FOREACH` ~0.7 ms; collecting nodes
+  into lists once and addressing them as `xs[i]` loaded 34k relationships in ~1 s instead of 13–19 s.
+* `relate.Record` serialises only its result columns, so keys added in Python vanish from JSON — copy to `dict`.
+* A writable open of a `.rl` file checkpoints (rewrites) it; open snapshots with `--read-only` / `read_only=True`.
 
 ## Limits and honest notes
 
-* Synthetic data only; the generator was written by the same people as the linker, so real complaints would be
-  messier (that is what the hard variant and the ablations are for).
-* Extraction is rule-based on purpose (works offline, explainable spans). An optional LLM extractor is a natural next
-  step.
-* The Relate store has one writer per file; the web app owns the live copy and MCP reads through its API.
-* Cards are keyed by their masked form (`4000 00** **** 1234`), so two different cards with the same first six and
-  last four digits would merge — acceptable for a demo, a real deployment would key on a bank-side token.
-* Card numbers are masked before anything is stored (`400000******1234`); `read_cypher` is guarded against writes
-  (comments, backticks and string literals are normalised before the check).
+* FTC numbers are numbers people *reported*, not proven offenders; caller ID is easily spoofed. The UI, the MCP tools
+  and the hook all carry that caution, and spoofed local ranges are never proposed for blocking.
+* A pool block covers up to 10,000 numbers; blocking one is a carrier decision with collateral risk. The what-if shows
+  the reports a rule would have stopped, not the legitimate calls it might block.
+* The hold-out spans 35 days of reports; longer windows may shift the numbers.
 
-License: MIT. Built for the Relate by Neo4j hackathon (2026).
+License: MIT. Built for the Relate by Neo4j hackathon (2026). FTC Do Not Call complaint data is US public data.

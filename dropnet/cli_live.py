@@ -57,7 +57,48 @@ def cmd_mcp(a: argparse.Namespace) -> int:
     return main()
 
 
+def cmd_ftc_build(a: argparse.Namespace) -> int:
+    from .ftc import build, fetch
+    if a.fetch:
+        paths = fetch.fetch(build.FTC_RAW)
+        print(f"{len(paths)} FTC daily files in {build.FTC_RAW}")
+    r = build.build()
+    _print_eval(r)
+    return 0
+
+
+def _print_eval(r: dict) -> None:
+    b, d, allseen = r["baseline"], r["dropnet"], r["blocklist_all_seen"]
+    print(f"\nReal FTC reports: train before {r['split_day']} ({r['train_reports']:,}) · test after "
+          f"({r['test_reports']:,})")
+    print(f"| rules | count | later reports caught |\n|---|---:|---:|")
+    print(f"| every number ever reported | {allseen['rules']:,} | {allseen['coverage']:.1%} |")
+    print(f"| blocklist: numbers with ≥2 reports | {b['rules']:,} | {b['coverage']:.1%} |")
+    print(f"| Dropnet: those numbers + {d['block_rules']:,} pool blocks | {d['rules']:,} | {d['coverage']:.1%} |")
+    print(f"\nDropnet caught {d['new_numbers_caught']:,} reports from numbers never reported before; "
+          f"{d['spoofed_caught']:,} of its catches were neighbor-spoofed calls.")
+
+
+def cmd_ftc_eval(a: argparse.Namespace) -> int:
+    from . import store
+    from .ftc import build, evaluate
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        days = [r["d"] for r in store.rows(conn, "MATCH (r:Report) RETURN DISTINCT r.day AS d")]
+        _print_eval(evaluate.holdout(conn, a.split or build.split_day(days)))
+    finally:
+        conn.close()
+    return 0
+
+
 def register(sub) -> None:
+    fb = sub.add_parser("ftc-build", help="build data/ftc.rl from real FTC Do Not Call reports")
+    fb.add_argument("--fetch", action="store_true", help="download the latest daily files from ftc.gov first")
+    fb.set_defaults(fn=cmd_ftc_build)
+    fe = sub.add_parser("ftc-eval", help="temporal hold-out: blocklist vs Dropnet pool rules on real reports")
+    fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")
+    fe.set_defaults(fn=cmd_ftc_eval)
+
     s = sub.add_parser("serve", help="run the web UI + API on the live copy of the snapshot")
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8000)

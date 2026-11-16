@@ -1,0 +1,126 @@
+{
+  "split_day": "2026-11-02",
+  "train_reports": 192653,
+  "test_reports": 103620,
+  "baseline": {
+    "rules": 11968,
+    "covered": 4496,
+    "coverage": 0.0434
+  },
+  "dropnet": {
+    "rules": 15649,
+    "number_rules": 11968,
+    "block_rules": 3681,
+    "covered": 22829,
+    "coverage": 0.2203,
+    "new_numbers_caught": 17532,
+    "spoofed_caught": 1358
+  },
+  "blocklist_all_seen": {
+    "rules": 163606,
+    "coverage": 0.0625
+  },
+  "profile": [
+    {
+      "subject": "OTHER",
+      "reports": 116425,
+      "neighbor": 47692,
+      "label": "Other",
+      "neighbor_share": 0.41
+    },
+    {
+      "subject": "DEBT",
+      "reports": 73858,
+      "neighbor": 5981,
+      "label": "Reducing debt (credit cards, mortgage, student loans)",
+      "neighbor_share": 0.081
+    },
+    {
+      "subject": "IMPOSTER_GOV",
+      "reports": 34284,
+      "neighbor": 14781,
+      "label": "Pretending to be government, business, family or friends",
+      "neighbor_share": 0.431
+    },
+    {
+      "subject": "DROPPED",
+      "reports": 21480,
+      "neighbor": 11940,
+      "label": "Dropped call or no message",
+      "neighbor_share": 0.556
+    },
+    {
+      "subject": "NONE",
+      "reports": 19455,
+      "neighbor": 8620,
+      "label": "No subject provided",
+      "neighbor_share": 0.443
+    },
+    {
+      "subject": "MEDICAL",
+      "reports": 17657,
+      "neighbor": 14470,
+      "label": "Medical & prescriptions",
+      "neighbor_share": 0.82
+    },
+    {
+      "subject": "WARRANTY",
+      "reports": 3655,
+      "neighbor": 1914,
+      "label": "Warranties & protection plans",
+      "neighbor_share": 0.524
+    },
+    {
+      "subject": "HOME",
+      "reports": 3320,
+      "neighbor": 1842,
+      "label": "Home improvement & cleaning",
+      "neighbor_share": 0.555
+    },
+    {
+      "subject": "TRAVEL",
+      "reports": 1654,
+      "neighbor": 406,
+      "label": "Vacation & timeshares",
+      "neighbor_share": 0.245
+    },
+    {
+      "subject": "PRIZES",
+      "reports": 1502,
+      "neighbor": 187,
+      "label": "Lotteries, prizes & sweepstakes",
+      "neighbor_share": 0.125
+    },
+    {
+      "subject": "ENERGY",
+      "reports": 1333,
+      "neighbor": 662,
+      "label": "Energy, solar & utilities",
+      "neighbor_share": 0.497
+    },
+    {
+      "subject": "TECH",
+      "reports": 913,
+      "neighbor": 458,
+      "label": "Computer & technical support",
+      "neighbor_share": 0.502
+    },
+    {
+      "subject": "WORK",
+      "reports": 737,
+      "neighbor": 159,
+      "label": "Work from home & business opportunities",
+      "neighbor_share": 0.216
+    }
+  ],
+  "stats": {
+    "reports": 296273,
+    "numbers": 248930,
+    "blocks": 96126
+  },
+  "campaigns": 6146,
+  "seconds": 137.0,
+  "store_mb": 39.9,
+  "first_day": "2026-10-09",
+  "last_day": "2026-11-12"
+}

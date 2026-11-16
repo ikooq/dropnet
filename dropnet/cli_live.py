@@ -136,7 +136,25 @@ def cmd_vault(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_carrier(a: argparse.Namespace) -> int:
+    from . import config, store
+    from .ftc import build, carrier, crosscheck
+    fcc_files = sorted((config.DATA_DIR / "fcc").glob("*.json.gz"))
+    fcc = crosscheck.fcc_blocks([r for p in fcc_files for r in crosscheck.read_fcc(p)])
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        n = carrier.export_csv(conn, a.out, fcc=fcc, top=a.top)
+    finally:
+        conn.close()
+    print(f"{n:,} ranges -> {a.out}" + (f" (FCC cross-check from {len(fcc_files)} file(s))" if fcc_files else ""))
+    return 0
+
+
 def register(sub) -> None:
+    cc = sub.add_parser("carrier-csv", help="carrier-ready CSV of number ranges with evidence and the FCC cross-check")
+    cc.add_argument("--out", default="data/ftc/ranges.csv")
+    cc.add_argument("--top", type=int, default=None)
+    cc.set_defaults(fn=cmd_carrier)
     vt = sub.add_parser("vault", help="export the top pools as a markdown vault Relate opens as a graph")
     vt.add_argument("--out")
     vt.add_argument("--top", type=int, default=50)

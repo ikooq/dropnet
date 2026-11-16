@@ -150,6 +150,7 @@ Then: pick a pool, click a number, run **What-if**, check `833-766-1884`, downlo
 python -m dropnet ftc-eval                 # the hold-out table above, recomputed from data/ftc.rl
 python -m dropnet ftc-build --fetch        # re-download the FTC files and rebuild (needs the Relate CLI to compact)
 python -m dropnet site                     # refresh the browser demo data in docs/
+python -m dropnet carrier-csv              # data/ftc/ranges.csv: 6,091 ranges, evidence, FCC check, price
 pip install -e ".[dev]" && pytest          # 191 tests
 ```
 

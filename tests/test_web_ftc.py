@@ -35,6 +35,9 @@ def test_ftc_summary(client):
     s = client.get("/api/ftc/summary").json()
     assert s["reports"] == 35 and s["eval"]["baseline"]["coverage"] == 0.043
     assert {p["subject"] for p in s["profile"]} >= {"DEBT", "MEDICAL"}
+    assert all("neighbor_share" in p and "label" in p for p in s["profile"])  # derived fields survive JSON
+    st = client.get("/api/ftc/states").json()
+    assert all("neighbor_share" in x for x in st)
 
 
 def test_ftc_campaigns_graph_assess(client):

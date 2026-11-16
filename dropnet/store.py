@@ -28,8 +28,12 @@ def reset_store(path: str | Path) -> None:
 
 
 def rows(conn: relate.Connection, cypher: str, params: dict[str, Any] | None = None) -> list[dict]:
-    """Run one statement and return its rows as plain dicts."""
-    return conn.execute(cypher, params or {}).data()
+    """Run one statement and return its rows as plain dicts.
+
+    relate.Record is a dict subclass whose serialisation only knows the result columns, so keys added later
+    (derived fields) would silently vanish from JSON responses. Copy into real dicts.
+    """
+    return [{k: r[k] for k in r.keys()} for r in conn.execute(cypher, params or {}).data()]
 
 
 def ensure_schema(conn: relate.Connection, dim: int = VECTOR_DIM) -> None:

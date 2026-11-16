@@ -22,6 +22,7 @@ function showTab(name) {
   document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.id === `tab-${name}`));
   if (name === "campaigns" && cy) setTimeout(() => cy.resize() && cy.fit(undefined, 30), 0);
+  if (name === "real" && ftcCy) setTimeout(() => ftcCy.resize() && ftcCy.fit(undefined, 24), 0);
   history.replaceState(null, "", `#${name}`);
 }
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
@@ -249,10 +250,99 @@ async function runQuery() {
 }
 $("#q-go").addEventListener("click", runQuery);
 
+/* ------------------------------------------------------- real FTC data */
+let ftcCy = null, ftcCampaigns = [];
+const pct = (x) => `${(100 * x).toFixed(1)}%`;
+const fmtNum = (n) => String(n).replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+function hbar(label, value, max, ours) {
+  return `<div class="hbar ${ours ? "ours" : ""}"><span>${label}</span><div class="track"><div class="fill"
+    style="width:${Math.max(1, (100 * value) / max)}%"></div></div><span class="v">${pct(value)}</span></div>`;
+}
+async function loadReal() {
+  let s;
+  try { s = await api("api/ftc/summary"); } catch (e) {
+    $("#real-lede").innerHTML = `Real FTC data is not built yet — run <code>python -m dropnet ftc-build</code>.`; return false;
+  }
+  $("#real-lede").innerHTML = `<b>${s.reports.toLocaleString()}</b> real complaints about unwanted calls, filed with the US
+    Federal Trade Commission between ${esc(s.first_day)} and ${esc(s.last_day)}, live in one Relate file. Most of the numbers
+    behind them were reported only once — so a blocklist of numbers is always one step behind.`;
+  $("#real-kpis").innerHTML = [[s.reports.toLocaleString(), "reports"], [s.numbers.toLocaleString(), "reported numbers"],
+    [pct(s.single_report_numbers_share), "numbers reported only once"], [pct(s.neighbor_share), "spoofed to look local"],
+    [(s.campaigns.pool || 0).toLocaleString(), "number pools found"]].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+  const ev = s.eval;
+  if (ev) {
+    const max = Math.max(ev.dropnet.coverage, ev.blocklist_all_seen.coverage);
+    $("#eval-caption").innerHTML = `Rules learned from reports before ${esc(ev.split_day)} (${ev.train_reports.toLocaleString()}),
+      scored on the ${ev.test_reports.toLocaleString()} reports that came after. Share of later reports each rule set would have caught:`;
+    $("#eval-bars").innerHTML = hbar(`Block every number ever reported (${ev.blocklist_all_seen.rules.toLocaleString()} rules)`, ev.blocklist_all_seen.coverage, max)
+      + hbar(`Blocklist: numbers with ≥2 reports (${ev.baseline.rules.toLocaleString()})`, ev.baseline.coverage, max)
+      + hbar(`<b>Dropnet</b>: those + ${ev.dropnet.block_rules.toLocaleString()} pool blocks (${ev.dropnet.rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
+      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} of Dropnet's catches came from numbers nobody had reported before.</p>`;
+  }
+  const prof = s.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share);
+  $("#spoof-bars").innerHTML = prof.map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
+  ftcCampaigns = await api("api/ftc/campaigns?limit=40&kind=pool");
+  $("#ftc-list").innerHTML = ftcCampaigns.map((c) => `<button class="camp-card" data-id="${esc(c.id)}">
+    <div class="id">${esc(c.id.replace("POOL-", "Pool "))}</div>
+    <div class="meta">${c.numbers} numbers · ${c.reports.toLocaleString()} reports · ${c.states} states</div>
+    <div class="meta">${esc((c.subjects || []).join(", "))}${c.toll_free ? " · toll-free" : ""}</div></button>`).join("");
+  $("#ftc-list").querySelectorAll(".camp-card").forEach((b) => b.addEventListener("click", () => openFtc(b.dataset.id)));
+  if (ftcCampaigns.length) openFtc(ftcCampaigns[0].id);
+  return true;
+}
+async function openFtc(id) {
+  document.querySelectorAll("#ftc-list .camp-card").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
+  const g = await api(`api/ftc/campaigns/${id}/graph`);
+  const k = g.campaign, blk = id.replace("POOL-", "");
+  $("#ftc-head").innerHTML = `<h2>${esc(blk.slice(0, 3))}-${esc(blk.slice(3))}-xxxx</h2>
+    <span class="badge">${k.numbers} numbers</span><span class="badge">${k.reports.toLocaleString()} reports</span>
+    <span class="badge">${k.states} states</span><span class="badge">${esc(k.first_day || "")} → ${esc(k.last_day || "")}</span>
+    <span class="spacer"></span><a href="api/ftc/campaigns/${esc(id)}/export"><button>Download case (.rl)</button></a>`;
+  const C = { Block: css("--c-cashout"), Number: css("--c-card"), State: css("--c-phone"), Subject: css("--c-persona") };
+  const els = [...g.nodes.map((n) => ({ data: { id: n.id, label: n.label, kind: n.kind, color: C[n.kind], w: n.kind === "Number" ? 8 + Math.min(26, Math.sqrt(n.reports || 1) * 2) : 18, raw: n } })),
+    ...g.edges.map((e, i) => ({ data: { id: `f${i}`, source: e.source, target: e.target, type: e.type } }))];
+  if (ftcCy) ftcCy.destroy();
+  ftcCy = cytoscape({ container: $("#ftc-graph"), elements: els, wheelSensitivity: 0.25,
+    style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)", "font-size": 9, color: css("--ink") } },
+      { selector: "node[kind = 'Block']", style: { shape: "round-rectangle", width: 40, height: 40, "font-weight": 700 } },
+      { selector: "node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 10 } },
+      { selector: "edge", style: { width: 1, "line-color": css("--line"), "curve-style": "haystack" } },
+      { selector: "edge[type = 'IN_BLOCK']", style: { width: 2, "line-color": C.Block } }],
+    layout: { name: "cose", animate: false, nodeRepulsion: 12000, idealEdgeLength: 60, padding: 24 } });
+  ftcCy.on("tap", "node[kind = 'Number']", (e) => assess(e.target.data("raw").number));
+  $("#ftc-legend").innerHTML = [["Block (NPA-NXX)", C.Block], ["Reported number", C.Number], ["Victim state", C.State], ["Scam type", C.Subject]]
+    .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("") + "<span>node size = reports</span>";
+  const picks = ftcCampaigns.slice(0, 12);
+  $("#ftc-whatif").innerHTML = `<b>What if we had blocked these pools on day one?</b>
+    <div class="whatif-pick">${picks.map((c) => `<label><input type="checkbox" value="${esc(c.id.replace("POOL-", ""))}" ${c.id === id ? "checked" : ""}> ${esc(c.id.replace("POOL-", ""))}</label>`).join("")}</div>
+    <button class="primary" id="whatif-go">Run what-if</button> <span class="muted">Runs inside a Relate transaction, then rolls back — nothing is written.</span>
+    <div id="whatif-out"></div>`;
+  $("#whatif-go").addEventListener("click", async () => {
+    const blocks = [...document.querySelectorAll(".whatif-pick input:checked")].map((x) => x.value);
+    try {
+      const r = await post("api/ftc/whatif", { blocks });
+      $("#whatif-out").innerHTML = `<p><b>${r.reports_stopped.toLocaleString()}</b> reports from <b>${r.numbers_covered.toLocaleString()}</b> numbers
+        would have been stopped by ${r.rules} block rule${r.rules > 1 ? "s" : ""}; ${r.campaigns_touched.length} campaigns touched.</p>`;
+    } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  });
+}
+async function assess(number) {
+  $("#num-in").value = fmtNum(number);
+  const a = await api(`api/ftc/number/${encodeURIComponent(number)}`);
+  const label = { likely_spoofed: "Likely spoofed", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
+  $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
+    ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} spoofed-local · block ${esc(a.block)} has
+    ${a.block_numbers} reported numbers · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
+  document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+$("#num-go").addEventListener("click", () => assess($("#num-in").value));
+$("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") assess($("#num-in").value); });
+
 /* ----------------------------------------------------------------- boot */
 (async function boot() {
   await Promise.all([refreshStats(), loadSamples(), loadCampaignList(), loadInbox()]);
   const tab = location.hash.slice(1);
   if (campaigns.length) await openCampaign(campaigns[0].id);
-  showTab(["ingest", "campaigns", "inbox", "query"].includes(tab) ? tab : "ingest");
+  const hasReal = await loadReal();
+  showTab(["real", "ingest", "campaigns", "inbox", "query"].includes(tab) ? tab : hasReal ? "real" : "ingest");
 })();

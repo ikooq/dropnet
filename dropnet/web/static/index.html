@@ -25,15 +25,51 @@
 </header>
 
 <nav class="tabs" role="tablist">
-  <button role="tab" data-tab="ingest" class="active">New complaint</button>
+  <button role="tab" data-tab="real" class="active">Real reports (FTC)</button>
+  <button role="tab" data-tab="ingest">New complaint</button>
   <button role="tab" data-tab="campaigns">Campaigns</button>
   <button role="tab" data-tab="inbox">Inbox</button>
   <button role="tab" data-tab="query">Query the graph</button>
 </nav>
 
 <main>
+  <!-- Real FTC data -->
+  <section id="tab-real" class="tab active">
+    <p class="lede" id="real-lede">Loading real reports…</p>
+    <div class="kpis" id="real-kpis"></div>
+    <div class="split2">
+      <div class="panel">
+        <h2>Blocklists can't keep up</h2>
+        <p class="muted" id="eval-caption"></p>
+        <div id="eval-bars"></div>
+      </div>
+      <div class="panel">
+        <h2>Spoofed to look local</h2>
+        <p class="muted">Share of reports whose caller number has the victim's own area code — a number faked to
+          look familiar. Its real owner is usually innocent, so Dropnet never blocks these blocks.</p>
+        <div id="spoof-bars"></div>
+      </div>
+    </div>
+    <div class="panel lookup">
+      <h2>Check a reported number</h2>
+      <div class="row"><input id="num-in" placeholder="e.g. 833-766-1884" inputmode="tel">
+        <button class="primary" id="num-go">Assess</button></div>
+      <div id="num-out"></div>
+    </div>
+    <div class="camp-layout">
+      <aside class="camp-list" id="ftc-list"></aside>
+      <div class="camp-main">
+        <div class="camp-head" id="ftc-head"></div>
+        <div class="graph-wrap"><div id="ftc-graph"></div><div class="legend" id="ftc-legend"></div></div>
+        <div class="panel detail" id="ftc-whatif"></div>
+      </div>
+    </div>
+    <p class="muted small">Source: FTC Do Not Call complaint data (US public data). Numbers are numbers people
+      reported, not proven offenders — caller ID is easily spoofed.</p>
+  </section>
+
   <!-- New complaint -->
-  <section id="tab-ingest" class="tab active">
+  <section id="tab-ingest" class="tab">
     <div class="split">
       <div class="panel">
         <h2>Paste a complaint</h2>

@@ -20,6 +20,27 @@ def test_campaign_list_and_graph(g):  # noqa: F811
     assert api.campaign_graph(g, "POOL-000000") is None
 
 
+def test_campaign_graph_is_fast_on_the_real_snapshot():
+    """On the real 249k-number graph an UNWIND-bound property lookup skipped the index (44 s)."""
+    import time
+
+    import pytest
+
+    from dropnet import config, store
+    snap = config.DATA_DIR / "ftc.rl"
+    if not snap.exists():
+        pytest.skip("real FTC snapshot not built")
+    c = store.open_store(snap, read_only=True)
+    try:
+        t = time.perf_counter()
+        gr = api.campaign_graph(c, "POOL-217863")
+        elapsed = time.perf_counter() - t
+    finally:
+        c.close()
+    assert gr and any(n["kind"] == "State" for n in gr["nodes"])
+    assert elapsed < 2.0, elapsed
+
+
 def test_states(g):  # noqa: F811
     st = {s["state"]: s for s in api.states(g)}
     assert st["Colorado"]["reports"] > 0 and 0 <= st["Colorado"]["neighbor_share"] <= 1

@@ -41,13 +41,17 @@ def campaign_graph(conn: relate.Connection, campaign_id: str, max_numbers: int =
         MATCH (n)-[:IN_BLOCK]->(b:Block)
         RETURN n.number AS number, n.reports AS reports, b.npa_nxx AS block
         ORDER BY reports DESC LIMIT $lim""", {"id": campaign_id, "lim": int(max_numbers)})
-    numbers = [x["number"] for x in nums]
-    states = rows(conn, """
-        UNWIND $ns AS num MATCH (:Number {number: num})<-[:FROM_NUMBER]-(r:Report)-[:VICTIM_IN]->(s:State)
-        RETURN num, s.name AS state, count(r) AS n""", {"ns": numbers})
-    subjects = rows(conn, """
-        UNWIND $ns AS num MATCH (:Number {number: num})<-[:FROM_NUMBER]-(r:Report)-[:ABOUT]->(s:Subject)
-        RETURN num, s.code AS subject, count(r) AS n""", {"ns": numbers})
+    keep_nums = {x["number"] for x in nums}
+    # Anchor on the campaign (indexed) — an UNWIND-bound `{number: num}` lookup skips the index in Relate 1.0.1.
+    anchor = """MATCH (c:FtcCampaign {id: $id})-[:USES_BLOCK|USES_NUMBER]->(t)
+                OPTIONAL MATCH (t)<-[:IN_BLOCK]-(bn:Number)
+                WITH CASE WHEN t:Number THEN t ELSE bn END AS n WHERE n IS NOT NULL
+                MATCH (n)<-[:FROM_NUMBER]-(r:Report)"""
+    states = [s for s in rows(conn, anchor + """ MATCH (r)-[:VICTIM_IN]->(s:State)
+              RETURN n.number AS num, s.name AS state, count(r) AS n""", {"id": campaign_id}) if s["num"] in keep_nums]
+    subjects = [s for s in rows(conn, anchor + """ MATCH (r)-[:ABOUT]->(s:Subject)
+                RETURN n.number AS num, s.code AS subject, count(r) AS n""", {"id": campaign_id})
+                if s["num"] in keep_nums]
     nodes, edges = {}, []
 
     def node(i, kind, label, **kw):

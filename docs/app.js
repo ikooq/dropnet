@@ -4,10 +4,16 @@ import init, { RelateDb } from "https://cdn.jsdelivr.net/npm/@relate/relate-wasm
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pct = (x) => `${(100 * x).toFixed(1)}%`;
+const fmt = (x) => Number(x || 0).toLocaleString("en-US");
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const day = (d, year = false) => (d ? `${MON[+d.slice(5, 7) - 1]} ${+d.slice(8, 10)}${year ? ", " + d.slice(0, 4) : ""}` : "");
+const dash = (n) => n.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+const rangeOf = (b) => `${b.slice(0, 3)}-${b.slice(3, 6)}-xxxx`;
 const LABEL = { DEBT: "Debt relief", IMPOSTER_GOV: "Impersonation", MEDICAL: "Medical", OTHER: "Other", DROPPED: "Dropped call",
   NONE: "No subject", WARRANTY: "Warranty", HOME: "Home improvement", TRAVEL: "Travel", PRIZES: "Prizes", ENERGY: "Energy",
   TECH: "Tech support", WORK: "Work from home" };
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
 
 function q(cypher, params) {
@@ -22,26 +28,26 @@ function hbar(label, value, max, ours) {
 
 function renderStatic() {
   const s = data.summary, ev = data.eval;
-  $("#lede").innerHTML = `<b>${s.reports.toLocaleString()}</b> real complaints about unwanted calls (FTC, ${esc(s.first_day)} →
-    ${esc(s.last_day)}). <b>${pct(s.single_report_numbers_share)}</b> of the numbers behind them were reported only once — a
-    blocklist of numbers is always one step behind. Dropnet links numbers into the pools they come from.`;
-  $("#kpis").innerHTML = [[s.reports.toLocaleString(), "reports"], [s.numbers.toLocaleString(), "reported numbers"],
-    [pct(s.single_report_numbers_share), "numbers reported only once"], [pct(s.neighbor_share), "spoofed to look local"],
-    [(s.campaigns.pool || 0).toLocaleString(), "number pools found"]].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+  $("#lede").innerHTML = `People reported <b>${fmt(s.reports)}</b> unwanted calls to the FTC between ${day(s.first_day)} and
+    ${day(s.last_day, true)}. <b>${pct(s.single_report_numbers_share)}</b> of the numbers were reported only once: scammers don't
+    reuse a number, they rotate through ranges they rent. So Dropnet looks at the range.`;
   if (ev) {
     const max = Math.max(ev.dropnet.coverage, ev.blocklist_all_seen.coverage);
-    $("#eval-caption").innerHTML = `Rules learned from reports before ${esc(ev.split_day)} (${ev.train_reports.toLocaleString()}), scored
-      on the ${ev.test_reports.toLocaleString()} reports that came after:`;
-    $("#eval-bars").innerHTML = hbar(`Every number ever reported (${ev.blocklist_all_seen.rules.toLocaleString()} rules)`, ev.blocklist_all_seen.coverage, max)
-      + hbar(`Blocklist, ≥2 reports (${ev.baseline.rules.toLocaleString()})`, ev.baseline.coverage, max)
-      + (ev.dropnet_geographic ? hbar(`<b>Dropnet</b>, geographic pools only (+${ev.dropnet_geographic.block_rules.toLocaleString()})`, ev.dropnet_geographic.coverage, max, true) : "")
-      + hbar(`<b>Dropnet</b>, all pools incl. toll-free (+${ev.dropnet.block_rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
-      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} catches came from numbers nobody had reported before. The price:
-        a block rule silences all 10,000 numbers of its range, and toll-free ranges are shared by many businesses.</p>`;
+    $("#eval-caption").innerHTML = `Rules learned from the ${fmt(ev.train_reports)} reports before ${day(ev.split_day)}, then
+      tested on the ${fmt(ev.test_reports)} that came after.`;
+    $("#eval-bars").innerHTML = hbar(`Block every number ever reported`, ev.blocklist_all_seen.coverage, max)
+      + hbar(`Block numbers with 2+ reports`, ev.baseline.coverage, max)
+      + (ev.dropnet_geographic ? hbar(`Dropnet: also block ${fmt(ev.dropnet_geographic.block_rules)} local ranges`, ev.dropnet_geographic.coverage, max, true) : "")
+      + hbar(`Dropnet: plus toll-free ranges`, ev.dropnet.coverage, max, true);
+    const rb = ev.robustness;
+    $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} of the calls caught came from numbers nobody had
+      reported yet.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet caught at
+      least ${rb.rolling_summary.min_lift.toFixed(1)} times as many calls every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""} The price: a range rule silences all
+      10,000 numbers in it, so this is a ranking for a carrier to decide on, not an automatic block.`;
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
-    .map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
-  $("#source").textContent = `${data.source}. ${data.caution}`;
+    .map((p) => hbar(esc(LABEL[p.subject] || p.label), p.neighbor_share, 1)).join("");
+  $("#source").textContent = data.caution;
 }
 
 function loadGraph() {
@@ -69,39 +75,43 @@ function loadGraph() {
        MATCH (s:${label}) WITH xs, s ORDER BY s.idx WITH xs, collect(s) AS ss
        UNWIND $e AS e WITH xs[e[0]] AS x, ss[e[1]] AS s, e[2] AS c CREATE (x)-[:${rel} {reports: c}]->(s)`, { e: edges });
   }
-  const counts = q("MATCH (n) RETURN count(n) AS nodes")[0].nodes;
+  const nodes = q("MATCH (n) RETURN count(n) AS nodes")[0].nodes;
   const rels = q("MATCH ()-[r]->() RETURN count(r) AS rels")[0].rels;
-  $("#engine").textContent = `Relate WASM · ${counts.toLocaleString()} nodes · ${rels.toLocaleString()} relationships · loaded in ${Math.round(performance.now() - t0)} ms`;
+  const ms = Math.round(performance.now() - t0);
+  $("#engine").textContent = `Relate running in your browser: ${fmt(nodes)} nodes and ${fmt(rels)} relationships${ms ? `, loaded in ${fmt(ms)} ms` : ""}`;
 }
 
 function renderNetworkAndWhatIf() {
   const n = (data.networks || [])[0];
   if (n) {
-    $("#net-panel").style.display = "";
-    $("#net-panel").innerHTML = `<h2>One operation, ${n.pools} number ranges</h2>
-      <p class="muted">Ranges that hit the same victims' area codes, on the same days, with the same scam type — linked by
-      multi-hop paths in the graph. <b>${n.reports.toLocaleString()}</b> reports.</p>
-      <div class="whatif-pick">${n.members.map((m) => `<label data-id="${esc(m.id)}" style="cursor:pointer">${esc(m.id.replace("POOL-", ""))} · ${m.reports.toLocaleString()}</label>`).join("")}</div>`;
-    $("#net-panel").querySelectorAll("label[data-id]").forEach((l) => l.addEventListener("click", () => openPool(l.dataset.id)));
+    const el = $("#net-panel");
+    el.hidden = false;
+    el.innerHTML = `<h2>One operation behind ${n.pools} ranges</h2>
+      <p class="quiet">These ranges called the same area codes on the same days with the same scam: ${fmt(n.reports)} reports
+      in all, linked by paths in the graph. Open one to see its numbers.</p>
+      <ul class="chips">${n.members.map((m) => `<li><button data-id="${esc(m.id)}"><b>${esc(rangeOf(m.id.replace("POOL-", "")))}</b> ${fmt(m.reports)} reports</button></li>`).join("")}</ul>`;
+    el.querySelectorAll("button[data-id]").forEach((b) => b.addEventListener("click", () => { openPool(b.dataset.id); $(".pools").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); }));
   }
   const top = q("MATCH (c:Pool) RETURN c.id AS id, c.reports AS r ORDER BY r DESC LIMIT 12");
-  $("#whatif").innerHTML = `<h2>What if a carrier blocked these ranges?</h2>
-    <div class="whatif-pick">${top.map((c, i) => `<label><input type="checkbox" value="${esc(c.id)}" ${i < 3 ? "checked" : ""}> ${esc(c.id.replace("POOL-", ""))}</label>`).join("")}</div>
-    <button class="primary" id="wi-go">Run in the browser</button> <span class="muted">Cypher on the in-browser Relate graph.</span><div id="wi-out"></div>`;
+  $("#whatif").innerHTML = `<h2>What if a carrier had blocked these ranges?</h2>
+    <p class="quiet">Pick ranges and count the reported calls they would have stopped. The count runs as Cypher on this page.</p>
+    <ul class="chips">${top.map((c, i) => `<li><label><input type="checkbox" value="${esc(c.id)}" ${i < 3 ? "checked" : ""}> <b>${esc(rangeOf(c.id.replace("POOL-", "")))}</b></label></li>`).join("")}</ul>
+    <button class="go small" id="wi-go">Count the calls stopped</button><div id="wi-out"></div>`;
   $("#wi-go").addEventListener("click", () => {
     const ids = [...document.querySelectorAll("#whatif input:checked")].map((x) => x.value);
     const r = q(`MATCH (c:Pool) WHERE c.id IN $ids
-                 RETURN count(c) AS rules, sum(c.reports) AS reports, sum(c.numbers) AS numbers, sum(c.states) AS st`, { ids })[0];
-    $("#wi-out").innerHTML = `<p><b>${(r.reports || 0).toLocaleString()}</b> reports from <b>${(r.numbers || 0).toLocaleString()}</b>
-      reported numbers would have been stopped by ${r.rules} block rule${r.rules === 1 ? "" : "s"} — at the price of
-      ${(r.rules * 10000).toLocaleString()} numbers silenced (each block = 10,000 numbers). A carrier's call, not ours.</p>`;
+                 RETURN count(c) AS rules, sum(c.reports) AS reports, sum(c.numbers) AS numbers`, { ids })[0];
+    $("#wi-out").innerHTML = r.rules ? `<p><b>${fmt(r.reports)}</b> reported calls from <b>${fmt(r.numbers)}</b> different numbers
+      would have been stopped by ${r.rules} rule${r.rules === 1 ? "" : "s"}. The price: ${fmt(r.rules * 10000)} numbers silenced,
+      some of them belonging to legitimate callers. That decision belongs to the carrier.</p>`
+      : `<p class="quiet">Pick at least one range.</p>`;
   });
 }
 
 function renderList() {
   const pools = q("MATCH (c:Pool) RETURN c.id AS id, c.numbers AS numbers, c.reports AS reports, c.states AS states, c.toll_free AS tf ORDER BY reports DESC LIMIT 40");
-  $("#list").innerHTML = pools.map((c) => `<button class="camp-card" data-id="${esc(c.id)}"><div class="id">${esc(c.id.replace("POOL-", "Pool "))}</div>
-    <div class="meta">${c.numbers} numbers · ${c.reports.toLocaleString()} reports · ${c.states} states${c.tf ? " · toll-free" : ""}</div></button>`).join("");
+  $("#list").innerHTML = pools.map((c) => `<li><button class="camp-card" data-id="${esc(c.id)}"><div class="id">${esc(rangeOf(c.id.replace("POOL-", "")))}</div>
+    <div class="meta">${fmt(c.reports)} reports from ${c.numbers} numbers, ${c.states} states${c.tf ? ", toll-free" : ""}</div></button></li>`).join("");
   $("#list").querySelectorAll(".camp-card").forEach((b) => b.addEventListener("click", () => openPool(b.dataset.id)));
   if (pools.length) openPool(pools[0].id);
 }
@@ -110,9 +120,8 @@ function openPool(id) {
   document.querySelectorAll("#list .camp-card").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
   const c = q("MATCH (c:Pool {id: $id}) RETURN c.numbers AS numbers, c.reports AS reports, c.states AS states, c.first_day AS f, c.last_day AS l", { id })[0];
   const blk = id.replace("POOL-", "");
-  $("#head").innerHTML = `<h2>${esc(blk.slice(0, 3))}-${esc(blk.slice(3))}-xxxx</h2><span class="badge">${c.numbers} numbers</span>
-    <span class="badge">${c.reports.toLocaleString()} reports</span><span class="badge">${c.states} states</span>
-    <span class="badge">${esc(c.f || "")} → ${esc(c.l || "")}</span>`;
+  $("#head").innerHTML = `<h3>${esc(rangeOf(blk))}</h3><span>${fmt(c.reports)} reports</span><span>${c.numbers} numbers</span>
+    <span>${c.states} states</span><span>${day(c.f)} to ${day(c.l)}</span>`;
   const nums = q(`MATCH (:Pool {id: $id})-[:USES_BLOCK]->(b:Block)<-[:IN_BLOCK]-(n:Number) RETURN b.npa_nxx AS b, n.number AS n, n.reports AS r`, { id });
   const states = q(`MATCH (:Pool {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)-[r:CALLED_INTO]->(s:State)
                     RETURN n.number AS n, s.name AS s, r.reports AS c ORDER BY c DESC`, { id });
@@ -120,11 +129,11 @@ function openPool(id) {
                   RETURN n.number AS n, s.code AS s, r.reports AS c`, { id });
   const topStates = new Set(Object.entries(states.reduce((m, x) => ((m[x.s] = (m[x.s] || 0) + x.c), m), {}))
     .sort((a, b) => b[1] - a[1]).slice(0, 12).map(([s]) => s));
-  const C = { Block: css("--c-cashout"), Number: css("--c-card"), State: css("--c-phone"), Subject: css("--c-persona") };
+  const C = { Block: css("--c-block"), Number: css("--c-number"), State: css("--c-state"), Subject: css("--c-subject") };
   const nodes = new Map(), edges = [];
   const add = (i, kind, label, w) => nodes.has(i) || nodes.set(i, { data: { id: i, kind, label, color: C[kind], w } });
   for (const x of nums) {
-    add("B" + x.b, "Block", `${x.b.slice(0, 3)}-${x.b.slice(3)}`, 40);
+    add("B" + x.b, "Block", rangeOf(x.b), 40);
     add("N" + x.n, "Number", x.n.slice(-4), 8 + Math.min(26, Math.sqrt(x.r) * 2));
     edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "B" + x.b, type: "IN_BLOCK" } });
   }
@@ -132,70 +141,141 @@ function openPool(id) {
   for (const x of subj) { add("T" + x.s, "Subject", LABEL[x.s] || x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "T" + x.s, type: "ABOUT" } }); }
   if (cy) cy.destroy();
   cy = cytoscape({ container: $("#ftc-graph"), elements: [...nodes.values(), ...edges], wheelSensitivity: 0.25,
-    style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)", "font-size": 9, color: css("--ink") } },
-      { selector: "node[kind = 'Block'], node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle" } },
-      { selector: "edge", style: { width: 1, "line-color": css("--line"), "curve-style": "haystack" } },
-      { selector: "edge[type = 'IN_BLOCK']", style: { width: 2, "line-color": C.Block } }],
-    layout: { name: "cose", animate: false, nodeRepulsion: 12000, idealEdgeLength: 60, padding: 24 } });
-  cy.on("tap", "node[kind = 'Number']", (e) => check(e.target.id().slice(1)));
-  $("#legend").innerHTML = [["Block (NPA-NXX)", C.Block], ["Reported number", C.Number], ["Victim state", C.State], ["Scam type", C.Subject]]
-    .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("") + "<span>node size = reports</span>";
+    style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)",
+        "font-size": 9, "font-family": "Archivo, sans-serif", color: css("--ink"), "text-valign": "bottom", "text-margin-y": 3 } },
+      { selector: "node[kind = 'Block'], node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 11, "font-weight": 700 } },
+      { selector: "node[kind = 'Number']", style: { label: "" } },
+      { selector: "edge", style: { width: 1, "line-color": css("--rule"), "curve-style": "haystack" } },
+      { selector: "edge[type = 'IN_BLOCK']", style: { width: 1.5, "line-color": css("--muted") } }],
+    layout: { name: "cose", animate: false, nodeRepulsion: 14000, idealEdgeLength: 70, padding: 24 } });
+  cy.on("tap", "node[kind = 'Number']", (e) => { check(e.target.id().slice(1)); $(".hero").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); });
+  $("#legend").innerHTML = [["Range", C.Block], ["Reported number (tap to check)", C.Number], ["State called", C.State], ["Scam type", C.Subject]]
+    .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
 }
 
-// Every reported number + every pool block (docs/data/lookup.txt, ~1 MB gzipped), fetched on the first check only.
-let lookup = null;
-async function loadLookup() {
-  if (lookup) return lookup;
-  const text = await (await fetch("data/lookup.txt")).text();
-  const nums = new Map(), blocks = new Map();
-  let span = "";
-  for (const line of text.split(/\r?\n/)) {
-    if (!line) continue;
-    if (line[0] === "#") { span = line.split(" ").slice(4, 6).join(" to "); continue; }
-    const p = line.split(" ");
-    if (p[0] === "B") blocks.set(p[1], { numbers: +p[2], reports: +p[3] });
-    else nums.set(p[0], { reports: +p[1], code: p[2] });
-  }
-  return (lookup = { nums, blocks, span });
+// ---- the hero: one number, and the 10,000-number range it belongs to ----
+// docs/data/lookup.txt: every reported number + every pool block (~1 MB gzipped), fetched once.
+let lookupPromise = null;
+function loadLookup() {
+  return lookupPromise ??= fetch("data/lookup.txt").then((r) => r.text()).then((text) => {
+    const nums = new Map(), blocks = new Map(), byBlock = new Map();
+    let span = "";
+    for (const line of text.split(/\r?\n/)) {
+      if (!line) continue;
+      if (line[0] === "#") { const [a, b] = line.split(" ").slice(4, 6); span = `${day(a)} and ${day(b, true)}`; continue; }
+      const p = line.split(" ");
+      if (p[0] === "B") { blocks.set(p[1], { numbers: +p[2], reports: +p[3] }); continue; }
+      const rec = { reports: +p[1], code: p[2] };
+      nums.set(p[0], rec);
+      const b = p[0].slice(0, 6);
+      if (!byBlock.has(b)) byBlock.set(b, []);
+      byBlock.get(b).push([+p[0].slice(6), rec]);
+    }
+    return { nums, blocks, byBlock, span };
+  });
 }
+
+const grid = { block: null, cells: null, focus: -1 };
+function drawGrid(L, block, focus, animate) {
+  const cv = $("#grid"), ctx = cv.getContext("2d"), N = 100, s = cv.width / N;
+  const rows = L.byBlock.get(block) || [];
+  grid.block = block; grid.focus = focus;
+  grid.cells = new Map(rows.map(([i, r]) => [i, r]));
+  const col = { rep: css("--signal"), spoof: css("--clear"), dim: css("--dim"), paper: css("--paper"), ink: css("--ink") };
+  const paintBase = () => {
+    ctx.fillStyle = col.paper; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = col.dim;
+    for (let i = 0; i < N * N; i++) ctx.fillRect((i % N) * s, Math.floor(i / N) * s, s - 1, s - 1);
+  };
+  const paint = (upto) => {
+    for (let k = 0; k < upto; k++) {
+      const [i, r] = rows[k];
+      ctx.fillStyle = r.code === "s" ? col.spoof : col.rep;
+      ctx.fillRect((i % N) * s, Math.floor(i / N) * s, s - 1, s - 1);
+    }
+  };
+  const ring = () => {
+    if (focus < 0) return;
+    ctx.strokeStyle = col.ink; ctx.lineWidth = 2;
+    ctx.strokeRect((focus % N) * s - 3, Math.floor(focus / N) * s - 3, s + 5, s + 5);
+  };
+  paintBase();
+  if (!animate || reducedMotion || !rows.length) { paint(rows.length); ring(); return; }
+  // the one moment of motion on the page: the reported numbers of this range light up
+  rows.sort(() => Math.random() - 0.5);
+  const t0 = performance.now(), dur = 650;
+  (function step(t) {
+    const k = Math.min(rows.length, Math.ceil(rows.length * Math.min(1, (t - t0) / dur)));
+    paintBase(); paint(k);
+    if (k < rows.length) requestAnimationFrame(step); else ring();
+  })(t0);
+}
+
+function caption(L, block) {
+  const rows = L.byBlock.get(block) || [], b = L.blocks.get(block);
+  const reported = rows.length, spoof = rows.filter(([, r]) => r.code === "s").length;
+  const reports = rows.reduce((a, [, r]) => a + r.reports, 0);
+  $("#grid-cap").innerHTML = reported
+    ? `<b>${esc(rangeOf(block))}</b>: ${reported === 1 ? "1 of its 10,000 numbers was" : `${fmt(reported)} of its 10,000 numbers were`}
+       reported, ${reports === 1 ? "once" : `${fmt(reports)} times in all`}.
+       ${b ? "Dropnet marks it as a rented range." : spoof === reported ? "Every report had a faked local caller ID, so Dropnet does not mark it." : "Too few numbers for Dropnet to mark it as a rented range."}`
+    : `<b>${esc(rangeOf(block))}</b>: none of its 10,000 numbers were reported.`;
+}
+
 const VERDICT = {
-  s: ["likely_spoofed", "Likely spoofed", "Reported only from the victim's own area code: the caller faked this number to look local. Its real owner is probably innocent — don't blame them, and don't call back."],
-  p: ["pool", "Part of a rented number pool", "This number sits in a range that scammers rotate through. Blocking the whole range stops numbers that haven't been reported yet."],
-  r: ["pool", "Reported again and again", "One number reported many times from other area codes."],
+  s: ["likely_spoofed", "Probably a faked caller ID", "Every report came from the victim's own area code, which is how spoofers make a call look local. The person who owns this number is probably innocent. Don't call it back to complain."],
+  p: ["pool", "Part of a rented scam range", "This number sits in a range scammers rotate through. Blocking the range stops numbers that haven't been reported yet."],
+  r: ["pool", "Reported again and again", "People in other area codes reported this one number many times."],
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
-async function check(raw) {
-  const n = String(raw).replace(/\D/g, "").slice(-10);
-  if (n.length !== 10) { $("#num-out").innerHTML = `<p class="muted">Enter a 10-digit US number.</p>`; return; }
-  $("#num-in").value = n.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
-  history.replaceState(null, "", "?n=" + n + location.hash);
-  $("#num-out").innerHTML = `<p class="muted">Checking ${data.summary.numbers.toLocaleString()} reported numbers…</p>`;
+async function check(raw, example = false) {
+  const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "").slice(-10);
+  if (n.length !== 10) { $("#num-out").innerHTML = `<p>Enter a 10-digit US number, like 866-771-6581.</p>`; return; }
+  if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
   let L;
-  try { L = await loadLookup(); } catch (e) { $("#num-out").innerHTML = `<p class="muted">Could not load the lookup file.</p>`; return; }
+  try { L = await loadLookup(); } catch { $("#num-out").innerHTML = `<p>The list of reported numbers didn't load. Check your connection and try again.</p>`; return; }
   const hit = L.nums.get(n), block = L.blocks.get(n.slice(0, 6));
-  const range = n.replace(/(\d{3})(\d{3})\d{4}/, "$1-$2-xxxx");
+  drawGrid(L, n.slice(0, 6), example ? -1 : +n.slice(6), true);
+  caption(L, n.slice(0, 6));
+  if (example) return;
   let html;
   if (hit) {
     const [cls, title, why] = VERDICT[hit.code] || VERDICT["1"];
-    html = `<p class="verdict ${cls}">${title}</p><p>${hit.reports.toLocaleString()} report${hit.reports > 1 ? "s" : ""} to the FTC (${esc(L.span)}). ${why}</p>`;
-    if (block && hit.code !== "s") html += `<p>Range ${range}: ${block.numbers.toLocaleString()} numbers, ${block.reports.toLocaleString()} reports.</p>`;
+    html = `<p class="verdict ${cls}">${title}</p><p>Reported ${fmt(hit.reports)} time${hit.reports > 1 ? "s" : ""} to the FTC between ${esc(L.span)}. ${why}</p>`;
   } else if (block) {
-    html = `<p class="verdict pool">Never reported — but its range is a rented pool</p><p>${range} has ${block.numbers.toLocaleString()} reported numbers and
-      ${block.reports.toLocaleString()} reports.${data.eval && data.eval.dropnet ? ` In our hold-out test, ${data.eval.dropnet.new_numbers_caught.toLocaleString()} later
-      complaints came from numbers like this: never reported before, but inside a known pool.` : ""}</p>`;
+    html = `<p class="verdict pool">Never reported, but it sits in a rented scam range</p><p>${fmt(block.numbers)} numbers from
+      ${esc(rangeOf(n.slice(0, 6)))} were reported ${fmt(block.reports)} times.${data.eval ? ` In our test, ${fmt(data.eval.dropnet.new_numbers_caught)} later calls came from numbers like this one.` : ""}</p>`;
   } else {
-    html = `<p class="verdict">No FTC reports for this number or its range</p><p class="muted">${esc(L.span)}. That is not proof it is safe.</p>`;
+    html = `<p class="verdict">No reports for this number or its range</p><p class="quiet">Between ${esc(L.span)}. That doesn't prove the call was safe.</p>`;
   }
-  $("#num-out").innerHTML = html + `<p class="muted"><a href="?n=${n}">Link to this result</a> · <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">Report a call to the FTC</a></p><div class="caution">${esc(data.caution)}</div>`;
+  $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
+    <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`
+    + (hit && hit.code === "s" ? "" : `<div class="caution">${esc(data.caution)}</div>`);
 }
-$("#num-go").addEventListener("click", () => check($("#num-in").value));
-$("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") check($("#num-in").value); });
+$("#num-form").addEventListener("submit", (e) => { e.preventDefault(); check($("#num-in").value); });
+
+// hover and click on the range: every cell is a phone number
+const tip = $("#grid-tip");
+$("#grid").addEventListener("mousemove", (e) => {
+  if (!grid.block) return;
+  const r = e.target.getBoundingClientRect(), x = Math.floor(((e.clientX - r.left) / r.width) * 100), y = Math.floor(((e.clientY - r.top) / r.height) * 100);
+  const i = y * 100 + x, rec = grid.cells.get(i), num = `${grid.block.slice(0, 3)}-${grid.block.slice(3)}-${String(i).padStart(4, "0")}`;
+  tip.hidden = false;
+  tip.style.left = `${e.clientX - r.left}px`; tip.style.top = `${e.clientY - r.top}px`;
+  tip.textContent = rec ? `${num}: ${fmt(rec.reports)} report${rec.reports > 1 ? "s" : ""}${rec.code === "s" ? ", faked caller ID" : ""}` : `${num}: not reported`;
+});
+$("#grid").addEventListener("mouseleave", () => { tip.hidden = true; });
+$("#grid").addEventListener("click", (e) => {
+  if (!grid.block) return;
+  const r = e.target.getBoundingClientRect(), x = Math.floor(((e.clientX - r.left) / r.width) * 100), y = Math.floor(((e.clientY - r.top) / r.height) * 100);
+  check(grid.block + String(y * 100 + x).padStart(4, "0"));
+});
 
 const QUERIES = [
-  ["Biggest pools", "MATCH (c:Pool)-[:USES_BLOCK]->(b:Block)\nRETURN b.npa_nxx AS block, c.numbers AS numbers, c.reports AS reports\nORDER BY reports DESC LIMIT 10"],
-  ["Pools hitting most states", "MATCH (c:Pool)-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(:Number)-[:CALLED_INTO]->(s:State)\nRETURN c.id AS pool, count(DISTINCT s) AS states ORDER BY states DESC LIMIT 10"],
-  ["Scam types by pool reports", "MATCH (:Number)-[r:ABOUT]->(s:Subject)\nRETURN s.code AS scam_type, sum(r.reports) AS reports ORDER BY reports DESC"],
-  ["Toll-free vs local pools", "MATCH (c:Pool)\nRETURN c.toll_free AS toll_free, count(c) AS pools, sum(c.reports) AS reports"],
+  ["Biggest ranges", "MATCH (c:Pool)-[:USES_BLOCK]->(b:Block)\nRETURN b.npa_nxx AS block, c.numbers AS numbers, c.reports AS reports\nORDER BY reports DESC LIMIT 10"],
+  ["Ranges reaching the most states", "MATCH (c:Pool)-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(:Number)-[:CALLED_INTO]->(s:State)\nRETURN c.id AS pool, count(DISTINCT s) AS states ORDER BY states DESC LIMIT 10"],
+  ["Scam types in these ranges", "MATCH (:Number)-[r:ABOUT]->(s:Subject)\nRETURN s.code AS scam_type, sum(r.reports) AS reports ORDER BY reports DESC"],
+  ["Toll-free or local", "MATCH (c:Pool)\nRETURN c.toll_free AS toll_free, count(c) AS pools, sum(c.reports) AS reports"],
 ];
 $("#q-samples").innerHTML = QUERIES.map(([l], i) => `<button data-i="${i}">${esc(l)}</button>`).join("");
 $("#q-samples").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { $("#q-text").value = QUERIES[b.dataset.i][1]; run(); }));
@@ -203,13 +283,13 @@ $("#q-text").value = QUERIES[0][1];
 function run() {
   const t0 = performance.now();
   try {
-    if (/\b(CREATE|MERGE|DELETE|SET|REMOVE|DROP)\b/i.test($("#q-text").value)) throw new Error("This demo console is read-only.");
+    if (/\b(CREATE|MERGE|DELETE|SET|REMOVE|DROP)\b/i.test($("#q-text").value)) throw new Error("This console only reads. Remove CREATE, MERGE, SET, DELETE, REMOVE or DROP and run it again.");
     const rows = q($("#q-text").value);
     const cols = rows.length ? Object.keys(rows[0]) : [];
-    $("#q-meta").textContent = `${rows.length} rows · ${(performance.now() - t0).toFixed(1)} ms in your browser`;
+    $("#q-meta").textContent = `${rows.length} rows in ${(performance.now() - t0).toFixed(1)} ms`;
     $("#q-out").innerHTML = rows.length ? `<table class="grid"><thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>`
-      + rows.map((r) => `<tr>${cols.map((c) => `<td class="mono">${esc(typeof r[c] === "object" ? JSON.stringify(r[c]) : r[c])}</td>`).join("")}</tr>`).join("")
-      + "</tbody></table>" : `<p class="muted">No rows.</p>`;
+      + rows.map((r) => `<tr>${cols.map((c) => `<td>${esc(typeof r[c] === "object" ? JSON.stringify(r[c]) : r[c])}</td>`).join("")}</tr>`).join("")
+      + "</tbody></table>" : `<p class="quiet">The query returned no rows.</p>`;
   } catch (e) { $("#q-meta").textContent = ""; $("#q-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 }
 $("#q-go").addEventListener("click", run);
@@ -217,12 +297,12 @@ $("#q-go").addEventListener("click", run);
 (async function boot() {
   data = await (await fetch("data/graph.json")).json();
   renderStatic();
+  const shared = new URLSearchParams(location.search).get("n");
+  check(shared || "8667716581", !shared);  // the hero works before the graph engine has loaded
   await init();
   db = new RelateDb();
   loadGraph();
   renderList();
   renderNetworkAndWhatIf();
   run();
-  const shared = new URLSearchParams(location.search).get("n");
-  if (shared) { $(".lookup").scrollIntoView({ block: "center" }); check(shared); }
-})().catch((e) => { $("#engine").textContent = "Error: " + e.message; console.error(e); });
+})().catch((e) => { $("#engine").textContent = "Relate didn't start: " + e.message; console.error(e); });

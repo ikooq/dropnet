@@ -3,60 +3,85 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dropnet — live demo</title>
-  <meta name="description" content="Real FTC phone-scam reports in a Relate graph running in your browser (WebAssembly).">
-  <link rel="stylesheet" href="style.css">
+  <title>Dropnet</title>
+  <meta name="description" content="Check a phone number against every scam call reported to the FTC. Dropnet finds the rented number ranges behind the calls, in a Relate graph running in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+  <link rel="stylesheet" href="style.css?v=6">
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
 </head>
 <body>
 <header class="top">
-  <div class="brand">
-    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-      <circle cx="5" cy="6" r="3" class="g-a"/><circle cx="21" cy="5" r="3" class="g-a"/>
-      <circle cx="6" cy="21" r="3" class="g-a"/><circle cx="14" cy="14" r="4" class="g-b"/>
-      <path d="M7.5 7.5 11 11M18.5 6.5 16.5 11M8 19 11 16.5" class="g-l"/>
-    </svg>
-    <div><div class="name">Dropnet</div><div class="tag">Scattered scam reports → connected campaigns</div></div>
-  </div>
-  <span class="badge" id="engine">Starting Relate in your browser…</span>
-  <a class="badge" href="https://github.com/ikooq/dropnet" id="repo-link" target="_blank" rel="noopener">Source &amp; full app</a>
+  <a class="brand" href="./">Dropnet</a>
+  <span class="engine" id="engine">Starting Relate in your browser</span>
+  <a class="repo" href="https://github.com/ikooq/dropnet" target="_blank" rel="noopener">Source and full app on GitHub</a>
 </header>
+
 <main>
-  <p class="lede" id="lede">Loading real reports…</p>
-  <div class="kpis" id="kpis"></div>
-  <div class="split2">
-    <div class="panel"><h2>Blocklists can't keep up</h2><p class="muted" id="eval-caption"></p><div id="eval-bars"></div></div>
-    <div class="panel"><h2>Spoofed to look local</h2>
-      <p class="muted">Share of reports whose caller number carries the victim's own area code. Those numbers usually
-        belong to innocent people, so Dropnet never recommends blocking them.</p><div id="spoof-bars"></div></div>
-  </div>
-  <div class="panel" id="net-panel" style="margin-bottom:18px;display:none"></div>
-  <div class="panel" id="whatif" style="margin-bottom:18px"></div>
-  <div class="panel lookup">
-    <h2>Did this number call you?</h2>
-    <p class="muted">Checks every number reported to the FTC and every rented number range — in your browser, nothing is sent.</p>
-    <div class="row"><input id="num-in" placeholder="e.g. 833-766-1884" inputmode="tel"><button class="primary" id="num-go">Check</button></div>
-    <div id="num-out"></div>
-  </div>
-  <div class="camp-layout">
-    <aside class="camp-list" id="list"></aside>
-    <div class="camp-main">
-      <div class="camp-head" id="head"></div>
-      <div class="graph-wrap"><div id="ftc-graph"></div><div class="legend" id="legend"></div></div>
+  <section class="hero">
+    <div class="ask">
+      <h1>Did this number call&nbsp;you?</h1>
+      <form class="dial" id="num-form" autocomplete="off">
+        <label class="sr" for="num-in">Phone number</label>
+        <input id="num-in" placeholder="866-771-6581" inputmode="tel" maxlength="16">
+        <button class="go" id="num-go" type="submit">Check</button>
+      </form>
+      <div id="num-out" aria-live="polite"><p class="quiet" id="num-hint">Checks every number reported to the FTC and every
+        rented number range. It runs in your browser; the number never leaves it.</p></div>
     </div>
-  </div>
-  <div class="panel" style="margin-top:18px">
-    <h2>Ask the graph (Cypher, in your browser)</h2>
-    <p class="muted">This page loaded the 200 biggest number pools into an in-memory Relate database compiled to
-      WebAssembly. Queries run locally — nothing is sent anywhere.</p>
+    <figure class="range">
+      <canvas id="grid" width="500" height="500" aria-label="The 10,000 numbers of this range"></canvas>
+      <figcaption id="grid-cap"></figcaption>
+      <div class="key"><span><i class="k-rep"></i>reported</span><span><i class="k-spoof"></i>faked caller ID, owner probably innocent</span><span><i class="k-none"></i>not reported</span></div>
+      <div class="tip" id="grid-tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="thesis">
+    <p id="lede">Loading real reports</p>
+  </section>
+
+  <section class="evidence">
+    <div>
+      <h2>A blocklist of numbers stays one step behind</h2>
+      <p class="quiet" id="eval-caption"></p>
+      <div id="eval-bars"></div>
+      <p class="quiet" id="eval-note"></p>
+    </div>
+    <div>
+      <h2>Faked to look local</h2>
+      <p class="quiet">Share of reports where the caller ID carried the victim's own area code. Those numbers belong to
+        innocent people, so Dropnet never proposes blocking them.</p>
+      <div id="spoof-bars"></div>
+    </div>
+  </section>
+
+  <section id="net-panel" hidden></section>
+  <section id="whatif"></section>
+
+  <section class="pools">
+    <h2>The 200 biggest ranges, as a graph</h2>
+    <p class="quiet">Each range with its reported numbers, the states they called into and the scam types people reported.</p>
+    <div class="camp-layout">
+      <ol class="camp-list" id="list"></ol>
+      <div class="camp-main">
+        <div class="camp-head" id="head"></div>
+        <div class="graph-wrap"><div id="ftc-graph"></div><div class="legend" id="legend"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="console">
+    <h2>Ask the graph in Cypher</h2>
+    <p class="quiet">These ranges sit in an in-memory Relate database compiled to WebAssembly. Queries run on this page.</p>
     <div class="samples" id="q-samples"></div>
-    <textarea id="q-text" rows="5" spellcheck="false"></textarea>
-    <div class="row"><button class="primary" id="q-go">Run</button><span class="muted" id="q-meta"></span></div>
+    <textarea id="q-text" rows="5" spellcheck="false" aria-label="Cypher query"></textarea>
+    <div class="row"><button class="go small" id="q-go">Run query</button><span class="quiet" id="q-meta"></span></div>
     <div id="q-out"></div>
-  </div>
-  <p class="muted small" id="source"></p>
+  </section>
 </main>
-<footer>Dropnet · <b>Relate</b> by Neo4j (WebAssembly build) · data: FTC Do Not Call complaint data (US public data)</footer>
-<script type="module" src="app.js"></script>
+<footer><p id="source"></p><p>Built on Relate by Neo4j, WebAssembly build. Data: FTC Do Not Call complaints, US public data.</p></footer>
+<script type="module" src="app.js?v=6"></script>
 </body>
 </html>

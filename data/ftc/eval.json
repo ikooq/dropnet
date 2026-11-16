@@ -142,5 +142,21 @@
     "random_blocks_coverage": 0.0436,
     "lift": 4.7,
     "dormant_share": 0.1665
+  },
+  "agent_eval": {
+    "sampled": 1000,
+    "seed": 0,
+    "verdicts": {
+      "single": 309,
+      "pool": 289,
+      "likely_spoofed": 395,
+      "repeat": 7
+    },
+    "naive_blames_likely_spoofed": 395,
+    "naive_blames_share": 0.395,
+    "naive_dismisses_pool_members": 246,
+    "naive_dismiss_share": 0.246,
+    "dropnet_flags_spoofed": 395,
+    "note": "Dropnet's hook and MCP tool return these verdicts with the spoofing caution before the agent answers."
   }
 }

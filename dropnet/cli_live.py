@@ -107,7 +107,27 @@ def cmd_site(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_agent_eval(a: argparse.Namespace) -> int:
+    from . import store
+    from .ftc import agent_eval, build
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        r = agent_eval.run(conn, n=a.n, seed=a.seed)
+    finally:
+        conn.close()
+    k = r["sampled"]
+    print(f"{k:,} random reported numbers. Without the graph, an agent that treats every reported number as a scammer "
+          f"would blame {r['naive_blames_likely_spoofed']:,} ({r['naive_blames_share']:.1%}) likely-spoofed numbers whose "
+          f"owners are probably innocent, and would dismiss {r['naive_dismisses_pool_members']:,} "
+          f"({r['naive_dismiss_share']:.1%}) once-reported numbers that belong to an active pool. Verdicts: {r['verdicts']}")
+    return 0
+
+
 def register(sub) -> None:
+    ae = sub.add_parser("ftc-agent-eval", help="naive agent vs Dropnet verdicts on random reported numbers")
+    ae.add_argument("--n", type=int, default=1000)
+    ae.add_argument("--seed", type=int, default=0)
+    ae.set_defaults(fn=cmd_agent_eval)
     st = sub.add_parser("site", help="export the browser demo data (docs/data/graph.json) from data/ftc.rl")
     st.add_argument("--top", type=int, default=200)
     st.set_defaults(fn=cmd_site)

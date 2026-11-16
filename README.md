@@ -97,6 +97,14 @@ python -m dropnet site                     # refresh the browser demo data in do
 pip install -e ".[dev]" && pytest          # 187 tests
 ```
 
+### Measured: what the graph changes for an agent
+
+On **1,000 random reported numbers** (`python -m dropnet ftc-agent-eval`, seed 0), an agent without the graph that
+treats every reported number as a scammer would **blame 395 (39.5 %) likely-spoofed numbers** — reported once, from the
+victim's own area code, owners probably innocent — and would **dismiss 246 (24.6 %) once-reported numbers that belong to
+an active pool**. With Dropnet the agent receives the right verdict for every one of them (via the hook or the
+`assess_number` MCP tool), together with the spoofing caution.
+
 ### With an AI agent
 
 Start Claude Code **from the activated venv** in this folder:

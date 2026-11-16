@@ -7,6 +7,8 @@ numbers can never keep up with — while refusing to blame the innocent people w
 **Try it without installing anything: https://ikooq.github.io/dropnet/**
 Relate runs in your browser as WebAssembly and loads the 200 biggest real pools in about a second.
 
+![Dropnet on 296,273 real FTC reports](docs/img/real-overview.png)
+
 ---
 
 ## Use case
@@ -103,7 +105,7 @@ Then: pick a pool, click a number, run **What-if**, check `833-766-1884`, downlo
 python -m dropnet ftc-eval                 # the hold-out table above, recomputed from data/ftc.rl
 python -m dropnet ftc-build --fetch        # re-download the FTC files and rebuild (needs the Relate CLI to compact)
 python -m dropnet site                     # refresh the browser demo data in docs/
-pip install -e ".[dev]" && pytest          # 187 tests
+pip install -e ".[dev]" && pytest          # 191 tests
 ```
 
 ### Measured: what the graph changes for an agent

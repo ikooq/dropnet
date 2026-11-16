@@ -19,6 +19,14 @@ scam types and victims in dozens of states. A pool is invisible in any single re
   ever reported (163,606 rules) 6.2 %; those numbers plus 2,872 geographic pool ranges 14.3 % (22.0 % with toll-free
   ranges). 17,532 catches came from numbers nobody had reported before. We show the price too: a range rule silences
   10,000 numbers, so Dropnet ranks ranges for a carrier's decision rather than blocking anything.
+- **Pools are signal, not noise.** Control: the same number of *random* reported blocks catches 4.4 % of later reports;
+  the pool blocks catch 20.3 % — a 4.7× lift. 83 % of pool rules caught at least one later report.
+- **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported
+  number as a scammer would blame 395 (39.5 %) likely-spoofed numbers whose owners are probably innocent, and dismiss
+  246 (24.6 %) once-reported numbers that belong to an active pool. With Dropnet's hook / MCP tool it gets the right
+  verdict for each, with the caution.
+- **One operation, fifteen ranges.** Linking pools by multi-hop paths (same victim area code, same day, same scam)
+  finds one network of 15 number ranges behind 11,071 reports.
 - **Spoofing-aware by design.** Pools are built only from non-spoofed reports, so Dropnet never proposes blocking the
   local ranges spoofers hide in. `assess_number` labels a one-off local number "likely spoofed" and says so.
 - **What-if in a transaction.** Pick pools, ask what blocking them on day one would have stopped: Dropnet writes the
@@ -35,7 +43,7 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 Python + `relate-db` (embedded). FTC daily CSVs → parse → batched `UNWIND`/`MERGE` into a directory store with range
 indexes (296k reports in ~2 min) → campaign detection as Cypher aggregations → `relate clone --to-snapshot-format
 parquet` compacts it to a 40 MB single file committed to the repo. FastAPI + cytoscape.js UI, MCP server (official
-SDK), a Claude Code hook, and a static page with `@relate/relate-wasm`. 187 tests.
+SDK), a Claude Code hook, and a static page with `@relate/relate-wasm`. 191 tests.
 
 ## Challenges
 - The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB.

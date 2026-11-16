@@ -71,6 +71,17 @@ On the real data this finds **one network of 15 ranges behind 11,071 reports**, 
 toll-free ranges (866-386 and 877-578) struck the same area codes on the same day 23 times. Looser settings glue
 hundreds of pools into one meaningless blob — the thresholds are chosen to avoid that (`dropnet/ftc/networks.py`).
 
+## The case file is a graph: a markdown vault
+
+`python -m dropnet vault` writes the 50 biggest pools, their blocks, scam types and the pool network as plain markdown
+notes in `data/vault/` — one note per node, frontmatter wikilinks per relationship. Relate opens the folder as a graph,
+Obsidian opens it as a notebook, and an analyst's edit (a finding, `status: closed`) is in the graph at the next open:
+
+```bash
+relate --snapshot-format markdown --markdown-body-properties text --database data/vault   query "MATCH (p:Pool)-[:IN_NETWORK]->(n:Network) RETURN n.name, count(p), sum(p.reports)"
+# NET-217863, 14, 10883
+```
+
 ## How it uses Relate
 
 - **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,

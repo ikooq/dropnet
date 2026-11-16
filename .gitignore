@@ -8,3 +8,6 @@ __pycache__/
 data/live/
 *.egg-info/
 .claude/launch.json
+data/vault/.cypherlite*
+data/vault/index.md
+data/vault/log.md

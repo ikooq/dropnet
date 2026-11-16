@@ -123,7 +123,24 @@ def cmd_agent_eval(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_vault(a: argparse.Namespace) -> int:
+    from . import config, store
+    from .ftc import build, vault
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        r = vault.export(conn, a.out or config.DATA_DIR / "vault", top=a.top)
+    finally:
+        conn.close()
+    print(f"{r['pools']} pools, {r['networks']} networks -> {r['path']}  "
+          f"(open: relate --snapshot-format markdown --markdown-body-properties text --database {r['path']})")
+    return 0
+
+
 def register(sub) -> None:
+    vt = sub.add_parser("vault", help="export the top pools as a markdown vault Relate opens as a graph")
+    vt.add_argument("--out")
+    vt.add_argument("--top", type=int, default=50)
+    vt.set_defaults(fn=cmd_vault)
     ae = sub.add_parser("ftc-agent-eval", help="naive agent vs Dropnet verdicts on random reported numbers")
     ae.add_argument("--n", type=int, default=1000)
     ae.add_argument("--seed", type=int, default=0)

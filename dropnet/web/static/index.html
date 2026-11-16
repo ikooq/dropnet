@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dropnet</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+      <circle cx="5" cy="6" r="3" class="g-a"/><circle cx="21" cy="5" r="3" class="g-a"/>
+      <circle cx="6" cy="21" r="3" class="g-a"/><circle cx="14" cy="14" r="4" class="g-b"/>
+      <path d="M7.5 7.5 11 11M18.5 6.5 16.5 11M8 19 11 16.5" class="g-l"/>
+    </svg>
+    <div>
+      <div class="name">Dropnet</div>
+      <div class="tag">Scattered fraud complaints → one connected case</div>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <span class="badge warn" title="All complaints, phones, cards and domains are generated">Synthetic data</span>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="ingest" class="active">New complaint</button>
+  <button role="tab" data-tab="campaigns">Campaigns</button>
+  <button role="tab" data-tab="inbox">Inbox</button>
+  <button role="tab" data-tab="query">Query the graph</button>
+</nav>
+
+<main>
+  <!-- New complaint -->
+  <section id="tab-ingest" class="tab active">
+    <div class="split">
+      <div class="panel">
+        <h2>Paste a complaint</h2>
+        <p class="muted">Russian free text, as a victim wrote it. Dropnet extracts phones, cards, IBANs, links,
+          aliases and the scam tactic, writes them into the Relate graph and tells you what this complaint is part of.</p>
+        <div class="samples" id="samples"></div>
+        <textarea id="ing-text" rows="9" placeholder="Мне позвонили из службы безопасности банка…"></textarea>
+        <div class="row">
+          <label>Region <select id="ing-region"></select></label>
+          <button class="primary" id="ing-go">Link it</button>
+        </div>
+      </div>
+      <div class="panel" id="ing-result">
+        <div class="empty">The result appears here: which campaign, through which card / phone / domain, with the
+          victim's own words as evidence.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Campaigns -->
+  <section id="tab-campaigns" class="tab">
+    <div class="camp-layout">
+      <aside class="camp-list" id="camp-list"></aside>
+      <div class="camp-main">
+        <div class="camp-head" id="camp-head"></div>
+        <div class="graph-wrap">
+          <div id="graph"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="panel detail" id="detail"><span class="muted">Click a node or a connection to see the
+          evidence behind it.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inbox -->
+  <section id="tab-inbox" class="tab">
+    <div class="row toolbar">
+      <label>Campaign <select id="inbox-filter"><option value="">All complaints</option></select></label>
+      <span class="muted" id="inbox-count"></span>
+      <span class="spacer"></span>
+      <button id="inbox-prev">← Newer</button><button id="inbox-next">Older →</button>
+    </div>
+    <table class="grid" id="inbox"><thead><tr><th>ID</th><th>Filed</th><th>Region</th><th>Tactic</th>
+      <th class="num">Amount</th><th>Campaign</th><th>Summary</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <!-- Query -->
+  <section id="tab-query" class="tab">
+    <div class="panel">
+      <h2>Ask the graph in Cypher</h2>
+      <p class="muted">Read-only. The same queries work through MCP in Claude Code (<code>read_cypher</code>).</p>
+      <div class="samples" id="q-samples"></div>
+      <textarea id="q-text" rows="6" spellcheck="false"></textarea>
+      <div class="row"><button class="primary" id="q-go">Run</button><span class="muted" id="q-meta"></span></div>
+      <div id="q-out"></div>
+    </div>
+  </section>
+</main>
+<footer>Dropnet · embedded <b>Relate</b> graph in a single file · <a href="api/schema" target="_blank">schema</a>
+  · <a href="https://github.com/relatedb/relate" target="_blank" rel="noopener">Relate on GitHub</a></footer>
+<script src="app.js"></script>
+</body>
+</html>

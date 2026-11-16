@@ -27,14 +27,25 @@ _ALLOWED_CALLS = {"db.index.vector.querynodes", "db.labels", "db.relationshiptyp
 
 
 # ------------------------------------------------------------------- helpers
-_FULL_PAN = re.compile(r"(?<![\d*])(\d{4})[ -]?(\d{2})\d{2}[ -]?\d{4}[ -]?(\d{4})(?![\d*])")
+_FULL_PAN = re.compile(r"(?<![\d*])\d{4}[ -]?\d{4}[ -]?\d{4}[ -]?\d{4}(?![\d*])")
+
+
+def _mask_pan(m: re.Match) -> str:
+    out, digit = [], 0
+    for ch in m.group(0):
+        if ch.isdigit():
+            out.append("*" if 6 <= digit < 12 else ch)
+            digit += 1
+        else:
+            out.append(ch)
+    return "".join(out)
 
 
 def redact(text: str | None) -> str | None:
-    """Mask full card numbers in free text: 4000 0012 3456 1234 -> 4000 00** **** 1234."""
+    """Mask the middle six digits of full card numbers, keeping length and separators."""
     if text is None:
         return None
-    return _FULL_PAN.sub(lambda m: f"{m.group(1)} {m.group(2)}** **** {m.group(3)}", text)
+    return _FULL_PAN.sub(_mask_pan, text)
 
 
 def jsonable(v: Any) -> Any:

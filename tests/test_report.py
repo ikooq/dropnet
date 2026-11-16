@@ -46,9 +46,11 @@ def test_no_full_card_numbers_in_output(built):
             assert not re.search(r"\b4000\s?00\d{2}\s?\d{4}\s?\d{4}\b", text)
 
 
-def test_redact():
-    assert tools.redact("карта 4000 0012 3456 1234 и 4000001234561234") == \
-        "карта 4000 00** **** 1234 и 4000 00** **** 1234"
+def test_redact_preserves_length_and_separators():
+    src = "карта 4000 0012 3456 1234 и 4000001234561234 и 4000-0012-3456-1234"
+    out = tools.redact(src)
+    assert out == "карта 4000 00** **** 1234 и 400000******1234 и 4000-00**-****-1234"
+    assert len(out) == len(src)  # extraction spans stay valid for highlighting
 
 
 def test_chain_case_shows_money_flow(built):

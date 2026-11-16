@@ -38,7 +38,7 @@ def export(ftc_store: Path | str = config.DATA_DIR / "ftc.rl", out: Path | str =
                 n["subjects"] = {x["subject"]: x["c"] for x in sb if x["number"] == n["number"]}
             p["nums"] = [n for n in nums if n["number"] in keep]  # p["numbers"] stays the pool's total count
         data = {"summary": api.summary(conn), "profile": campaigns.spoofing_profile(conn), "states": api.states(conn),
-                "pools": pools,
+                "pools": pools, "networks": api.networks(conn),
                 "eval": json.loads(Path(eval_path).read_text(encoding="utf-8")) if Path(eval_path).exists() else None,
                 "source": "FTC Do Not Call complaint data (US public data)", "caution": campaigns.CAUTION}
     finally:

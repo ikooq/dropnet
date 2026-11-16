@@ -35,6 +35,7 @@ def test_export_marks_spoofed_numbers(tmp_path):
     assert v["8667719999"] == "likely_spoofed" and v["8667710001"] == "pool"
     assert data["profile"] and "neighbor_share" in data["profile"][0]
     assert data["eval"] is None
+    assert data["networks"] == []  # no pool network in this tiny fixture, but the key is always there
 
 
 def test_site_files_exist():

@@ -74,6 +74,30 @@ function loadGraph() {
   $("#engine").textContent = `Relate WASM · ${counts.toLocaleString()} nodes · ${rels.toLocaleString()} relationships · loaded in ${Math.round(performance.now() - t0)} ms`;
 }
 
+function renderNetworkAndWhatIf() {
+  const n = (data.networks || [])[0];
+  if (n) {
+    $("#net-panel").style.display = "";
+    $("#net-panel").innerHTML = `<h2>One operation, ${n.pools} number ranges</h2>
+      <p class="muted">Ranges that hit the same victims' area codes, on the same days, with the same scam type — linked by
+      multi-hop paths in the graph. <b>${n.reports.toLocaleString()}</b> reports.</p>
+      <div class="whatif-pick">${n.members.map((m) => `<label data-id="${esc(m.id)}" style="cursor:pointer">${esc(m.id.replace("POOL-", ""))} · ${m.reports.toLocaleString()}</label>`).join("")}</div>`;
+    $("#net-panel").querySelectorAll("label[data-id]").forEach((l) => l.addEventListener("click", () => openPool(l.dataset.id)));
+  }
+  const top = q("MATCH (c:Pool) RETURN c.id AS id, c.reports AS r ORDER BY r DESC LIMIT 12");
+  $("#whatif").innerHTML = `<h2>What if a carrier blocked these ranges?</h2>
+    <div class="whatif-pick">${top.map((c, i) => `<label><input type="checkbox" value="${esc(c.id)}" ${i < 3 ? "checked" : ""}> ${esc(c.id.replace("POOL-", ""))}</label>`).join("")}</div>
+    <button class="primary" id="wi-go">Run in the browser</button> <span class="muted">Cypher on the in-browser Relate graph.</span><div id="wi-out"></div>`;
+  $("#wi-go").addEventListener("click", () => {
+    const ids = [...document.querySelectorAll("#whatif input:checked")].map((x) => x.value);
+    const r = q(`MATCH (c:Pool) WHERE c.id IN $ids
+                 RETURN count(c) AS rules, sum(c.reports) AS reports, sum(c.numbers) AS numbers, sum(c.states) AS st`, { ids })[0];
+    $("#wi-out").innerHTML = `<p><b>${(r.reports || 0).toLocaleString()}</b> reports from <b>${(r.numbers || 0).toLocaleString()}</b>
+      reported numbers would have been stopped by ${r.rules} block rule${r.rules === 1 ? "" : "s"} — at the price of
+      ${(r.rules * 10000).toLocaleString()} numbers silenced (each block = 10,000 numbers). A carrier's call, not ours.</p>`;
+  });
+}
+
 function renderList() {
   const pools = q("MATCH (c:Pool) RETURN c.id AS id, c.numbers AS numbers, c.reports AS reports, c.states AS states, c.toll_free AS tf ORDER BY reports DESC LIMIT 40");
   $("#list").innerHTML = pools.map((c) => `<button class="camp-card" data-id="${esc(c.id)}"><div class="id">${esc(c.id.replace("POOL-", "Pool "))}</div>
@@ -166,5 +190,6 @@ $("#q-go").addEventListener("click", run);
   db = new RelateDb();
   loadGraph();
   renderList();
+  renderNetworkAndWhatIf();
   run();
 })().catch((e) => { $("#engine").textContent = "Error: " + e.message; console.error(e); });

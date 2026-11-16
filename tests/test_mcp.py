@@ -29,7 +29,28 @@ def free_port() -> int:
 
 def test_tool_names():
     assert set(mcp_server.TOOL_NAMES) == {"get_schema", "read_cypher", "find_campaign", "explain_link", "top_mules",
-                                         "similar_scripts", "build_case", "list_campaigns"}
+                                         "similar_scripts", "build_case", "list_campaigns", "ftc_summary",
+                                         "ftc_campaigns", "assess_number", "whatif_block"}
+
+
+def test_ftc_tools_in_snapshot_mode(tmp_path):
+    from dropnet import store
+    from dropnet.ftc import campaigns, load
+    from tests.test_ftc_load import R
+    ftc = tmp_path / "ftc.rl"
+    c = store.open_store(ftc)
+    load.load_reports(c, [R(i, f"866771{i % 6:04d}", victim_npa="303") for i in range(30)])
+    campaigns.write_campaigns(c, min_numbers=5)
+    c.close()
+    before = ftc.read_bytes()
+    b = mcp_server.Backend(web_url="http://127.0.0.1:1", snapshot=tmp_path / "x.rl", ftc_snapshot=ftc)
+    try:
+        assert b.call("assess_number", {"number": "866-771-0001"})["verdict"] == "pool"
+        assert b.call("ftc_campaigns", {"limit": 3})[0]["id"] == "POOL-866771"
+        assert b.call("whatif_block", {"blocks": ["866771"]})["reports_stopped"] == 30
+    finally:
+        b.close()
+    assert ftc.read_bytes() == before  # what-if ran on a temporary copy
 
 
 def test_snapshot_mode(snap):

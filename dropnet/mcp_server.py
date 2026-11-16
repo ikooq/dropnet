@@ -16,7 +16,9 @@ from typing import Any
 
 from . import config, store, tools
 
-TOOL_NAMES = tools.TOOL_NAMES
+from .ftc.api import FTC_TOOL_NAMES, dispatch_ftc  # noqa: E402
+
+TOOL_NAMES = tools.TOOL_NAMES + FTC_TOOL_NAMES
 INSTRUCTIONS = """Dropnet: a Relate graph of (synthetic) Kazakh fraud complaints.
 Nodes: Complaint (Russian text + English gloss), Phone, Card (masked), Account (IBAN), Url, Domain, Persona (alias),
 Tactic, Region, Bank, Campaign, Extraction (provenance: the quote each link comes from).
@@ -27,11 +29,29 @@ legitimate shared numbers (e.g. marketplace support) and are NOT evidence. All d
 
 
 class Backend:
-    def __init__(self, web_url: str | None = None, snapshot: str | Path | None = None):
+    def __init__(self, web_url: str | None = None, snapshot: str | Path | None = None,
+                 ftc_snapshot: str | Path | None = None):
         self.web_url = (web_url or os.environ.get("DROPNET_WEB_URL") or "http://127.0.0.1:8000").rstrip("/")
         self.snapshot = Path(snapshot or os.environ.get("DROPNET_SNAPSHOT") or config.SNAPSHOT_PATH)
+        self.ftc_snapshot = Path(ftc_snapshot or os.environ.get("DROPNET_FTC_SNAPSHOT") or config.DATA_DIR / "ftc.rl")
         self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate-mcp")
         self._conn = None
+        self._ftc = None
+        self._ftc_rw = None
+        self._tmp = None
+
+    def _local_ftc(self, name: str, args: dict) -> Any:
+        import shutil
+        import tempfile
+        if name == "whatif_block":  # needs a writable store: a throw-away copy keeps the snapshot untouched
+            if self._ftc_rw is None:
+                self._tmp = Path(tempfile.mkdtemp(prefix="dropnet-mcp-"))
+                shutil.copy(self.ftc_snapshot, self._tmp / "ftc.rl")
+                self._ftc_rw = store.open_store(self._tmp / "ftc.rl")
+            return dispatch_ftc(self._ftc_rw, name, args)
+        if self._ftc is None:
+            self._ftc = store.open_store(self.ftc_snapshot, read_only=True)
+        return dispatch_ftc(self._ftc, name, args)
 
     def mode(self) -> str:
         try:
@@ -59,13 +79,20 @@ class Backend:
             except urllib.error.HTTPError as e:
                 detail = json.loads(e.read() or b"{}").get("detail", str(e))
                 raise ValueError(detail) from None
+        if name in FTC_TOOL_NAMES:
+            return self._pool.submit(self._local_ftc, name, args).result()
         return self._pool.submit(self._local, name, args).result()
 
     def close(self) -> None:
-        if self._conn is not None:
-            self._pool.submit(self._conn.close).result()
-            self._conn = None
+        for attr in ("_conn", "_ftc", "_ftc_rw"):
+            c = getattr(self, attr)
+            if c is not None:
+                self._pool.submit(c.close).result()
+                setattr(self, attr, None)
         self._pool.shutdown(wait=True)
+        if self._tmp is not None:
+            import shutil
+            shutil.rmtree(self._tmp, ignore_errors=True)
 
 
 def build_server(backend: Backend):
@@ -109,6 +136,31 @@ def build_server(backend: Backend):
     def similar_scripts(text: str, k: int = 5) -> list:
         """Complaints whose scam script is closest to `text` (Relate vector index), with their campaigns."""
         return backend.call("similar_scripts", {"text": text, "k": k})
+
+    @mcp.tool()
+    def ftc_summary() -> dict:
+        """REAL data: totals of the FTC Do Not Call reports graph (US, public) and, per scam type, the share of
+        calls from a number faked to look local (neighbor spoofing)."""
+        return backend.call("ftc_summary", {})
+
+    @mcp.tool()
+    def ftc_campaigns(limit: int = 20, kind: str | None = None) -> list:
+        """REAL data: number pools (many numbers from one NPA-NXX block) and repeat numbers, by report volume."""
+        return backend.call("ftc_campaigns", {"limit": limit, "kind": kind})
+
+    @mcp.tool()
+    def assess_number(number: str) -> dict:
+        """Evidence about a phone number reported to the FTC: reports, states, scam types, its block's pool, and a
+        verdict (likely_spoofed / pool / repeat / single / unknown). ALWAYS relay the `caution` field: a spoofed
+        number usually belongs to an innocent person."""
+        return backend.call("assess_number", {"number": number})
+
+    @mcp.tool()
+    def whatif_block(blocks: list[str] | None = None, numbers: list[str] | None = None,
+                     since_day: str | None = None) -> dict:
+        """What would blocking these NPA-NXX blocks / numbers have stopped? Computed inside a Relate transaction
+        that is rolled back — nothing is written."""
+        return backend.call("whatif_block", {"blocks": blocks, "numbers": numbers, "since_day": since_day})
 
     @mcp.tool()
     def build_case(campaign_id: str) -> str:

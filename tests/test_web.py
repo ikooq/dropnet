@@ -27,7 +27,8 @@ def test_health(client):
 
 def test_index_served(client):
     r = client.get("/")
-    assert r.status_code == 200 and "Dropnet" in r.text and "Synthetic data" in r.text
+    assert r.status_code == 200 and "Dropnet" in r.text
+    assert "Real FTC data" in r.text and "free-text demo is synthetic" in r.text  # data provenance is always visible
 
 
 def test_campaigns_and_graph(client):

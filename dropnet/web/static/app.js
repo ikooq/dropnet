@@ -128,9 +128,9 @@ async function loadCampaignList() {
 }
 const TACTICS_LABEL = (t) => TACTIC[t] || t;
 
-async function openCampaign(id) {
+async function openCampaign(id, switchTab = true) {
   currentCampaign = id;
-  showTab("campaigns");
+  if (switchTab) showTab("campaigns");  // not during page load: the page opens on the real-data tab
   document.querySelectorAll(".camp-card").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
   const g = await api(`api/campaigns/${id}/graph`);
   const k = g.campaign;
@@ -322,16 +322,21 @@ async function openFtc(id) {
     <span class="badge">${k.states} states</span><span class="badge">${esc(k.first_day || "")} → ${esc(k.last_day || "")}</span>
     <span class="spacer"></span><a href="api/ftc/campaigns/${esc(id)}/export"><button>Download case (.rl)</button></a>`;
   const C = { Block: css("--c-cashout"), Number: css("--c-card"), State: css("--c-phone"), Subject: css("--c-persona") };
-  const els = [...g.nodes.map((n) => ({ data: { id: n.id, label: n.label, kind: n.kind, color: C[n.kind], w: n.kind === "Number" ? 8 + Math.min(26, Math.sqrt(n.reports || 1) * 2) : 18, raw: n } })),
+  // Readability: only the busiest numbers carry a label; state / scam-type labels are short and sit on a backdrop.
+  const topNums = new Set(g.nodes.filter((n) => n.kind === "Number").sort((a, b) => (b.reports || 0) - (a.reports || 0)).slice(0, 8).map((n) => n.id));
+  const short = (n) => n.kind === "Subject" ? (n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label)
+    : n.kind === "Number" ? (topNums.has(n.id) ? n.label : "") : n.label;
+  const els = [...g.nodes.map((n) => ({ data: { id: n.id, label: short(n), kind: n.kind, color: C[n.kind], w: n.kind === "Number" ? 8 + Math.min(22, Math.sqrt(n.reports || 1) * 1.6) : 16, raw: n } })),
     ...g.edges.map((e, i) => ({ data: { id: `f${i}`, source: e.source, target: e.target, type: e.type } }))];
   if (ftcCy) ftcCy.destroy();
   ftcCy = cytoscape({ container: $("#ftc-graph"), elements: els, wheelSensitivity: 0.25,
-    style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)", "font-size": 9, color: css("--ink") } },
-      { selector: "node[kind = 'Block']", style: { shape: "round-rectangle", width: 40, height: 40, "font-weight": 700 } },
-      { selector: "node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 10 } },
-      { selector: "edge", style: { width: 1, "line-color": css("--line"), "curve-style": "haystack" } },
-      { selector: "edge[type = 'IN_BLOCK']", style: { width: 2, "line-color": C.Block } }],
-    layout: { name: "cose", animate: false, nodeRepulsion: 12000, idealEdgeLength: 60, padding: 24 } });
+    style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)", "font-size": 8, color: css("--ink"), "text-valign": "bottom", "text-margin-y": 2 } },
+      { selector: "node[kind = 'Block']", style: { shape: "round-rectangle", width: 40, height: 40, "font-weight": 700, "font-size": 11 } },
+      { selector: "node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 8,
+        "text-background-color": css("--panel"), "text-background-opacity": 0.85, "text-background-padding": 2 } },
+      { selector: "edge", style: { width: 0.6, "line-color": css("--line"), "curve-style": "haystack", opacity: 0.6 } },
+      { selector: "edge[type = 'IN_BLOCK']", style: { width: 1.6, "line-color": C.Block, opacity: 0.8 } }],
+    layout: { name: "cose", animate: false, nodeRepulsion: 40000, idealEdgeLength: 110, nodeOverlap: 20, padding: 30 } });
   ftcCy.on("tap", "node[kind = 'Number']", (e) => assess(e.target.data("raw").number));
   $("#ftc-legend").innerHTML = [["Block (NPA-NXX)", C.Block], ["Reported number", C.Number], ["Victim state", C.State], ["Scam type", C.Subject]]
     .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("") + "<span>node size = reports</span>";
@@ -367,7 +372,7 @@ $("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") assess(
 (async function boot() {
   await Promise.all([refreshStats(), loadSamples(), loadCampaignList(), loadInbox()]);
   const tab = location.hash.slice(1);
-  if (campaigns.length) await openCampaign(campaigns[0].id);
+  if (campaigns.length) await openCampaign(campaigns[0].id, false);
   const hasReal = await loadReal();
   showTab(["real", "ingest", "campaigns", "inbox", "query"].includes(tab) ? tab : hasReal ? "real" : "ingest");
 })();

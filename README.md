@@ -9,6 +9,14 @@ Relate runs in your browser as WebAssembly and loads the 200 biggest real pools 
 
 ![Dropnet on 296,273 real FTC reports](docs/img/real-overview.png)
 
+<details><summary>More: the full page (pool network, number check, pool graph) and the architecture</summary>
+
+![Full real-data page: blocklist vs Dropnet, spoofing by scam type, the 15-range network, a pool's graph](docs/img/real-full.png)
+
+![Architecture: FTC + FCC data → one Relate file → web app, WASM demo, agents, Neo4j, case vault](docs/img/architecture.svg)
+
+</details>
+
 ---
 
 ## Use case

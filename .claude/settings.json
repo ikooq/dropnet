@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dropnet hook",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

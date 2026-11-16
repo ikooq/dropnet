@@ -91,7 +91,15 @@ def cmd_ftc_eval(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_hook(a: argparse.Namespace) -> int:
+    from . import hook
+    return hook.main(ftc_store=a.ftc)
+
+
 def register(sub) -> None:
+    hk = sub.add_parser("hook", help="Claude Code UserPromptSubmit hook: evidence + caution for phone numbers")
+    hk.add_argument("--ftc", default=None, help="FTC store (default data/ftc.rl)")
+    hk.set_defaults(fn=cmd_hook)
     fb = sub.add_parser("ftc-build", help="build data/ftc.rl from real FTC Do Not Call reports")
     fb.add_argument("--fetch", action="store_true", help="download the latest daily files from ftc.gov first")
     fb.set_defaults(fn=cmd_ftc_build)

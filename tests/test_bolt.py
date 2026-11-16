@@ -14,3 +14,13 @@ def test_neo4j_driver_reads_the_real_store():
     if r is None:
         pytest.skip("Relate CLI not installed")
     assert r[0]["pools"] > 1000
+
+
+def test_http_query_api_reads_the_real_store():
+    if not (config.DATA_DIR / "ftc.rl").exists():
+        pytest.skip("real FTC snapshot not built")
+    r = bolt.query_via_http(config.DATA_DIR / "ftc.rl",
+                            "MATCH (c:FtcCampaign {kind: 'pool'}) WHERE c.numbers >= $m RETURN count(c) AS pools", {"m": 5})
+    if r is None:
+        pytest.skip("Relate CLI not installed")
+    assert r[0]["pools"] > 1000

@@ -23,6 +23,16 @@ scam types and victims in dozens of states. A pool is invisible in any single re
   complaints for the same weeks — versus 9.2 % of random reported blocks.
 - **Pools are signal, not noise.** Control: the same number of *random* reported blocks catches 4.4 % of later reports;
   the pool blocks catch 20.3 % — a 4.7× lift. 83 % of pool rules caught at least one later report.
+- **Not one lucky split.** 27 rolling train/test splits: Dropnet beats the blocklist in 27 of 27 (lift ≥ 2.6×, median
+  3.1×). 95 % bootstrap intervals over test days do not overlap (3.9–5.0 % vs 13.2–16.0 %). The threshold sweep has no
+  cliff. And an ablation says plainly what does the work: ranges instead of numbers, and dropping spoofed reports
+  first — ranking ranges by raw volume catches the same but puts 1.9× more innocent spoofed numbers in blocked ranges.
+- **Useful today, to anyone.** "Did this number call you?" on the public page checks all 248,930 reported numbers and
+  6,091 rented ranges in the browser, with a shareable link, and tells you when the owner is probably innocent.
+  Carriers get a ranked CSV of ranges with evidence and the price of each rule.
+- **Dropnet inside Relate's own CLI.** A Relate command extension: `relate run dropnet-ftc --path <FTC files> -d graph`
+  turns raw files into the graph and its pools (296,273 reports → 6,091 pools in 33 s, the same as the full build).
+  The same file is also served over Bolt (official neo4j driver) and the HTTP Query API v2, both tested.
 - **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported
   number as a scammer would blame 395 (39.5 %) likely-spoofed numbers whose owners are probably innocent, and dismiss
   246 (24.6 %) once-reported numbers that belong to an active pool. With Dropnet's hook / MCP tool it gets the right
@@ -45,13 +55,15 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 Python + `relate-db` (embedded). FTC daily CSVs → parse → batched `UNWIND`/`MERGE` into a directory store with range
 indexes (296k reports in ~2 min) → campaign detection as Cypher aggregations → `relate clone --to-snapshot-format
 parquet` compacts it to a 40 MB single file committed to the repo. FastAPI + cytoscape.js UI, MCP server (official
-SDK), a Claude Code hook, and a static page with `@relate/relate-wasm`. 191 tests.
+SDK), a Claude Code hook, a Relate command extension, and a static page with `@relate/relate-wasm`. 206 tests.
 
 ## Challenges
 - The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB.
 - A multi-hop pattern started from an `UNWIND`-bound key took 21 s on the 249k-number graph; starting from an indexed
   anchor took 0.03 s. In WASM, per-row lookups cost ~0.5 ms, so the demo addresses nodes by list index — 13 s → 1 s.
 - Being fair to spoofing victims shaped the method: no block rules from spoofed reports, cautions everywhere.
+- A Relate extension that wrote 5,000 rows per statement ended silently with exit code 0; the handshake's
+  `caps.maxRowsPerStatement` (1,000) was the limit. On Windows the extension ships as one `.cmd` that is also Python.
 
 ## What we learned
 Blocking is a graph problem, not a list problem — and the graph also tells you whom *not* to blame.

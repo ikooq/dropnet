@@ -142,20 +142,51 @@ function openPool(id) {
     .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("") + "<span>node size = reports</span>";
 }
 
-function check(raw) {
+// Every reported number + every pool block (docs/data/lookup.txt, ~1 MB gzipped), fetched on the first check only.
+let lookup = null;
+async function loadLookup() {
+  if (lookup) return lookup;
+  const text = await (await fetch("data/lookup.txt")).text();
+  const nums = new Map(), blocks = new Map();
+  let span = "";
+  for (const line of text.split(/\r?\n/)) {
+    if (!line) continue;
+    if (line[0] === "#") { span = line.split(" ").slice(4, 6).join(" to "); continue; }
+    const p = line.split(" ");
+    if (p[0] === "B") blocks.set(p[1], { numbers: +p[2], reports: +p[3] });
+    else nums.set(p[0], { reports: +p[1], code: p[2] });
+  }
+  return (lookup = { nums, blocks, span });
+}
+const VERDICT = {
+  s: ["likely_spoofed", "Likely spoofed", "Reported only from the victim's own area code: the caller faked this number to look local. Its real owner is probably innocent — don't blame them, and don't call back."],
+  p: ["pool", "Part of a rented number pool", "This number sits in a range that scammers rotate through. Blocking the whole range stops numbers that haven't been reported yet."],
+  r: ["pool", "Reported again and again", "One number reported many times from other area codes."],
+  "1": ["", "Reported once", "One report is weak evidence on its own."],
+};
+async function check(raw) {
   const n = String(raw).replace(/\D/g, "").slice(-10);
+  if (n.length !== 10) { $("#num-out").innerHTML = `<p class="muted">Enter a 10-digit US number.</p>`; return; }
   $("#num-in").value = n.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
-  const r = q(`MATCH (n:Number {number: $n})-[:IN_BLOCK]->(b:Block)<-[:USES_BLOCK]-(c:Pool)
-               OPTIONAL MATCH (n)-[s:CALLED_INTO]->(st:State)
-               RETURN n.reports AS reports, n.verdict AS verdict, c.id AS pool, c.numbers AS pool_numbers, count(st) AS states`, { n });
-  const spoofed = r.length && r[0].verdict === "likely_spoofed";
-  $("#num-out").innerHTML = r.length && r[0].reports != null
-    ? `<p class="verdict ${spoofed ? "likely_spoofed" : "pool"}">${spoofed ? "Likely spoofed — reported from the victim's own area code; the owner is probably innocent"
-        : "Part of a number pool"}</p><p>${r[0].reports.toLocaleString()} reports · ${r[0].states} states ·
-       ${esc(r[0].pool)} has ${r[0].pool_numbers} reported numbers</p><div class="caution">${esc(data.caution)}</div>`
-    : `<p class="verdict">Not among the 200 biggest pools loaded in this browser demo.</p><p class="muted">The full app
-       (<code>pip install -e . && python -m dropnet serve</code>) checks all ${data.summary.numbers.toLocaleString()} reported numbers
-       and flags likely-spoofed ones.</p><div class="caution">${esc(data.caution)}</div>`;
+  history.replaceState(null, "", "?n=" + n + location.hash);
+  $("#num-out").innerHTML = `<p class="muted">Checking ${data.summary.numbers.toLocaleString()} reported numbers…</p>`;
+  let L;
+  try { L = await loadLookup(); } catch (e) { $("#num-out").innerHTML = `<p class="muted">Could not load the lookup file.</p>`; return; }
+  const hit = L.nums.get(n), block = L.blocks.get(n.slice(0, 6));
+  const range = n.replace(/(\d{3})(\d{3})\d{4}/, "$1-$2-xxxx");
+  let html;
+  if (hit) {
+    const [cls, title, why] = VERDICT[hit.code] || VERDICT["1"];
+    html = `<p class="verdict ${cls}">${title}</p><p>${hit.reports.toLocaleString()} report${hit.reports > 1 ? "s" : ""} to the FTC (${esc(L.span)}). ${why}</p>`;
+    if (block && hit.code !== "s") html += `<p>Range ${range}: ${block.numbers.toLocaleString()} numbers, ${block.reports.toLocaleString()} reports.</p>`;
+  } else if (block) {
+    html = `<p class="verdict pool">Never reported — but its range is a rented pool</p><p>${range} has ${block.numbers.toLocaleString()} reported numbers and
+      ${block.reports.toLocaleString()} reports.${data.eval && data.eval.dropnet ? ` In our hold-out test, ${data.eval.dropnet.new_numbers_caught.toLocaleString()} later
+      complaints came from numbers like this: never reported before, but inside a known pool.` : ""}</p>`;
+  } else {
+    html = `<p class="verdict">No FTC reports for this number or its range</p><p class="muted">${esc(L.span)}. That is not proof it is safe.</p>`;
+  }
+  $("#num-out").innerHTML = html + `<p class="muted"><a href="?n=${n}">Link to this result</a> · <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">Report a call to the FTC</a></p><div class="caution">${esc(data.caution)}</div>`;
 }
 $("#num-go").addEventListener("click", () => check($("#num-in").value));
 $("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") check($("#num-in").value); });
@@ -192,4 +223,6 @@ $("#q-go").addEventListener("click", run);
   renderList();
   renderNetworkAndWhatIf();
   run();
+  const shared = new URLSearchParams(location.search).get("n");
+  if (shared) { $(".lookup").scrollIntoView({ block: "center" }); check(shared); }
 })().catch((e) => { $("#engine").textContent = "Error: " + e.message; console.error(e); });

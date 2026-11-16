@@ -104,6 +104,7 @@ def cmd_site(a: argparse.Namespace) -> int:
     from . import site
     d = site.export(top=a.top)
     print(f"Wrote {site.SITE_DATA} ({len(d['pools'])} pools). Serve docs/ (GitHub Pages: branch, /docs).")
+    print(f"Wrote {site.LOOKUP}: {site.export_lookup()}")
     return 0
 
 
@@ -150,7 +151,41 @@ def cmd_carrier(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_relate_ext(a) -> int:
+    from . import relate_ext
+    from .ftc import build
+    cli = build.relate_cli()
+    if not cli:
+        print("Relate CLI not found — install it first (see README).")
+        return 1
+    print(relate_ext.install(cli))
+    print("now: relate run dropnet-ftc --path data/ftc/raw -d ./ftc-graph")
+    return 0
+
+
+def cmd_robustness(a) -> int:
+    import json
+    from . import store
+    from .ftc import build, robustness
+    ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        ev["robustness"] = robustness.run(conn, ev["split_day"])
+    finally:
+        conn.close()
+    build.EVAL_JSON.write_text(json.dumps(ev, indent=2), encoding="utf-8")
+    r = ev["robustness"]
+    print(json.dumps({k: r[k] for k in ("rolling_summary", "bootstrap", "ablations")}, indent=2))
+    for t in r["thresholds"]:
+        print(t)
+    return 0
+
+
 def register(sub) -> None:
+    rb = sub.add_parser("ftc-robustness", help="rolling splits, bootstrap intervals, threshold sweep, ablations")
+    rb.set_defaults(fn=cmd_robustness)
+    rx = sub.add_parser("relate-ext", help="install Dropnet as a Relate extension: `relate run dropnet-ftc`")
+    rx.set_defaults(fn=cmd_relate_ext)
     cc = sub.add_parser("carrier-csv", help="carrier-ready CSV of number ranges with evidence and the FCC cross-check")
     cc.add_argument("--out", default="data/ftc/ranges.csv")
     cc.add_argument("--top", type=int, default=None)

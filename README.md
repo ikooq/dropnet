@@ -5,7 +5,8 @@ embedded **Relate** graph and finds the number pools behind them — the rented 
 numbers can never keep up with — while refusing to blame the innocent people whose numbers get spoofed.
 
 **Try it without installing anything: https://ikooq.github.io/dropnet/**
-Relate runs in your browser as WebAssembly and loads the 200 biggest real pools in about a second.
+Relate runs in your browser as WebAssembly and loads the 200 biggest real pools in about a second — and you can check
+any number that called you against all 248,930 reported numbers: `https://ikooq.github.io/dropnet/?n=8337661884`.
 
 ![Dropnet on 296,273 real FTC reports](docs/img/real-overview.png)
 
@@ -32,6 +33,15 @@ carriers, regulators and anti-fraud teams block numbers — and lose, because:
 The relationship that matters is **Number → Block (NPA-NXX, the first six digits)**. Rented number ranges show up as
 *pools*: many different reported numbers in one block, the same scam types, victims in dozens of states. A pool is
 visible only in the graph — never in a single report.
+
+### Who it helps, and with what
+
+| who | what they get | where |
+|---|---|---|
+| **anyone who got a call** | "Did this number call you?" — every one of the 248,930 reported numbers and 6,091 rented ranges, checked in the browser, with a shareable link (`?n=8337661884`). It says *likely spoofed — the owner is probably innocent* for 101,393 numbers, so nobody harasses the wrong person | [live demo](https://ikooq.github.io/dropnet/) |
+| **carriers / call-blocking apps** | `data/ftc/ranges.csv`: 6,091 ranges ranked, each with its evidence, the FCC cross-check, the network it belongs to and the price of the rule (numbers silenced) | `python -m dropnet carrier-csv` |
+| **regulators, investigators** | one operation = 15 ranges linked in the graph; a case file per pool as markdown (Obsidian / Relate vault) or a single-file Relate store | `dropnet vault`, `/api/ftc/campaigns/{id}/export` |
+| **analysts with an AI agent** | MCP tools and a Claude Code hook that attach evidence *and* the spoofing caution to any phone number in a prompt — measured: a naive agent would blame 39.5 % likely-spoofed numbers | `.mcp.json`, `dropnet hook` |
 
 | relationship | why it matters |
 |---|---|
@@ -67,6 +77,20 @@ for the top 200 pools, 92.5 % vs 8.7 %. Data: `data/fcc/`, code: `dropnet/ftc/cr
 **Is a pool more than a random block?** A control: the same number of blocks (3,681), drawn at random from the 44,306
 blocks that had a non-spoofed report before the split, catches **4.4 %** of later reports; the pool blocks catch
 **20.3 %** — a **4.7× lift**. **83 %** of pool rules caught at least one later report (16.7 % stayed dormant).
+
+**Not one lucky split.** `python -m dropnet ftc-robustness` (results in `data/ftc/eval.json → robustness`):
+
+| check | result |
+|---|---|
+| **27 rolling splits** — learn on every report before day D, score the next 7 days | Dropnet wins **27 / 27**; lift over the blocklist **2.6× minimum, 3.1× median** |
+| **95 % bootstrap interval**, headline split, resampling whole test days (1,000 draws) | blocklist **3.9–5.0 %** · geographic pools **13.2–16.0 %** · lift **3.2–3.5×** — no overlap |
+| **threshold sweep**: a pool = ≥ m distinct numbers per block | smooth trade-off, no cliff: m = 3 → 19.9 % (69.6 M numbers silenced), m = 5 → 14.3 % (28.7 M), m = 15 → 7.5 % (3.0 M) — even the strictest beats the blocklist |
+| **ablation — what does the work?** same number of blocks (2,872) picked by raw report volume | catches the same (14.2 %) but **1.9× more innocent spoofed numbers** fall in the blocked ranges (5.2 % vs 2.8 % of later spoofed calls) |
+| ablation — pools built *with* spoofed reports (what a naive system does) | +2,148 blocks, 18.2 % caught, but **3× the innocent hits (8.6 %)** — the victims' own local ranges |
+
+The honest reading: the gain comes from **blocking ranges instead of numbers** and from **throwing out spoofed reports
+before deciding**. Counting distinct numbers rather than report volume adds little coverage (+0.4 pt with spoofed
+reports excluded from both); its value is a threshold that needs no budget and a pool that is easy to explain.
 The FTC page lists ~25 business days; files already downloaded are kept, so running `ftc-build --fetch` weekly grows
 the window.
 
@@ -132,6 +156,9 @@ Investigate locally, embedded; publish only what was confirmed.
 | **full-text index** + `db.index.fulltext.queryNodes` ("mortgage" → scam type → its pools; `GET /api/ftc/search?q=`) | `dropnet/ftc/api.py` |
 | vector index + `db.index.vector.queryNodes`, `shortestPath`, variable-length money trails | free-text module |
 | **MCP**: our server + Relate's native `relate serve --mcp stdio --read-only` | `.mcp.json` |
+| **command extension** — `relate run dropnet-ftc --path data/ftc/raw -d graph`: FTC files → graph → pools inside Relate's own CLI (296,273 reports → 6,091 pools in 33 s, the same count as the full build) | `dropnet/relate_ext/` |
+| **HTTP Query API v2** (`relate serve --http`, `POST /db/neo4j/query/v2`) and **Bolt** with the official `neo4j` driver | `dropnet/ftc/bolt.py` |
+| `relate push` of a confirmed subgraph to Neo4j / Aura; markdown-vault snapshot format | README below |
 
 ## Setup and run
 
@@ -204,6 +231,10 @@ link. It is a demonstration of the extraction pipeline, not part of the real-dat
   into lists once and addressing them as `xs[i]` loaded 34k relationships in ~1 s instead of 13–19 s.
 * `relate.Record` serialises only its result columns, so keys added in Python vanish from JSON — copy to `dict`.
 * A writable open of a `.rl` file checkpoints (rewrites) it; open snapshots with `--read-only` / `read_only=True`.
+* Command extensions: the host announces `caps.maxRowsPerStatement` (1,000) in the handshake. An `UNWIND` of 5,000
+  rows ended the run **silently with exit code 0** — size batches from `caps`. `extension install` copies only the
+  manifest and the one executable, and on Windows a `.py` cannot be spawned directly; a single `.cmd` file whose first
+  line runs `python -x "%~f0"` (skip that line) carries the Python child.
 
 ## Limits and honest notes
 
@@ -211,6 +242,9 @@ link. It is a demonstration of the extraction pipeline, not part of the real-dat
   and the hook all carry that caution, and spoofed local ranges are never proposed for blocking.
 * A pool block covers up to 10,000 numbers; blocking one is a carrier decision with collateral risk. The what-if shows
   the reports a rule would have stopped, not the legitimate calls it might block.
-* The hold-out spans 35 days of reports; longer windows may shift the numbers.
+* The data spans 35 days of reports. The 27 rolling splits show the result is stable inside that window, not that it
+  holds for a year; running `ftc-build --fetch` weekly grows the window.
+* We cannot measure legitimate calls a range rule would block (the FTC data holds complaints only). The proxy we report
+  is how many later *spoofed* calls — numbers of innocent people — land in blocked ranges: 2.8 %.
 
 License: MIT. Built for the Relate by Neo4j hackathon (2026). FTC Do Not Call complaint data is US public data.

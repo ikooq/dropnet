@@ -23,6 +23,42 @@ def _free_port() -> int:
     return port
 
 
+def query_via_http(store: Path | str, cypher: str, params: dict | None = None, timeout: float = 30) -> list[dict] | None:
+    """Same graph over Relate's Neo4j-compatible HTTP Query API v2 (POST /db/neo4j/query/v2) — plain JSON, no driver."""
+    import json
+    import urllib.request
+    cli = relate_cli()
+    if not cli:
+        return None
+    port = _free_port()
+    proc = subprocess.Popen([cli, "serve", "--database", str(store), "--read-only", "--host", "127.0.0.1",
+                             "--http", str(port), "--auth", "none"],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                            env={**os.environ, "RELATE_TELEMETRY": "off"})
+    base = f"http://127.0.0.1:{port}"
+    try:
+        deadline = time.time() + timeout
+        while True:
+            try:
+                urllib.request.urlopen(base + "/", timeout=1).read()
+                break
+            except OSError:
+                if time.time() > deadline:
+                    raise
+                time.sleep(0.2)
+        req = urllib.request.Request(base + "/db/neo4j/query/v2", method="POST",
+                                     data=json.dumps({"statement": cypher, "parameters": params or {}}).encode(),
+                                     headers={"Content-Type": "application/json", "Accept": "application/json"})
+        data = json.loads(urllib.request.urlopen(req, timeout=timeout).read())["data"]
+        return [dict(zip(data["fields"], v)) for v in data["values"]]
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
 def query_via_bolt(store: Path | str, cypher: str, params: dict | None = None, timeout: float = 30) -> list[dict] | None:
     """Start a read-only Relate Bolt server on the store, run one query with the official neo4j driver, stop."""
     cli = relate_cli()

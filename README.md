@@ -4,7 +4,7 @@
 embedded **Relate** graph and finds the number pools behind them — the rented number ranges a blocklist of single
 numbers can never keep up with — while refusing to blame the innocent people whose numbers get spoofed.
 
-**Try it without installing anything:** open `docs/index.html` via GitHub Pages (Settings → Pages → branch, `/docs`).
+**Try it without installing anything: https://ikooq.github.io/dropnet/**
 Relate runs in your browser as WebAssembly and loads the 200 biggest real pools in about a second.
 
 ---
@@ -75,7 +75,7 @@ shows that count as a risk. Reproduce: `python -m dropnet ftc-eval`.
 Python **3.10+** (tested on 3.14, Windows 11). No API key, no database server.
 
 ```bash
-git clone <this repo> && cd dropnet
+git clone https://github.com/ikooq/dropnet && cd dropnet
 python -m venv .venv
 # Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
 pip install -e .

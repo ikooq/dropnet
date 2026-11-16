@@ -96,7 +96,17 @@ def cmd_hook(a: argparse.Namespace) -> int:
     return hook.main(ftc_store=a.ftc)
 
 
+def cmd_site(a: argparse.Namespace) -> int:
+    from . import site
+    d = site.export(top=a.top)
+    print(f"Wrote {site.SITE_DATA} ({len(d['pools'])} pools). Serve docs/ (GitHub Pages: branch, /docs).")
+    return 0
+
+
 def register(sub) -> None:
+    st = sub.add_parser("site", help="export the browser demo data (docs/data/graph.json) from data/ftc.rl")
+    st.add_argument("--top", type=int, default=200)
+    st.set_defaults(fn=cmd_site)
     hk = sub.add_parser("hook", help="Claude Code UserPromptSubmit hook: evidence + caution for phone numbers")
     hk.add_argument("--ftc", default=None, help="FTC store (default data/ftc.rl)")
     hk.set_defaults(fn=cmd_hook)

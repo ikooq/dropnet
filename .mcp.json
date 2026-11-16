@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "dropnet": {
+      "command": "python",
+      "args": ["-m", "dropnet", "mcp"]
+    },
+    "relate-native": {
+      "command": "relate",
+      "args": ["serve", "--database", "data/dropnet.rl", "--mcp", "stdio", "--read-only"]
+    }
+  }
+}

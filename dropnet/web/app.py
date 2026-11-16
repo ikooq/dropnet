@@ -198,24 +198,15 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
         except Exception as e:  # Relate compile/runtime errors explain how to fix the query
             raise HTTPException(400, f"{type(e).__name__}: {e}")
 
-    TOOLS = {
-        "get_schema": lambda c, a: tools.get_schema(c),
-        "read_cypher": lambda c, a: tools.read_cypher(c, a["statement"], a.get("params")),
-        "find_campaign": lambda c, a: tools.find_campaign(c, a["complaint_id"]),
-        "explain_link": lambda c, a: {**(r := tools.explain_link(c, a["a"], a["b"])), "path_text": tools.render_path(r)},
-        "top_mules": lambda c, a: tools.top_mules(c, a["campaign_id"], int(a.get("n", 5))),
-        "similar_scripts": lambda c, a: tools.similar_scripts(c, a["text"], int(a.get("k", 5))),
-        "build_case": lambda c, a: report.to_markdown(report.build_case(c, a["campaign_id"])),
-        "list_campaigns": lambda c, a: tools.list_campaigns(c),
-    }
-
     @app.post("/api/tools/{name}")
     def tool(name: str, args: dict[str, Any] = Body(default_factory=dict)):
-        if name not in TOOLS:
+        if name not in tools.TOOL_NAMES:
             raise HTTPException(404, f"unknown tool {name}")
         try:
-            return run(lambda c: TOOLS[name](c, args))
+            return run(tools.dispatch, name, args)
         except (KeyError, ValueError) as e:
+            raise HTTPException(400, f"{type(e).__name__}: {e}")
+        except Exception as e:  # Relate errors explain how to fix the query
             raise HTTPException(400, f"{type(e).__name__}: {e}")
 
     app.mount("/", StaticFiles(directory=STATIC, html=True), name="static")

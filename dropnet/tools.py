@@ -262,6 +262,33 @@ def campaign_graph(conn: relate.Connection, campaign_id: str) -> dict:
             "edges": list(uniq.values())}
 
 
+def dispatch(conn: relate.Connection, name: str, args: dict) -> Any:
+    """Named tool calls shared by the web API (/api/tools/{name}) and the MCP server."""
+    from . import report
+    if name == "get_schema":
+        return get_schema(conn)
+    if name == "read_cypher":
+        return read_cypher(conn, args["statement"], args.get("params"))
+    if name == "find_campaign":
+        return find_campaign(conn, args["complaint_id"])
+    if name == "explain_link":
+        r = explain_link(conn, args["a"], args["b"])
+        return {**r, "path_text": render_path(r)}
+    if name == "top_mules":
+        return top_mules(conn, args["campaign_id"], int(args.get("n", 5)))
+    if name == "similar_scripts":
+        return similar_scripts(conn, args["text"], int(args.get("k", 5)))
+    if name == "build_case":
+        return report.to_markdown(report.build_case(conn, args["campaign_id"]))
+    if name == "list_campaigns":
+        return list_campaigns(conn)
+    raise LookupError(name)
+
+
+TOOL_NAMES = ["get_schema", "read_cypher", "find_campaign", "explain_link", "top_mules", "similar_scripts",
+              "build_case", "list_campaigns"]
+
+
 def list_campaigns(conn: relate.Connection) -> list[dict]:
     return [jsonable(dict(r["k"].items())) for r in
             rows(conn, "MATCH (k:Campaign) RETURN k ORDER BY k.size DESC, k.id")]

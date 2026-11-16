@@ -58,6 +58,11 @@ def test_ftc_whatif_and_export(client):
     ex = client.get("/api/ftc/campaigns/POOL-866771/export")
     assert ex.status_code == 200 and len(ex.content) > 1000
     assert "attachment" in ex.headers["content-disposition"]
+    import tempfile
+    from pathlib import Path
+    assert not list(Path(tempfile.gettempdir()).glob("dropnet-case-*/*.rl"))  # no leftovers after download
+    assert client.get("/api/ftc/campaigns/POOL-000000/export").status_code == 404
+    assert not list(Path(tempfile.gettempdir()).glob("dropnet-case-*"))
 
 
 def test_ftc_tools_dispatch(client):

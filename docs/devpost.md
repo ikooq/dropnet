@@ -1,7 +1,7 @@
 # Devpost submission draft — Dropnet
 
 **Tagline (≤ 200 chars):** 296,273 real phone-scam reports in one Relate file. Dropnet finds the number pools behind
-them — 5× what a blocklist catches — and never blames people whose numbers were spoofed.
+them — 3× what a blocklist catches — and never blames people whose numbers were spoofed.
 
 ## Inspiration
 Every day about 13,000 people report unwanted calls to the US Federal Trade Commission. Each report names one number,
@@ -16,8 +16,9 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 
 - **Real results, measured honestly.** Rules learned from reports before 2 Nov, scored on the 103,620 reports that came
   after: a blocklist of every number with ≥ 2 reports (11,968 rules) would have caught 4.3 %; blocking every number
-  ever reported (163,606 rules) 6.2 %; Dropnet's 15,649 rules (those numbers + 3,681 pool blocks) 22.0 %. 17,532 of its
-  catches came from numbers nobody had reported before.
+  ever reported (163,606 rules) 6.2 %; those numbers plus 2,872 geographic pool ranges 14.3 % (22.0 % with toll-free
+  ranges). 17,532 catches came from numbers nobody had reported before. We show the price too: a range rule silences
+  10,000 numbers, so Dropnet ranks ranges for a carrier's decision rather than blocking anything.
 - **Spoofing-aware by design.** Pools are built only from non-spoofed reports, so Dropnet never proposes blocking the
   local ranges spoofers hide in. `assess_number` labels a one-off local number "likely spoofed" and says so.
 - **What-if in a transaction.** Pick pools, ask what blocking them on day one would have stopped: Dropnet writes the
@@ -34,12 +35,12 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 Python + `relate-db` (embedded). FTC daily CSVs → parse → batched `UNWIND`/`MERGE` into a directory store with range
 indexes (296k reports in ~2 min) → campaign detection as Cypher aggregations → `relate clone --to-snapshot-format
 parquet` compacts it to a 40 MB single file committed to the repo. FastAPI + cytoscape.js UI, MCP server (official
-SDK), a Claude Code hook, and a static page with `@relate/relate-wasm`. 184 tests.
+SDK), a Claude Code hook, and a static page with `@relate/relate-wasm`. 187 tests.
 
 ## Challenges
 - The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB.
-- An `UNWIND`-bound property lookup skipped the index on the 249k-number label (21 s); anchoring on an indexed node
-  fixed it (0.03 s). In WASM, per-row lookups cost ~0.5 ms, so the demo addresses nodes by list index — 13 s → 1 s.
+- A multi-hop pattern started from an `UNWIND`-bound key took 21 s on the 249k-number graph; starting from an indexed
+  anchor took 0.03 s. In WASM, per-row lookups cost ~0.5 ms, so the demo addresses nodes by list index — 13 s → 1 s.
 - Being fair to spoofing victims shaped the method: no block rules from spoofed reports, cautions everywhere.
 
 ## What we learned

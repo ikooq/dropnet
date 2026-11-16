@@ -18,12 +18,14 @@ LABEL = {"likely_spoofed": "LIKELY SPOOFED — reported once, from the victim's 
 
 def numbers_in(text: str) -> list[str]:
     seen, out = set(), []
-    for m in US_PHONE.finditer(text):
+    for m in US_PHONE.finditer(text[:20_000]):
         n = "".join(m.groups())
         if n not in seen:
             seen.add(n)
             out.append(n)
-    return out[:5]
+            if len(out) == 5:
+                break
+    return out
 
 
 def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl") -> str | None:
@@ -33,8 +35,10 @@ def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl"
     conn = store.open_store(ftc_store, read_only=True)
     try:
         lines = ["Dropnet evidence (real FTC Do Not Call reports, embedded Relate graph):"]
-        for n in nums:
-            a = assess_number(conn, n)
+        found = [(n, assess_number(conn, n)) for n in nums]
+        if all(a["verdict"] == "unknown" for _, a in found):
+            return None  # e.g. an order number: say nothing rather than add noise
+        for n, a in found:
             pretty = f"{n[:3]}-{n[3:6]}-{n[6:]}"
             if a["verdict"] == "unknown":
                 lines.append(f"- {pretty}: {LABEL['unknown']}.")
@@ -50,11 +54,14 @@ def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl"
 
 
 def main(argv: list[str] | None = None, ftc_store: Path | str | None = None) -> int:
-    try:
+    try:  # a hook must never break the user's prompt: any failure means "no extra context"
         payload = json.loads(sys.stdin.read() or "{}")
-    except ValueError:
+        prompt = payload.get("prompt") if isinstance(payload, dict) else None
+        if not isinstance(prompt, str):
+            return 0
+        ctx = number_guard(prompt, ftc_store or config.DATA_DIR / "ftc.rl")
+        if ctx:
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": ctx}}))
+    except Exception:  # noqa: BLE001
         return 0
-    ctx = number_guard(payload.get("prompt", ""), ftc_store or config.DATA_DIR / "ftc.rl")
-    if ctx:
-        print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": ctx}}))
     return 0

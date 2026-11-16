@@ -40,6 +40,18 @@ def test_cli_hook_json(tmp_path):
     assert "303-555-0001" in data["hookSpecificOutput"]["additionalContext"]
 
 
+def test_unknown_numbers_only_stay_silent(tmp_path):
+    assert hook.number_guard("order 2125550147 shipped", make(tmp_path)) is None
+
+
+def test_hook_survives_odd_input(tmp_path):
+    p = make(tmp_path)
+    for raw in ["[]", '{"prompt": 5}', "not json", "", '{"prompt": "' + " 303-555-0001" * 20000 + '"}']:
+        out = subprocess.run([sys.executable, "-m", "dropnet", "hook", "--ftc", str(p)], input=raw,
+                             capture_output=True, text=True, timeout=60)
+        assert out.returncode == 0, (raw[:20], out.stderr[-300:])
+
+
 def test_cli_hook_silent_without_numbers(tmp_path):
     out = subprocess.run([sys.executable, "-m", "dropnet", "hook", "--ftc", str(make(tmp_path))],
                          input=json.dumps({"prompt": "hello"}), capture_output=True, text=True, timeout=120)

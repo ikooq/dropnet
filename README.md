@@ -35,16 +35,19 @@ visible only in the graph — never in a single report.
 Rules are learned from reports filed **before 2026-11-02** (192,653) and scored on the **103,620 reports filed after**
 — numbers the rules could not have seen.
 
-| rule set | rules | later reports caught |
-|---|---:|---:|
-| block every number ever reported | 163,606 | 6.2 % |
-| classic blocklist: numbers with ≥ 2 reports | 11,968 | 4.3 % |
-| **Dropnet: those numbers + 3,681 pool blocks** | 15,649 | **22.0 %** |
+| rule set | rules | numbers silenced | later reports caught |
+|---|---:|---:|---:|
+| block every number ever reported | 163,606 | 163,606 | 6.2 % |
+| classic blocklist: numbers with ≥ 2 reports | 11,968 | 11,968 | 4.3 % |
+| **Dropnet, geographic pools:** those numbers + 2,872 pool blocks | 14,840 | 28.7 M | **14.3 %** |
+| Dropnet, all pools incl. 809 toll-free blocks | 15,649 | 36.8 M | 22.0 % |
 
-**5× the coverage** of the blocklist with a comparable number of rules; **17,532** of Dropnet's catches came from numbers
-nobody had reported before. Pools are built from *non-spoofed* reports only, so Dropnet never recommends blocking the
-local ranges spoofers hide in (the 1,358 spoofed calls it still catches sit inside genuine pools).
-Reproduce: `python -m dropnet ftc-eval`.
+Pools catch what number lists cannot: **3.3×** the blocklist's coverage from geographic ranges alone (5× with
+toll-free ranges), and **17,532** of the catches came from numbers nobody had reported before. The price is explicit in
+the table: a block rule silences all 10,000 numbers of an NPA-NXX, and toll-free ranges are shared by many legitimate
+businesses — so Dropnet ranks ranges for a carrier's decision, it does not block anything itself. Pools are built from
+*non-spoofed* reports only; still, 1,358 caught calls carried a spoofed caller ID inside a pool range, and the what-if
+shows that count as a risk. Reproduce: `python -m dropnet ftc-eval`.
 
 ## How it uses Relate
 
@@ -85,7 +88,7 @@ Then: pick a pool, click a number, run **What-if**, check `833-766-1884`, downlo
 python -m dropnet ftc-eval                 # the hold-out table above, recomputed from data/ftc.rl
 python -m dropnet ftc-build --fetch        # re-download the FTC files and rebuild (needs the Relate CLI to compact)
 python -m dropnet site                     # refresh the browser demo data in docs/
-pip install -e ".[dev]" && pytest          # 184 tests
+pip install -e ".[dev]" && pytest          # 187 tests
 ```
 
 ### With an AI agent
@@ -120,8 +123,11 @@ quote for every link. Tabs *New complaint*, *Campaigns*, *Inbox* and *Query the 
 
 ## What we learned about Relate 1.0.1 (shared for the team)
 
-* `UNWIND $list AS x MATCH (:Number {number: x})` did not use the range index on a 249k-node label (21 s for 60
-  lookups); anchoring on an indexed node first took 0.03 s.
+* A multi-hop pattern started from an `UNWIND`-bound key —
+  `UNWIND $ns AS x MATCH (:Number {number: x})<-[:FROM_NUMBER]-(r:Report)-[:VICTIM_IN]->(s:State)` — took 21 s for 60
+  keys on the 249k-number graph, while the same data reached from an indexed anchor (`(:FtcCampaign {id})`) took
+  0.03 s. A plain `UNWIND … MATCH (:Number {number: x})` was fast (0.33 s for 5,000), so the planner's choice of start
+  point is the likely cause.
 * In the WASM build a per-row property `MATCH` costs ~0.5 ms and `MERGE` inside `FOREACH` ~0.7 ms; collecting nodes
   into lists once and addressing them as `xs[i]` loaded 34k relationships in ~1 s instead of 13–19 s.
 * `relate.Record` serialises only its result columns, so keys added in Python vanish from JSON — copy to `dict`.

@@ -4,6 +4,7 @@
   "test_reports": 103620,
   "baseline": {
     "rules": 11968,
+    "numbers_blocked": 11968,
     "covered": 4496,
     "coverage": 0.0434
   },
@@ -11,6 +12,7 @@
     "rules": 15649,
     "number_rules": 11968,
     "block_rules": 3681,
+    "numbers_blocked": 36821968,
     "covered": 22829,
     "coverage": 0.2203,
     "new_numbers_caught": 17532,
@@ -122,5 +124,15 @@
   "seconds": 137.0,
   "store_mb": 39.9,
   "first_day": "2026-10-09",
-  "last_day": "2026-11-12"
+  "last_day": "2026-11-12",
+  "dropnet_geographic": {
+    "rules": 14840,
+    "number_rules": 11968,
+    "block_rules": 2872,
+    "numbers_blocked": 28731968,
+    "covered": 14825,
+    "coverage": 0.1431,
+    "new_numbers_caught": 9978,
+    "spoofed_caught": 1168
+  }
 }

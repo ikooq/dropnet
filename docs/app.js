@@ -34,8 +34,10 @@ function renderStatic() {
       on the ${ev.test_reports.toLocaleString()} reports that came after:`;
     $("#eval-bars").innerHTML = hbar(`Every number ever reported (${ev.blocklist_all_seen.rules.toLocaleString()} rules)`, ev.blocklist_all_seen.coverage, max)
       + hbar(`Blocklist, ≥2 reports (${ev.baseline.rules.toLocaleString()})`, ev.baseline.coverage, max)
-      + hbar(`<b>Dropnet</b> + ${ev.dropnet.block_rules.toLocaleString()} pool blocks (${ev.dropnet.rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
-      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} of Dropnet's catches came from numbers nobody had reported before.</p>`;
+      + (ev.dropnet_geographic ? hbar(`<b>Dropnet</b>, geographic pools only (+${ev.dropnet_geographic.block_rules.toLocaleString()})`, ev.dropnet_geographic.coverage, max, true) : "")
+      + hbar(`<b>Dropnet</b>, all pools incl. toll-free (+${ev.dropnet.block_rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
+      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} catches came from numbers nobody had reported before. The price:
+        a block rule silences all 10,000 numbers of its range, and toll-free ranges are shared by many businesses.</p>`;
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
     .map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
@@ -52,7 +54,7 @@ function loadGraph() {
     const i = k++;
     for (const [s, c] of Object.entries(n.states)) { if (!(s in si)) { si[s] = states.length; states.push(s); } eS.push([i, si[s], c]); }
     for (const [s, c] of Object.entries(n.subjects)) { if (!(s in ti)) { ti[s] = subjects.length; subjects.push(s); } eT.push([i, ti[s], c]); }
-    return { number: n.number, reports: n.reports, i };
+    return { number: n.number, reports: n.reports, verdict: n.verdict, i };
   }) }));
   q(`UNWIND range(0, size($s) - 1) AS i CREATE (:State {name: $s[i], idx: i})`, { s: states });
   q(`UNWIND range(0, size($s) - 1) AS i CREATE (:Subject {code: $s[i], idx: i})`, { s: subjects });
@@ -61,7 +63,7 @@ function loadGraph() {
      CREATE (c:Pool {id: p.id, numbers: p.numbers, reports: p.reports, states: p.states, toll_free: p.toll_free,
                      first_day: p.first_day, last_day: p.last_day})-[:USES_BLOCK]->(b)
      WITH b, p UNWIND p.nums AS n
-     CREATE (:Number {number: n.number, reports: n.reports, idx: n.i})-[:IN_BLOCK]->(b)`, { pools });
+     CREATE (:Number {number: n.number, reports: n.reports, verdict: n.verdict, idx: n.i})-[:IN_BLOCK]->(b)`, { pools });
   for (const [label, rel, edges] of [["State", "CALLED_INTO", eS], ["Subject", "ABOUT", eT]]) {
     q(`MATCH (x:Number) WITH x ORDER BY x.idx WITH collect(x) AS xs
        MATCH (s:${label}) WITH xs, s ORDER BY s.idx WITH xs, collect(s) AS ss
@@ -121,9 +123,11 @@ function check(raw) {
   $("#num-in").value = n.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
   const r = q(`MATCH (n:Number {number: $n})-[:IN_BLOCK]->(b:Block)<-[:USES_BLOCK]-(c:Pool)
                OPTIONAL MATCH (n)-[s:CALLED_INTO]->(st:State)
-               RETURN n.reports AS reports, c.id AS pool, c.numbers AS pool_numbers, count(st) AS states`, { n });
+               RETURN n.reports AS reports, n.verdict AS verdict, c.id AS pool, c.numbers AS pool_numbers, count(st) AS states`, { n });
+  const spoofed = r.length && r[0].verdict === "likely_spoofed";
   $("#num-out").innerHTML = r.length && r[0].reports != null
-    ? `<p class="verdict pool">Part of a number pool</p><p>${r[0].reports.toLocaleString()} reports · ${r[0].states} states ·
+    ? `<p class="verdict ${spoofed ? "likely_spoofed" : "pool"}">${spoofed ? "Likely spoofed — reported from the victim's own area code; the owner is probably innocent"
+        : "Part of a number pool"}</p><p>${r[0].reports.toLocaleString()} reports · ${r[0].states} states ·
        ${esc(r[0].pool)} has ${r[0].pool_numbers} reported numbers</p><div class="caution">${esc(data.caution)}</div>`
     : `<p class="verdict">Not among the 200 biggest pools loaded in this browser demo.</p><p class="muted">The full app
        (<code>pip install -e . && python -m dropnet serve</code>) checks all ${data.summary.numbers.toLocaleString()} reported numbers

@@ -251,7 +251,7 @@ async function runQuery() {
 $("#q-go").addEventListener("click", runQuery);
 
 /* ------------------------------------------------------- real FTC data */
-let ftcCy = null, ftcCampaigns = [];
+let ftcCy = null, ftcCampaigns = [], ftcSplit = null;
 const pct = (x) => `${(100 * x).toFixed(1)}%`;
 const fmtNum = (n) => String(n).replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
 function hbar(label, value, max, ours) {
@@ -271,13 +271,17 @@ async function loadReal() {
     [(s.campaigns.pool || 0).toLocaleString(), "number pools found"]].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
   const ev = s.eval;
   if (ev) {
+    ftcSplit = ev.split_day;
     const max = Math.max(ev.dropnet.coverage, ev.blocklist_all_seen.coverage);
     $("#eval-caption").innerHTML = `Rules learned from reports before ${esc(ev.split_day)} (${ev.train_reports.toLocaleString()}),
       scored on the ${ev.test_reports.toLocaleString()} reports that came after. Share of later reports each rule set would have caught:`;
     $("#eval-bars").innerHTML = hbar(`Block every number ever reported (${ev.blocklist_all_seen.rules.toLocaleString()} rules)`, ev.blocklist_all_seen.coverage, max)
       + hbar(`Blocklist: numbers with ≥2 reports (${ev.baseline.rules.toLocaleString()})`, ev.baseline.coverage, max)
-      + hbar(`<b>Dropnet</b>: those + ${ev.dropnet.block_rules.toLocaleString()} pool blocks (${ev.dropnet.rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
-      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} of Dropnet's catches came from numbers nobody had reported before.</p>`;
+      + (ev.dropnet_geographic ? hbar(`<b>Dropnet</b>, geographic pool blocks only (+${ev.dropnet_geographic.block_rules.toLocaleString()})`, ev.dropnet_geographic.coverage, max, true) : "")
+      + hbar(`<b>Dropnet</b>, all pool blocks incl. toll-free (+${ev.dropnet.block_rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
+      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} catches came from numbers nobody had reported before. The price: a
+        block rule silences all 10,000 numbers of its range (${(ev.dropnet.numbers_blocked / 1e6).toFixed(1)} M numbers vs
+        ${ev.baseline.numbers_blocked.toLocaleString()} for the blocklist), and toll-free ranges are shared by many businesses — blocking is a carrier's call.</p>`;
   }
   const prof = s.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share);
   $("#spoof-bars").innerHTML = prof.map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
@@ -320,9 +324,11 @@ async function openFtc(id) {
   $("#whatif-go").addEventListener("click", async () => {
     const blocks = [...document.querySelectorAll(".whatif-pick input:checked")].map((x) => x.value);
     try {
-      const r = await post("api/ftc/whatif", { blocks });
-      $("#whatif-out").innerHTML = `<p><b>${r.reports_stopped.toLocaleString()}</b> reports from <b>${r.numbers_covered.toLocaleString()}</b> numbers
-        would have been stopped by ${r.rules} block rule${r.rules > 1 ? "s" : ""}; ${r.campaigns_touched.length} campaigns touched.</p>`;
+      const r = await post("api/ftc/whatif", { blocks, since_day: ftcSplit });
+      $("#whatif-out").innerHTML = `<p>Reports filed from ${esc(ftcSplit || "the first day")}: <b>${r.reports_stopped.toLocaleString()}</b> from
+        <b>${r.numbers_covered.toLocaleString()}</b> numbers would have been stopped by ${r.rules} block rule${r.rules > 1 ? "s" : ""}
+        (each block covers 10,000 numbers); ${r.campaigns_touched.length} campaigns touched.
+        ${r.spoofed_reports_in_scope ? `<br><span class="muted">${r.spoofed_reports_in_scope.toLocaleString()} of them were spoofed-local calls — a block would also hit those numbers' real owners.</span>` : ""}</p>`;
     } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   });
 }

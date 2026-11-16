@@ -74,9 +74,13 @@ def _print_eval(r: dict) -> None:
     print(f"| rules | count | later reports caught |\n|---|---:|---:|")
     print(f"| every number ever reported | {allseen['rules']:,} | {allseen['coverage']:.1%} |")
     print(f"| blocklist: numbers with ≥2 reports | {b['rules']:,} | {b['coverage']:.1%} |")
-    print(f"| Dropnet: those numbers + {d['block_rules']:,} pool blocks | {d['rules']:,} | {d['coverage']:.1%} |")
-    print(f"\nDropnet caught {d['new_numbers_caught']:,} reports from numbers never reported before; "
-          f"{d['spoofed_caught']:,} of its catches were neighbor-spoofed calls.")
+    g = r.get("dropnet_geographic")
+    if g:
+        print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {g['coverage']:.1%} |")
+    print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {d['coverage']:.1%} |")
+    print(f"\n{d['new_numbers_caught']:,} catches came from numbers never reported before. Price: block rules silence "
+          f"{d.get('numbers_blocked', 0) / 1e6:.1f} M numbers (blocklist: {b.get('numbers_blocked', b['rules']):,}); "
+          f"risk: {d['spoofed_caught']:,} caught calls carried a spoofed caller ID inside a pool range.")
 
 
 def cmd_ftc_eval(a: argparse.Namespace) -> int:

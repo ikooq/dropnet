@@ -19,9 +19,11 @@ def export(ftc_store: Path | str = config.DATA_DIR / "ftc.rl", out: Path | str =
         for p in pools:
             p["block"] = p["id"].replace("POOL-", "")
             nums = rows(conn, """
-                MATCH (:FtcCampaign {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)
-                RETURN n.number AS number, n.reports AS reports ORDER BY reports DESC, number LIMIT $k""",
-                        {"id": p["id"], "k": per_pool})
+                MATCH (:FtcCampaign {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(r:Report)
+                WITH n, count(r) AS reps, sum(CASE WHEN r.neighbor THEN 1 ELSE 0 END) AS nb
+                RETURN n.number AS number, n.reports AS reports,
+                       CASE WHEN reps <= 2 AND nb = reps THEN 'likely_spoofed' ELSE 'pool' END AS verdict
+                ORDER BY reports DESC, number LIMIT $k""", {"id": p["id"], "k": per_pool})
             keep = {n["number"] for n in nums}
             st = rows(conn, """
                 MATCH (:FtcCampaign {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(r:Report)

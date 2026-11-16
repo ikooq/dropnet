@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -172,8 +172,15 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
         try:
             run_ftc(ftc_whatif.export_case, cid, tmp)
         except KeyError:
+            shutil.rmtree(tmp.parent, ignore_errors=True)
             raise HTTPException(404, "unknown campaign")
-        return FileResponse(tmp, filename=tmp.name, media_type="application/octet-stream")
+        except Exception:
+            shutil.rmtree(tmp.parent, ignore_errors=True)
+            raise
+        data = tmp.read_bytes()  # small (~1 MB): serve from memory so nothing is left on disk
+        shutil.rmtree(tmp.parent, ignore_errors=True)
+        return Response(data, media_type="application/octet-stream",
+                        headers={"content-disposition": f'attachment; filename="{tmp.name}"'})
 
     @app.get("/api/ftc/states")
     def ftc_states():

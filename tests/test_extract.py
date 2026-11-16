@@ -87,6 +87,12 @@ def test_spans_quote():
         assert e.extractor == "rules"
 
 
+def test_quote_not_cut_at_abbreviation():
+    text = "Мне позвонили. Я перевела 50 тыс. тг на карту 4000 0012 3456 1234, как он сказал. Конец."
+    card = next(e for e in rules.extract("CMP-0013", text) if e.kind == "card")
+    assert card.quote.startswith("Я перевела 50 тыс. тг")
+
+
 def test_no_entities():
     assert rules.extract("CMP-0005", "Мне просто нагрубили") == []
 

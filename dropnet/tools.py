@@ -27,8 +27,20 @@ _ALLOWED_CALLS = {"db.index.vector.querynodes", "db.labels", "db.relationshiptyp
 
 
 # ------------------------------------------------------------------- helpers
+_FULL_PAN = re.compile(r"(?<![\d*])(\d{4})[ -]?(\d{2})\d{2}[ -]?\d{4}[ -]?(\d{4})(?![\d*])")
+
+
+def redact(text: str | None) -> str | None:
+    """Mask full card numbers in free text: 4000 0012 3456 1234 -> 4000 00** **** 1234."""
+    if text is None:
+        return None
+    return _FULL_PAN.sub(lambda m: f"{m.group(1)} {m.group(2)}** **** {m.group(3)}", text)
+
+
 def jsonable(v: Any) -> Any:
-    if v is None or isinstance(v, (bool, int, float, str)):
+    if isinstance(v, str):
+        return redact(v)
+    if v is None or isinstance(v, (bool, int, float)):
         return v
     if isinstance(v, (date, datetime)):
         return v.isoformat()
@@ -114,7 +126,7 @@ def _quote_for(conn, complaint_id: str, label: str, key: Any) -> str | None:
         return None
     r = rows(conn, """MATCH (x:Extraction {complaint_id: $c, kind: $k, value: $v}) RETURN x.quote AS q LIMIT 1""",
              {"c": complaint_id, "k": kind, "v": key})
-    return r[0]["q"] if r else None
+    return redact(r[0]["q"]) if r else None
 
 
 def explain_link(conn: relate.Connection, a: str, b: str, max_len: int = 8) -> dict:
@@ -122,16 +134,19 @@ def explain_link(conn: relate.Connection, a: str, b: str, max_len: int = 8) -> d
     r = rows(conn, f"""
         MATCH p = shortestPath((x:Complaint {{id: $a}})-[:{LINK_RELS}*..{int(max_len)}]-(y:Complaint {{id: $b}}))
         WHERE all(n IN nodes(p) WHERE coalesce(n.hub, false) = false)
-        RETURN nodes(p) AS ns, [r IN relationships(p) | type(r)] AS rels""", {"a": a, "b": b})
+        RETURN nodes(p) AS ns, [r IN relationships(p) | type(r)] AS rels,
+               [i IN range(0, size(relationships(p)) - 1) |
+                    startNode(relationships(p)[i]) = nodes(p)[i]] AS fwd""", {"a": a, "b": b})
     if not r:
         sim = rows(conn, """
             MATCH (x:Complaint {id: $a})-[s:SIMILAR_SCRIPT]-(y:Complaint {id: $b}) RETURN s.score AS score""",
                    {"a": a, "b": b})
         return {"found": bool(sim), "hops": [{"label": "Complaint", "key": a}, {"label": "Complaint", "key": b}]
-                if sim else [], "rels": ["SIMILAR_SCRIPT"] if sim else [], "quotes": [],
-                "similarity": sim[0]["score"] if sim else None}
+                if sim else [], "rels": ["SIMILAR_SCRIPT"] if sim else [], "forward": [True] if sim else [],
+                "quotes": [], "similarity": sim[0]["score"] if sim else None}
     hops = [_node_ref(n) for n in r[0]["ns"]]
     rels = r[0]["rels"]
+    forward = [bool(x) for x in r[0]["fwd"]]
     quotes = []
     for i, h in enumerate(hops):
         if h["label"] != "Complaint":
@@ -141,7 +156,21 @@ def explain_link(conn: relate.Connection, a: str, b: str, max_len: int = 8) -> d
                 q = _quote_for(conn, h["key"], hops[j]["label"], hops[j]["key"])
                 if q:
                     quotes.append({"complaint": h["key"], "entity": hops[j]["key"], "quote": q})
-    return {"found": True, "hops": hops, "rels": rels, "quotes": quotes, "similarity": None}
+    return {"found": True, "hops": hops, "rels": rels, "forward": forward, "quotes": quotes, "similarity": None}
+
+
+def render_path(link: dict) -> str:
+    """CMP-0012 —PAID_TO→ 4000 00** **** 1234 ←PAID_TO— CMP-0031"""
+    if not link.get("found"):
+        return "(no connection found)"
+    if link.get("similarity") is not None:
+        a, b = link["hops"][0]["key"], link["hops"][1]["key"]
+        return f"{a} ≈same script ({link['similarity']:.2f})≈ {b}"
+    parts = [str(link["hops"][0]["key"])]
+    for rel, fwd, hop in zip(link["rels"], link["forward"], link["hops"][1:]):
+        parts.append(f"—{rel}→" if fwd else f"←{rel}—")
+        parts.append(str(hop["key"]))
+    return " ".join(parts)
 
 
 def top_mules(conn: relate.Connection, campaign_id: str, n: int = 5) -> list[dict]:

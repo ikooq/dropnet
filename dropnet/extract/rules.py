@@ -42,11 +42,15 @@ PERSONA_RE = re.compile(r"(?<![А-Яа-яЁё])(" + "|".join(f"(?P<n{i}>{_name_r
                         + r")(?![А-Яа-яЁё])")
 
 
+# A sentence ends at . ! ? or newline — but not after common abbreviations like "тыс." or "млн.".
+_SENT_END = re.compile(r"(?<!тыс)(?<!млн)(?<!руб)(?<!г)(?<!ул)[.!?](?=\s|$)|\n")
+
+
 def _quote(text: str, start: int, end: int, limit: int = 240) -> str:
     """The sentence around a span, clipped to `limit` chars but always containing the span."""
-    s = max(text.rfind(c, 0, start) for c in ".!?\n") + 1
-    e_candidates = [i for i in (text.find(c, end) for c in ".!?\n") if i != -1]
-    e = min(e_candidates) + 1 if e_candidates else len(text)
+    ends = [m.end() for m in _SENT_END.finditer(text)]
+    s = max([e for e in ends if e <= start], default=0)
+    e = min([x for x in ends if x >= end], default=len(text))
     q = text[s:e].strip()
     if len(q) <= limit:
         return q

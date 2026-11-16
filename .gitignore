@@ -4,3 +4,5 @@ __pycache__/
 *.auth-token
 .env
 .pytest_cache/
+.superpowers/
+data/live/

@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+dropnet/__init__.py
+dropnet.egg-info/PKG-INFO
+dropnet.egg-info/SOURCES.txt
+dropnet.egg-info/dependency_links.txt
+dropnet.egg-info/requires.txt
+dropnet.egg-info/top_level.txt
+tests/test_store.py

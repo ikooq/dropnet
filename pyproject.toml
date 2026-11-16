@@ -22,7 +22,7 @@ dropnet = "dropnet.__main__:main"
 [project.optional-dependencies]
 agent = ["pydantic-ai"]
 ml = ["sentence-transformers"]
-dev = ["pytest>=8", "httpx>=0.27"]
+dev = ["pytest>=8", "httpx>=0.27", "neo4j>=5"]
 
 [tool.setuptools.packages.find]
 include = ["dropnet*"]

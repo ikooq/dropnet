@@ -82,6 +82,27 @@ relate --snapshot-format markdown --markdown-body-properties text --database dat
 # NET-217863, 14, 10883
 ```
 
+## Works with the Neo4j ecosystem
+
+The same file speaks **Bolt**, so existing Neo4j drivers and tools work unchanged (tested in `tests/test_bolt.py`):
+
+```bash
+relate serve --database data/ftc.rl --read-only --bolt 7687 --auth none     # loopback only
+```
+```python
+from neo4j import GraphDatabase
+with GraphDatabase.driver("bolt://127.0.0.1:7687", auth=None) as d:
+    print(d.execute_query("MATCH (c:FtcCampaign {kind: 'pool'}) RETURN count(c) AS pools").records)
+```
+
+To share confirmed pools with a team's Neo4j / Aura, push only that subgraph (credentials in an env file, preview first):
+
+```bash
+relate push --to aura.env --database data/ftc.rl --dry-run   --query "MATCH p = (:FtcCampaign {kind: 'pool'})-[:USES_BLOCK]->(:Block) RETURN p"   --merge-key FtcCampaign:id --merge-key Block:npa_nxx
+```
+
+Investigate locally, embedded; publish only what was confirmed.
+
 ## How it uses Relate
 
 - **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,

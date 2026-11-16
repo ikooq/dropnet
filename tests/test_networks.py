@@ -33,6 +33,11 @@ def test_sibling_pools_share_area_day_subject(tmp_path):
     from dropnet.ftc import api
     nets = api.networks(c)
     assert nets[0]["pools"] == 2 and {m["id"] for m in nets[0]["members"]} == {"POOL-866771", "POOL-877578"}
+    from dropnet.ftc import load as ftc_load
+    ftc_load.ensure_fulltext(c)
+    hits = api.search_pools(c, "mortgage")  # full-text on scam types, then graph hops to the pools
+    assert hits["subjects"][0]["code"] == "DEBT" and {p["id"] for p in hits["pools"]} == {"POOL-866771", "POOL-877578"}
+    assert api.search_pools(c, "")["pools"] == []
     networks.link_pools(c, min_shared=3)  # idempotent
     assert store.rows(c, "MATCH ()-[s:SIBLING]->() RETURN count(s) AS n")[0]["n"] == 1
     c.close()

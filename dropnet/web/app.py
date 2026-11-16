@@ -182,6 +182,10 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
         return Response(data, media_type="application/octet-stream",
                         headers={"content-disposition": f'attachment; filename="{tmp.name}"'})
 
+    @app.get("/api/ftc/search")
+    def ftc_search(q: str = ""):
+        return run_ftc(ftc_api.search_pools, q[:200])
+
     @app.get("/api/ftc/networks")
     def ftc_networks():
         return run_ftc(ftc_api.networks)

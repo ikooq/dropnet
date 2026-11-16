@@ -22,6 +22,11 @@ def ensure_indexes(conn: relate.Connection) -> None:
         rows(conn, f"CREATE INDEX {label.lower()}_{prop}_idx IF NOT EXISTS FOR (n:{label}) ON (n.{prop})")
 
 
+def ensure_fulltext(conn: relate.Connection) -> None:
+    """Relate full-text index over scam-type labels (search 'mortgage', 'medical', 'government' …)."""
+    rows(conn, "CREATE FULLTEXT INDEX subject_label_ft IF NOT EXISTS FOR (s:Subject) ON EACH [s.label]")
+
+
 def _chunks(xs: list, n: int):
     for i in range(0, len(xs), n):
         yield xs[i:i + n]

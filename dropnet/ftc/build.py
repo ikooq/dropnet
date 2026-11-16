@@ -38,6 +38,7 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
     conn = store.open_store(work)
     try:
         stats = load.load_reports(conn, reports)
+        load.ensure_fulltext(conn)
         log(f"loaded {stats} in {time.perf_counter() - t0:.0f}s")
         n = campaigns.write_campaigns(conn)
         log(f"wrote {n:,} campaigns")

@@ -129,6 +129,7 @@ Investigate locally, embedded; publish only what was confirmed.
 | one campaign → its own single-file store | `whatif.export_case` |
 | `relate clone --to-snapshot-format parquet` compaction | `dropnet/ftc/build.py` |
 | **WebAssembly build** in the browser demo (in-memory, ~1 s load) | `docs/app.js` |
+| **full-text index** + `db.index.fulltext.queryNodes` ("mortgage" → scam type → its pools; `GET /api/ftc/search?q=`) | `dropnet/ftc/api.py` |
 | vector index + `db.index.vector.queryNodes`, `shortestPath`, variable-length money trails | free-text module |
 | **MCP**: our server + Relate's native `relate serve --mcp stdio --read-only` | `.mcp.json` |
 

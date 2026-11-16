@@ -91,7 +91,22 @@ def networks(conn: relate.Connection) -> list[dict]:
     return out
 
 
-FTC_TOOL_NAMES =["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block"]
+def search_pools(conn: relate.Connection, text: str, limit: int = 20) -> dict:
+    """Full-text search (Relate FULLTEXT index on Subject.label) then graph hops to the pools behind those scams."""
+    text = (text or "").strip()
+    if not text:
+        return {"subjects": [], "pools": []}
+    subjects = rows(conn, """CALL db.index.fulltext.queryNodes('subject_label_ft', $q) YIELD node, score
+                             RETURN node.code AS code, node.label AS label, score ORDER BY score DESC LIMIT 5""",
+                    {"q": text})
+    codes = [s["code"] for s in subjects]
+    pools = rows(conn, """MATCH (c:FtcCampaign {kind: 'pool'}) WHERE any(s IN c.subjects WHERE s IN $codes)
+                          RETURN c.id AS id, c.reports AS reports, c.numbers AS numbers, c.subjects AS subjects
+                          ORDER BY reports DESC LIMIT $lim""", {"codes": codes, "lim": int(limit)}) if codes else []
+    return {"subjects": subjects, "pools": pools}
+
+
+FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block"]
 
 
 def dispatch_ftc(conn: relate.Connection, name: str, args: dict):

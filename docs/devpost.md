@@ -57,6 +57,14 @@ indexes (296k reports in ~2 min) â†’ campaign detection as Cypher aggregations â
 parquet` compacts it to a 40 MB single file committed to the repo. FastAPI + cytoscape.js UI, MCP server (official
 SDK), a Claude Code hook, a Relate command extension, and a static page with `@relate/relate-wasm`. 206 tests.
 
+## AI-assisted development
+Built with substantial help from Claude Code (Anthropic), as the rules allow. I chose the problem (phone fraud on real
+FTC data), the approach (number ranges, excluding spoofed reports), and the priorities, and I directed and reviewed
+each step. Claude Code wrote most of the code, tests and documentation under that direction, ran the evaluations,
+and built the demo page and the video. The video's voice-over is synthetic (Kokoro, a local text-to-speech model).
+Every number in this write-up comes from the code and public data in the repository, and can be reproduced with
+`python -m dropnet ftc-eval` and `python -m dropnet ftc-robustness`.
+
 ## Challenges
 - The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB.
 - A multi-hop pattern started from an `UNWIND`-bound key took 21 s on the 249k-number graph; starting from an indexed

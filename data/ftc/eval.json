@@ -158,5 +158,260 @@
     "naive_dismiss_share": 0.246,
     "dropnet_flags_spoofed": 395,
     "note": "Dropnet's hook and MCP tool return these verdicts with the spoofing caution before the agent answers."
+  },
+  "fcc_crosscheck": {
+    "pools_checked": 50,
+    "pools_confirmed": 49,
+    "pool_rate": 0.98,
+    "random_rate": 0.092,
+    "random_blocks_per_draw": 50,
+    "seeds": 20,
+    "confirmed": [
+      {
+        "block": "866771",
+        "ftc_reports": 1581,
+        "fcc_complaints": 10
+      },
+      {
+        "block": "217863",
+        "ftc_reports": 1468,
+        "fcc_complaints": 14
+      },
+      {
+        "block": "877578",
+        "ftc_reports": 1290,
+        "fcc_complaints": 9
+      },
+      {
+        "block": "833766",
+        "ftc_reports": 1212,
+        "fcc_complaints": 12
+      },
+      {
+        "block": "866386",
+        "ftc_reports": 887,
+        "fcc_complaints": 6
+      },
+      {
+        "block": "855580",
+        "ftc_reports": 755,
+        "fcc_complaints": 7
+      },
+      {
+        "block": "217834",
+        "ftc_reports": 654,
+        "fcc_complaints": 2
+      },
+      {
+        "block": "844515",
+        "ftc_reports": 651,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "844589",
+        "ftc_reports": 621,
+        "fcc_complaints": 26
+      },
+      {
+        "block": "888310",
+        "ftc_reports": 595,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "844475",
+        "ftc_reports": 526,
+        "fcc_complaints": 40
+      },
+      {
+        "block": "949565",
+        "ftc_reports": 497,
+        "fcc_complaints": 8
+      },
+      {
+        "block": "855994",
+        "ftc_reports": 495,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "833662",
+        "ftc_reports": 454,
+        "fcc_complaints": 4
+      },
+      {
+        "block": "866398",
+        "ftc_reports": 405,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "833254",
+        "ftc_reports": 400,
+        "fcc_complaints": 21
+      },
+      {
+        "block": "833371",
+        "ftc_reports": 395,
+        "fcc_complaints": 11
+      },
+      {
+        "block": "365826",
+        "ftc_reports": 393,
+        "fcc_complaints": 21
+      },
+      {
+        "block": "877372",
+        "ftc_reports": 387,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "866480",
+        "ftc_reports": 385,
+        "fcc_complaints": 13
+      },
+      {
+        "block": "888269",
+        "ftc_reports": 359,
+        "fcc_complaints": 2
+      },
+      {
+        "block": "888750",
+        "ftc_reports": 359,
+        "fcc_complaints": 12
+      },
+      {
+        "block": "844502",
+        "ftc_reports": 355,
+        "fcc_complaints": 1
+      },
+      {
+        "block": "855363",
+        "ftc_reports": 355,
+        "fcc_complaints": 14
+      },
+      {
+        "block": "877554",
+        "ftc_reports": 353,
+        "fcc_complaints": 16
+      },
+      {
+        "block": "844594",
+        "ftc_reports": 332,
+        "fcc_complaints": 8
+      },
+      {
+        "block": "855750",
+        "ftc_reports": 326,
+        "fcc_complaints": 10
+      },
+      {
+        "block": "866594",
+        "ftc_reports": 325,
+        "fcc_complaints": 13
+      },
+      {
+        "block": "709300",
+        "ftc_reports": 300,
+        "fcc_complaints": 15
+      },
+      {
+        "block": "844588",
+        "ftc_reports": 299,
+        "fcc_complaints": 15
+      },
+      {
+        "block": "844562",
+        "ftc_reports": 297,
+        "fcc_complaints": 13
+      },
+      {
+        "block": "855520",
+        "ftc_reports": 293,
+        "fcc_complaints": 11
+      },
+      {
+        "block": "331888",
+        "ftc_reports": 290,
+        "fcc_complaints": 1
+      },
+      {
+        "block": "866666",
+        "ftc_reports": 290,
+        "fcc_complaints": 6
+      },
+      {
+        "block": "888912",
+        "ftc_reports": 289,
+        "fcc_complaints": 2
+      },
+      {
+        "block": "877733",
+        "ftc_reports": 287,
+        "fcc_complaints": 19
+      },
+      {
+        "block": "866711",
+        "ftc_reports": 282,
+        "fcc_complaints": 9
+      },
+      {
+        "block": "833691",
+        "ftc_reports": 270,
+        "fcc_complaints": 9
+      },
+      {
+        "block": "833640",
+        "ftc_reports": 260,
+        "fcc_complaints": 4
+      },
+      {
+        "block": "877961",
+        "ftc_reports": 256,
+        "fcc_complaints": 5
+      },
+      {
+        "block": "833906",
+        "ftc_reports": 254,
+        "fcc_complaints": 6
+      },
+      {
+        "block": "844650",
+        "ftc_reports": 249,
+        "fcc_complaints": 9
+      },
+      {
+        "block": "877795",
+        "ftc_reports": 249,
+        "fcc_complaints": 11
+      },
+      {
+        "block": "855324",
+        "ftc_reports": 248,
+        "fcc_complaints": 14
+      },
+      {
+        "block": "428496",
+        "ftc_reports": 231,
+        "fcc_complaints": 19
+      },
+      {
+        "block": "855883",
+        "ftc_reports": 228,
+        "fcc_complaints": 2
+      },
+      {
+        "block": "866342",
+        "ftc_reports": 216,
+        "fcc_complaints": 9
+      },
+      {
+        "block": "775438",
+        "ftc_reports": 206,
+        "fcc_complaints": 1
+      },
+      {
+        "block": "877681",
+        "ftc_reports": 201,
+        "fcc_complaints": 7
+      }
+    ]
   }
 }

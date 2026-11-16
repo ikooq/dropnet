@@ -19,6 +19,8 @@ scam types and victims in dozens of states. A pool is invisible in any single re
   ever reported (163,606 rules) 6.2 %; those numbers plus 2,872 geographic pool ranges 14.3 % (22.0 % with toll-free
   ranges). 17,532 catches came from numbers nobody had reported before. We show the price too: a range rule silences
   10,000 numbers, so Dropnet ranks ranges for a carrier's decision rather than blocking anything.
+- **Confirmed by a second agency.** 49 of the 50 largest pools (98 %) also show up in the FCC's separate consumer
+  complaints for the same weeks — versus 9.2 % of random reported blocks.
 - **Pools are signal, not noise.** Control: the same number of *random* reported blocks catches 4.4 % of later reports;
   the pool blocks catch 20.3 % — a 4.7× lift. 83 % of pool rules caught at least one later report.
 - **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported

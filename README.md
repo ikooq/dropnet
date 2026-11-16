@@ -51,6 +51,11 @@ businesses — so Dropnet ranks ranges for a carrier's decision, it does not blo
 *non-spoofed* reports only; still, 1,358 caught calls carried a spoofed caller ID inside a pool range, and the what-if
 shows that count as a risk. Reproduce: `python -m dropnet ftc-eval`.
 
+**Confirmed by a second agency.** The FCC publishes its own consumer complaints (a different agency, a different
+intake form). Over the same weeks it received 13,696 complaints with a caller ID. **49 of Dropnet's 50 largest pools
+(98 %)** have FCC complaints from numbers in the same block — against **9.2 %** for random reported blocks (20 draws);
+for the top 200 pools, 92.5 % vs 8.7 %. Data: `data/fcc/`, code: `dropnet/ftc/crosscheck.py`.
+
 **Is a pool more than a random block?** A control: the same number of blocks (3,681), drawn at random from the 44,306
 blocks that had a non-spoofed report before the split, catches **4.4 %** of later reports; the pool blocks catch
 **20.3 %** — a **4.7× lift**. **83 %** of pool rules caught at least one later report (16.7 % stayed dormant).

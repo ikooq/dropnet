@@ -88,6 +88,12 @@ def write_extractions(conn: relate.Connection, extractions: Iterable[Extraction]
                                                            n.label_en = r.label_en
             MERGE (c)-[:USED_TACTIC]->(n)
         """ + prov, {"rows": by_kind["tactic"]})
+    if "persona" in by_kind:
+        rows(conn, """
+            UNWIND $rows AS r MATCH (c:Complaint {id: r.cid})
+            MERGE (n:Persona {name: r.value}) ON CREATE SET n.synthetic = true
+            MERGE (c)-[:MENTIONS_PERSONA]->(n)
+        """ + prov, {"rows": by_kind["persona"]})
     if "amount" in by_kind:
         rows(conn, """
             UNWIND $rows AS r MATCH (c:Complaint {id: r.cid})

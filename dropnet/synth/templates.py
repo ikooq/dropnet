@@ -39,6 +39,10 @@ CAMPAIGN_SCRIPTS: dict[str, list[Template]] = {
          "защищённый депозитный счёт {iban}, иначе деньги спишут. Перевёл {amount}.",
          "A woman named Dinara, 'National Bank', called from {phone} and convinced me to move everything to "
          "protected deposit account {iban} or lose it. I sent {amount}."),
+        ("Сначала звонили с {phone}, потом перезванивали с {phone2} — Динара из Национального банка. "
+         "Просила срочно перевести сбережения на защищённый депозитный счёт {iban}. Я перевела {amount}.",
+         "First a call from {phone}, then call-backs from {phone2}: Dinara from the National Bank. She urged me "
+         "to move my savings to protected deposit account {iban}. I sent {amount}."),
     ],
     # C: phishing domain, loan status SMS
     "LOAN_STATUS_SMS": [
@@ -53,38 +57,40 @@ CAMPAIGN_SCRIPTS: dict[str, list[Template]] = {
     ],
     # D: forwarding chain, police threat
     "POLICE_THREAT": [
-        ("Позвонил «следователь Нурлан» с номера {phone}, сказал, что на моё имя оформлен кредит для "
+        ("Позвонил «следователь» с номера {phone}, сказал, что на моё имя оформлен кредит для "
          "финансирования преступной деятельности, и мне грозит уголовное дело. Чтобы «снять подозрения», "
          "велел перевести {amount} на карту {card}.",
-         "'Investigator Nurlan' called from {phone}, said a loan in my name was funding crime and I faced a "
+         "An 'investigator' called from {phone}, said a loan in my name was funding crime and I faced a "
          "criminal case. To 'clear suspicion' he told me to transfer {amount} to card {card}."),
-        ("Следователь (назвался Нурланом, {phone}) угрожал уголовным делом из-за кредита на моё имя. "
-         "Я перевела {amount} на карту {card}, как он сказал.",
-         "An investigator (called himself Nurlan, {phone}) threatened a criminal case over a loan in my "
-         "name. I transferred {amount} to card {card} as instructed."),
+        ("Следователь ({phone}) угрожал уголовным делом из-за кредита на моё имя, говорил, что я под "
+         "подозрением. Я перевела {amount} на карту {card}, как он сказал.",
+         "An investigator ({phone}) threatened a criminal case over a loan in my name and said I was a "
+         "suspect. I transferred {amount} to card {card} as instructed."),
     ],
     # E: script-only, investment
     "INVESTMENT": [
-        ("В Telegram написал куратор Алия с платформы «KazOil Invest»: гарантированный доход 30 % в месяц от "
+        ("В Telegram написал личный куратор платформы «KazOil Invest»: гарантированный доход 30 % в месяц от "
          "акций нефтяной компании. Первый взнос через карту {card}, потом попросили налог за вывод. "
-         "Всего отдал {amount}. Её номер {phone}.",
-         "Curator Aliya from the 'KazOil Invest' platform wrote on Telegram: guaranteed 30% monthly return on "
-         "oil company shares. First deposit via card {card}, then a 'withdrawal tax'. I lost {amount} in total. "
-         "Her number: {phone}."),
-        ("Куратор Алия, платформа «KazOil Invest», обещала 30 % в месяц на акциях нефтяной компании. "
-         "Вносил через карту {card}, за вывод потребовали налог. Потерял {amount}. Номер куратора {phone}.",
-         "Curator Aliya, 'KazOil Invest' platform, promised 30% a month on oil company shares. I paid via card "
-         "{card}; withdrawing required a 'tax'. Lost {amount}. Curator's number {phone}."),
+         "Всего отдал {amount}. Номер куратора {phone}.",
+         "A personal curator of the 'KazOil Invest' platform wrote on Telegram: guaranteed 30% monthly return "
+         "on oil company shares. First deposit via card {card}, then a 'withdrawal tax'. I lost {amount} in "
+         "total. Curator's number: {phone}."),
+        ("В Telegram мне написал личный куратор платформы «KazOil Invest»: гарантированный доход 30 % в месяц "
+         "от акций нефтяной компании. Первый взнос через карту {card}, а за вывод попросили налог. "
+         "Потеряла {amount}. Номер куратора {phone}.",
+         "A personal curator of the 'KazOil Invest' platform messaged me on Telegram: guaranteed 30% monthly "
+         "return on oil company shares. First deposit via card {card}; withdrawing required a 'tax'. Lost "
+         "{amount}. Curator's number {phone}."),
     ],
     # F: two shared mules, marketplace prepayment
     "MARKETPLACE_PREPAY": [
-        ("Покупала диван на маркетплейсе, продавец Санжар ({phone}) попросил предоплату 50 % на карту "
-         "{card}, сказал, что отправит курьером СДЭК. Перевела {amount}, продавец пропал.",
-         "I was buying a sofa on a marketplace; seller Sanzhar ({phone}) asked for 50% prepayment to card "
+        ("Покупала диван на маркетплейсе, продавец ({phone}) попросил предоплату 50 % на карту "
+         "{card}, сказал, что отправит курьером. Перевела {amount}, продавец пропал.",
+         "I was buying a sofa on a marketplace; the seller ({phone}) asked for 50% prepayment to card "
          "{card} and promised courier delivery. I sent {amount}; the seller vanished."),
-        ("Продавец мебели Санжар ({phone}) с маркетплейса взял предоплату 50 % на карту {card} за доставку "
+        ("Заказал шкаф у продавца мебели ({phone}), тот взял предоплату на карту {card} за доставку "
          "курьером. Отправил {amount}, больше на связь не выходит.",
-         "Furniture seller Sanzhar ({phone}) from a marketplace took 50% prepayment to card {card} for courier "
+         "I ordered a wardrobe from a furniture seller ({phone}) who took prepayment to card {card} for courier "
          "delivery. I sent {amount}; no reply since."),
     ],
     # G: ATM drop recruitment
@@ -159,6 +165,92 @@ GENERIC: dict[str, list[Template]] = {
     ],
 }
 
+# Unrelated victims tell their stories in their own words: noise is composed from
+# independent parts so two noise complaints rarely read like one script.
+OPENINGS: list[Template] = [
+    ("Хочу сообщить о мошенничестве.", "I want to report fraud."),
+    ("Прошу помочь вернуть деньги.", "Please help me get my money back."),
+    ("Пишу заявление по поводу обмана.", "I am filing a complaint about a scam."),
+    ("Вчера вечером со мной случилась неприятная история.", "Something bad happened to me last night."),
+    ("Мама пожилая, пишу за неё.", "My mother is elderly, I am writing for her."),
+    ("Никогда не думал, что попадусь.", "I never thought I would fall for this."),
+    ("Это произошло на прошлой неделе.", "It happened last week."),
+    ("", ""),
+]
+ENDINGS: list[Template] = [
+    ("Прошу найти виновных.", "Please find those responsible."),
+    ("В банк уже обратилась.", "I have already contacted my bank."),
+    ("Скриншоты переписки сохранил.", "I saved screenshots of the chat."),
+    ("Деньги были отложены на лечение.", "The money was saved for medical treatment."),
+    ("Больше со мной не связывались.", "Nobody contacted me again."),
+    ("Номер теперь не отвечает.", "The number does not answer now."),
+    ("", ""),
+]
+GENERIC_EXTRA: dict[str, list[Template]] = {
+    "BANK_SECURITY": [
+        ("Человек представился сотрудником банка, говорил про подозрительную операцию, номер {phone}. "
+         "Я продиктовала код из SMS, и пропало {amount}.",
+         "A man claiming to be from my bank talked about a suspicious transaction, number {phone}. I read out "
+         "the SMS code and {amount} disappeared."),
+        ("Звонок со службы безопасности, якобы мою карту взломали. Я подтвердила операцию, списали {amount}.",
+         "A 'security service' call said my card was hacked. I confirmed an operation and {amount} was taken."),
+    ],
+    "SAFE_ACCOUNT": [
+        ("Убедили, что надо спасти деньги и перевести на безопасный счёт {iban}. Звонил мужчина, {phone}. "
+         "Ушло {amount}.",
+         "They convinced me to save my money by moving it to a safe account {iban}. A man called, {phone}. "
+         "{amount} gone."),
+    ],
+    "LOAN_STATUS_SMS": [
+        ("Пришло сообщение о займе, я открыла {url} и всё заполнила. Потеряла {amount}.",
+         "A message about a loan arrived; I opened {url} and filled everything in. I lost {amount}."),
+    ],
+    "MARKETPLACE_PREPAY": [
+        ("Покупал б/у ноутбук, по объявлению внёс предоплату {amount} на карту {card}, после чего меня "
+         "заблокировали.",
+         "I was buying a used laptop; I paid {amount} prepayment to card {card} from an ad and was blocked."),
+        ("Снимали квартиру посуточно, по объявлению попросили предоплату на карту {card}. Перевели {amount}, "
+         "квартиры не существует.",
+         "We booked a flat from an ad; they asked for prepayment to card {card}. We sent {amount}; the flat "
+         "doesn't exist."),
+    ],
+    "POLICE_THREAT": [
+        ("Звонил «майор» с {phone}, кричал, что я соучастница и меня арестуют, если не переведу {amount} на "
+         "карту {card}. Говорил про уголовное дело.",
+         "A 'major' called from {phone}, shouting that I was an accomplice and would be arrested unless I sent "
+         "{amount} to card {card}. He talked about a criminal case."),
+    ],
+    "INVESTMENT": [
+        ("Увидела рекламу инвестиций с доходом 1 000 долларов в неделю, отправила {amount} на карту {card}. "
+         "Личный кабинет исчез.",
+         "I saw an investment ad promising $1,000 a week, sent {amount} to card {card}. The account page "
+         "vanished."),
+    ],
+    "ATM_DROP_HELP": [
+        ("У банкомата женщина попросила помочь положить деньги на карту {card}, а потом мой счёт заморозили. "
+         "Сумма {amount}.",
+         "At an ATM a woman asked me to help deposit money to card {card}; later my account was frozen. Amount "
+         "{amount}."),
+    ],
+}
+
+DETAILS: list[Template] = [
+    ("Я работаю учителем в школе.", "I work as a school teacher."),
+    ("Деньги копили на свадьбу дочери.", "We were saving for our daughter's wedding."),
+    ("Голос был очень уверенный и вежливый.", "The voice was very confident and polite."),
+    ("Разговор длился почти час.", "The conversation lasted almost an hour."),
+    ("Я был за рулём и не сразу понял, что происходит.", "I was driving and didn't realise what was happening."),
+    ("Мне 67 лет, я на пенсии.", "I am 67 and retired."),
+    ("Муж был на работе, посоветоваться было не с кем.", "My husband was at work; I had no one to ask."),
+    ("Всё произошло очень быстро.", "It all happened very fast."),
+    ("Сначала я ничего не заподозрила.", "At first I suspected nothing."),
+    ("У меня сохранилась история звонков.", "I still have the call log."),
+    ("Говорили на казахском и русском.", "They spoke Kazakh and Russian."),
+    ("Это были почти все мои сбережения.", "It was almost all my savings."),
+    ("Я студент, это деньги на учёбу.", "I'm a student; this was my tuition money."),
+    ("На заднем плане был шум, как в офисе.", "There was office-like noise in the background."),
+]
+
 # Mentions of the legitimate marketplace support line (a hub, not a fraudster).
 HUB_SENTENCES: list[Template] = [
     (" Сначала я звонила в поддержку маркетплейса по номеру {hub}, там сказали обратиться в полицию.",
@@ -182,6 +274,31 @@ CHANNEL = {
     "BANK_SECURITY": "call", "SAFE_ACCOUNT": "call", "LOAN_STATUS_SMS": "sms",
     "MARKETPLACE_PREPAY": "marketplace", "POLICE_THREAT": "call", "INVESTMENT": "messenger",
     "ATM_DROP_HELP": "in_person",
+}
+
+# Victims retell events in their own words: random synonym swaps (word -> options).
+SYNONYMS: dict[str, list[str]] = {
+    "позвонили": ["набрали", "связались", "вышли на связь"],
+    "Позвонили": ["Набрали", "Связались"],
+    "звонили": ["набирали", "звонил какой-то человек"],
+    "Звонили": ["Набирали", "Звонил мужчина"],
+    "сказали": ["сообщили", "заявили", "объяснили"],
+    "сказал": ["сообщил", "заявил", "объяснил"],
+    "перевела": ["отправила", "скинула", "перечислила"],
+    "перевёл": ["отправил", "скинул", "перечислил"],
+    "перевести": ["отправить", "перечислить", "скинуть"],
+    "карту": ["карточку", "банковскую карту"],
+    "деньги": ["средства", "сбережения", "свои деньги"],
+    "попросили": ["потребовали", "велели", "уговорили"],
+    "попросил": ["потребовал", "велел", "уговорил"],
+    "списали": ["сняли", "украли", "пропало"],
+    "Потеряла": ["Лишилась", "Ушло"],
+    "потом": ["затем", "после этого", "через пару минут"],
+    "срочно": ["немедленно", "как можно быстрее"],
+    "якобы": ["будто бы", "вроде как"],
+    "объявлению": ["объявлению на сайте", "рекламе"],
+    "продавец": ["продавщица", "человек из объявления"],
+    "меня": ["меня сразу", "меня потом"],
 }
 
 TYPOS = {"перевела": "перевила", "карту": "карут", "номер": "номр", "деньги": "денги", "банка": "банко"}

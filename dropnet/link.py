@@ -12,12 +12,12 @@ from collections import Counter, defaultdict
 
 import relate
 
-from .config import (HUB_MIN_REGIONS, HUB_MIN_TACTICS, MAX_FORWARD_HOPS, SIMILARITY_K,
+from .config import (HUB_MIN_REGIONS, HUB_MIN_TACTICS, MAX_FORWARD_HOPS, SCRIPT_ONLY_THRESHOLD, SIMILARITY_K,
                      SIMILARITY_THRESHOLD, VECTOR_INDEX)
 from .models import Campaign
 from .store import rows
 
-ENTITY_KEYS = {"Phone": "e164", "Card": "pan_masked", "Account": "iban", "Domain": "name"}
+ENTITY_KEYS = {"Phone": "e164", "Card": "pan_masked", "Account": "iban", "Domain": "name", "Persona": "name"}
 
 
 # ------------------------------------------------------------------ similarity
@@ -54,6 +54,8 @@ def find_hubs(conn: relate.Connection, min_tactics: int = HUB_MIN_TACTICS,
             pattern = "(c:Complaint)-[:VISITED]->(:Url)-[:ON_DOMAIN]->(n:Domain)"
         elif label == "Phone":
             pattern = "(c:Complaint)-[:CONTACTED_BY]->(n:Phone)"
+        elif label == "Persona":
+            pattern = "(c:Complaint)-[:MENTIONS_PERSONA]->(n:Persona)"
         else:
             pattern = f"(c:Complaint)-[:PAID_TO]->(n:{label})"
         found = rows(conn, f"""
@@ -87,6 +89,12 @@ def strong_pairs(conn: relate.Connection, max_hops: int = MAX_FORWARD_HOPS) -> l
         MATCH (a:Complaint)-[:VISITED]->(:Url)-[:ON_DOMAIN]->(d:Domain)<-[:ON_DOMAIN]-(:Url)<-[:VISITED]-(b:Complaint)
         WHERE a.id < b.id AND coalesce(d.hub, false) = false
         RETURN a.id AS a, b.id AS b, d.name AS via"""):
+        out.add((r["a"], r["b"], r["via"]))
+    for r in rows(conn, """
+        MATCH (a:Complaint)-[:MENTIONS_PERSONA]->(p:Persona)<-[:MENTIONS_PERSONA]-(b:Complaint)
+        WHERE a.id < b.id AND coalesce(p.hub, false) = false
+        MATCH (a)-[:USED_TACTIC]->(t:Tactic)<-[:USED_TACTIC]-(b)
+        RETURN DISTINCT a.id AS a, b.id AS b, 'persona:' + p.name AS via"""):
         out.add((r["a"], r["b"], r["via"]))
     hops = int(max_hops)
     for r in rows(conn, f"""
@@ -172,7 +180,7 @@ def build_campaigns(conn: relate.Connection, use_vectors: bool = True, use_forwa
         uf2 = _UF()
         loose = [c for c in nbrs if c not in member_of]
         loose_set = set(loose)
-        for a, b in weak:
+        for a, b in _weak_edges(conn, max(threshold, SCRIPT_ONLY_THRESHOLD)):
             if a in loose_set and b in loose_set:
                 uf2.union(a, b)
         for root, ms in _groups(uf2, loose).items():

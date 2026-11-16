@@ -22,10 +22,24 @@ TACTIC_LEXICON: dict[str, list[str]] = {
     "LOAN_STATUS_SMS": [r"статус\w* (?:вашего )?займа", r"сообщение о займе"],
     "MARKETPLACE_PREPAY": [r"предоплат", r"объявлени", r"выкупить заказ"],
     "POLICE_THREAT": [r"следовател", r"уголовн\w* дел", r"из полиции"],
-    "INVESTMENT": [r"доход\w*", r"криптобирж", r"инвест"],
+    "INVESTMENT": [r"доход\w*", r"криптобирж", r"инвест", r"invest", r"куратор"],
     "ATM_DROP_HELP": [r"(?:у|возле) банкомата"],
 }
 _TACTIC_RES = {k: re.compile("|".join(v), re.IGNORECASE) for k, v in TACTIC_LEXICON.items()}
+
+# Scammer personas: a gazetteer of common Kazakh given names (with Russian case endings).
+# Gangs re-use their aliases, so a shared alias + shared tactic is evidence.
+PERSONA_NAMES = ["Ерлан", "Нурлан", "Санжар", "Данияр", "Арман", "Марат", "Бауыржан", "Асхат", "Ержан",
+                 "Динара", "Алия", "Камила", "Айгерим", "Асель", "Мадина", "Жанна", "Гульнара", "Сауле"]
+
+
+def _name_re(name: str) -> str:
+    stem = name[:-1] if name[-1] in "аяь" else name
+    return stem + r"(?:а|я|у|ю|ом|ем|ой|ей|е|ы|и)?" if stem != name else name + r"(?:а|у|ом|е|ым)?"
+
+
+PERSONA_RE = re.compile(r"(?<![А-Яа-яЁё])(" + "|".join(f"(?P<n{i}>{_name_re(n)})" for i, n in enumerate(PERSONA_NAMES))
+                        + r")(?![А-Яа-яЁё])")
 
 
 def _quote(text: str, start: int, end: int, limit: int = 240) -> str:
@@ -75,6 +89,12 @@ def extract(complaint_id: str, text: str) -> list[Extraction]:
         v = normalize.amount_kzt(m.group(0))
         if v and free(m):
             out.append(_ex(complaint_id, "amount", str(v), m, text))
+    seen_personas: set[str] = set()
+    for m in PERSONA_RE.finditer(text):
+        name = next(PERSONA_NAMES[int(k[1:])] for k, v in m.groupdict().items() if v)
+        if name not in seen_personas:
+            seen_personas.add(name)
+            out.append(_ex(complaint_id, "persona", name, m, text))
     for code, rx in _TACTIC_RES.items():
         m = rx.search(text)
         if m:

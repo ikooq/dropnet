@@ -107,7 +107,7 @@ def test_hub_does_not_merge(tmp_path):
 
 
 def test_script_only_trio(tmp_path):
-    script = ("Куратор Алия с платформы «KazOil Invest» обещала гарантированный доход 30 % в месяц от акций "
+    script = ("Личный куратор платформы «KazOil Invest» обещал гарантированный доход 30 % в месяц от акций "
               "нефтяной компании, первый взнос через карту {card}, потом налог за вывод.")
     cards = ["4000 0011 1111 1111", "4000 0022 2222 2222", "4000 0033 3333 3333"]
     other = "Продавец шин по объявлению взял предоплату на карту 4000 0044 4444 4444 и пропал."
@@ -119,6 +119,20 @@ def test_script_only_trio(tmp_path):
     assert m.get("CMP-0001") == m.get("CMP-0002") == m.get("CMP-0003") == "CAMP-0001"
     assert "CMP-0004" not in m
     assert link.build_campaigns(conn, use_vectors=False) == []
+    conn.close()
+
+
+def test_shared_persona_and_tactic_links(tmp_path):
+    cs = [
+        _C(1, "Куратор Алия обещала доход 30 %, карта 4000 0011 1111 1111.", "Almaty"),
+        _C(2, "Мне писала куратор Алия про доход, перевела на 4000 0022 2222 2222.", "Oral"),
+        _C(3, "Продавец Алия по объявлению взяла предоплату на 4000 0033 3333 3333.", "Astana"),
+    ]
+    conn = build(tmp_path, Dataset(cs, [], {}))
+    m = member_map(link.build_campaigns(conn, use_vectors=False))
+    assert m["CMP-0001"] == m["CMP-0002"]
+    assert "CMP-0003" not in m  # same name, different tactic: not enough
+    assert ("CMP-0001", "CMP-0002", "persona:Алия") in link.strong_pairs(conn)
     conn.close()
 
 

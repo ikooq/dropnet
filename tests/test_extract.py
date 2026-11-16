@@ -50,6 +50,30 @@ def test_tactic_lexicon():
     assert kinds(exs, "tactic") == ["BANK_SECURITY"]
 
 
+def test_every_campaign_script_has_a_tactic():
+    from dropnet.synth import templates as T
+    for tactic, scripts in T.CAMPAIGN_SCRIPTS.items():
+        for ru, _en in scripts:
+            text = ru.format(phone="8 799 011 11 11", phone2="8 799 022 22 22", card="4000 00** **** 1111",
+                             iban="KZ001111222233334444", url="https://a.example/x", amount="50 тыс. тг")
+            assert tactic in kinds(rules.extract("CMP-0009", text), "tactic"), (tactic, ru[:60])
+
+
+@pytest.mark.parametrize("text,name", [
+    ("Представились Ерланом из отдела финансового мониторинга.", "Ерлан"),
+    ("Написал куратор Алия с платформы.", "Алия"),
+    ("Продавец Санжар (8 799 012 34 56) взял предоплату.", "Санжар"),
+    ("Женщина по имени Динара, «Нацбанк».", "Динара"),
+    ("Позвонил «следователь Нурлан» и угрожал.", "Нурлан"),
+])
+def test_persona(text, name):
+    assert kinds(rules.extract("CMP-0011", text), "persona") == [name]
+
+
+def test_no_persona_without_known_name():
+    assert kinds(rules.extract("CMP-0012", "Мама пожилая, звонил Мужчина из банка."), "persona") == []
+
+
 def test_hub_sentence_is_not_marketplace_tactic():
     exs = rules.extract("CMP-0003", "Поддержка маркетплейса по номеру 8 799 000 00 00 не помогла.")
     assert kinds(exs, "tactic") == []

@@ -32,8 +32,9 @@ REGIONS: list[str] = [
 BANKS: list[str] = ["Demo Bank A", "Demo Bank B", "Demo Bank C", "Demo Bank D"]
 
 # Linking thresholds (tuned on seed 1 only; see dropnet.evaluate).
-SIMILARITY_K = 5
-SIMILARITY_THRESHOLD = 0.80
+SIMILARITY_K = 15  # top-5 was filled by near-verbatim copies, hiding links between script variants
+SIMILARITY_THRESHOLD = 0.80        # attach a loose complaint to an existing campaign (needs 2 votes)
+SCRIPT_ONLY_THRESHOLD = 0.90       # form a brand-new campaign from script similarity alone
 MAX_FORWARD_HOPS = 3
 HUB_MIN_TACTICS = 3
 HUB_MIN_REGIONS = 4

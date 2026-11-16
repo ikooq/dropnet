@@ -84,5 +84,28 @@ def test_ground_truth_json(tmp_path):
     assert all(len(v) >= 3 for v in truth.values())
 
 
+def test_noise_is_diverse():
+    from itertools import combinations
+    from dropnet import embed
+    ds = generate(seed=1)
+    in_campaign = {cid for ids in ds.truth.values() for cid in ids}
+    noise = [c for c in ds.complaints if c.id not in in_campaign]
+    from dropnet.extract import rules
+    vecs = [embed.vectorize(c.text) for c in noise]
+    tactics = [{e.value for e in rules.extract(c.id, c.text) if e.kind == "tactic"} for c in noise]
+    # Only same-tactic pairs can become weak links (see dropnet.link), so only they matter.
+    pairs = [(i, j) for i, j in combinations(range(len(noise)), 2) if tactics[i] & tactics[j]]
+    # New script-only groups need SCRIPT_ONLY_THRESHOLD (0.90), so that is the bar noise must stay under.
+    close = sum(1 for i, j in pairs if (embed.cosine(vecs[i], vecs[j]) + 1) / 2 >= 0.90)
+    assert close / len(pairs) < 0.02, (close, len(pairs))
+
+
+def test_phone_pool_numbers_co_mentioned():
+    ds = generate(seed=1)
+    by = {c.id: c for c in ds.complaints}
+    two = [cid for cid in ds.truth["B"] if len(re.findall(r"799[ )-]*0\d\d", by[cid].text)) >= 2]
+    assert len(two) >= 0.25 * len(ds.truth["B"])
+
+
 def test_hard_variant_has_extra_script_campaign():
     assert len(generate(seed=1, hard=True).truth) == 8

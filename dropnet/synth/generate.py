@@ -140,8 +140,20 @@ class _Ctx:
     transfers: list[Transfer] = field(default_factory=list)
 
 
-def _fill(ctx: _Ctx, tpl: T.Template, values: dict[str, str], amount: int) -> tuple[str, str]:
+def _paraphrase(rng: random.Random, text: str, p: float) -> str:
+    """Swap whole words for synonyms with probability p each (templates only, before ids are filled)."""
+    def swap(m):
+        w = m.group(0)
+        opts = T.SYNONYMS.get(w)
+        return rng.choice(opts) if opts and rng.random() < p else w
+    import re as _re
+    return _re.sub(r"[А-Яа-яЁё]+", swap, text)
+
+
+def _fill(ctx: _Ctx, tpl: T.Template, values: dict[str, str], amount: int, paraphrase: float = 0.0) -> tuple[str, str]:
     rng = ctx.rng
+    if paraphrase:
+        tpl = (_paraphrase(rng, tpl[0], paraphrase), tpl[1])
     ru_amt, en_amt = fmt_amount(amount, rng)
     ru_vals, en_vals = dict(values), dict(values)
     for k in ("phone", "phone2", "hub"):
@@ -204,6 +216,7 @@ def _campaign(ctx: _Ctx, label: str, tactic: str, mechanic: str, size: int) -> l
             values["card"] = shared_card
         elif mechanic == "phone_pool":
             values["phone"] = pool[i % len(pool)]
+            values["phone2"] = pool[(i + 1) % len(pool)]
         elif mechanic == "domain":
             path = rng.choice(["verify", "status", "check", "loan"]) + "?id=" + str(rng.randrange(10000, 99999))
             values["url"] = f"https://{domain}/{path}"
@@ -212,7 +225,13 @@ def _campaign(ctx: _Ctx, label: str, tactic: str, mechanic: str, size: int) -> l
         elif mechanic == "two_mules":
             values["card"] = mules[i % 2]
         amount = rand_amount(rng)
-        ru, en = _fill(ctx, rng.choice(scripts), values, amount)
+        tpl = rng.choice(scripts)
+        if ctx.hard and rng.random() < 0.15:  # the victim lost the number / card: only the script remains
+            tpl = (tpl[0].replace("{phone}", "(номер не определился)").replace("{card}", "(номер карты не сохранился)")
+                   .replace("{iban}", "(реквизиты не сохранились)"),
+                   tpl[1].replace("{phone}", "(number not shown)").replace("{card}", "(card number not kept)")
+                   .replace("{iban}", "(details not kept)"))
+        ru, en = _fill(ctx, tpl, values, amount, paraphrase=0.3 if ctx.hard else 0.0)
         out.append(Draft(label, tactic, start + timedelta(days=rng.randrange(span)), rng.choice(regions),
                          amount, ru, en, rng.random(), rng.choice(AGE_BANDS)))
     return out
@@ -224,11 +243,17 @@ def _noise(ctx: _Ctx, count: int) -> list[Draft]:
     tactics = list(T.GENERIC)
     for _ in range(count):
         tactic = rng.choice(tactics)
-        tpl = rng.choice(T.VAGUE) if rng.random() < 0.15 else rng.choice(T.GENERIC[tactic])
+        body = rng.choice(T.VAGUE) if rng.random() < 0.15 else \
+            rng.choice(T.GENERIC[tactic] + T.GENERIC_EXTRA[tactic])
+        parts = [rng.choice(T.OPENINGS)] + rng.sample(T.DETAILS, 2)
+        rng.shuffle(parts)
+        parts.insert(rng.randrange(len(parts) + 1), body)
+        parts.append(rng.choice(T.ENDINGS))
+        tpl = (" ".join(p[0] for p in parts if p[0]), " ".join(p[1] for p in parts if p[1]))
         values = {"phone": ids.phone(), "card": ids.card(), "iban": ids.iban(),
                   "url": f"https://{ids.domain('.test')}/{rng.choice(['login', 'pay', 'form'])}"}
         amount = rand_amount(rng)
-        ru, en = _fill(ctx, tpl, values, amount)
+        ru, en = _fill(ctx, tpl, values, amount, paraphrase=0.6)
         out.append(Draft(None, tactic, YEAR_START + timedelta(days=rng.randrange(YEAR_DAYS)),
                          rng.choice(REGIONS), amount, ru, en, rng.random(), rng.choice(AGE_BANDS)))
     return out

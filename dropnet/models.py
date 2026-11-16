@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from typing import Literal
 
-ExtractionKind = Literal["phone", "card", "iban", "url", "amount", "tactic"]
+ExtractionKind = Literal["phone", "card", "iban", "url", "amount", "tactic", "persona"]
 
 
 @dataclass

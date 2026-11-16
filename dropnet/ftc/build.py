@@ -41,6 +41,8 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
         log(f"loaded {stats} in {time.perf_counter() - t0:.0f}s")
         n = campaigns.write_campaigns(conn)
         log(f"wrote {n:,} campaigns")
+        from . import networks
+        log(f"pool networks: {networks.link_pools(conn)}")
         result = evaluate.holdout(conn, split_day([r.created_day for r in reports]))
         result["profile"] = campaigns.spoofing_profile(conn)
     finally:

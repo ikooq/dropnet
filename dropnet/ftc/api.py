@@ -76,7 +76,22 @@ def campaign_graph(conn: relate.Connection, campaign_id: str, max_numbers: int =
             "states_total": len(by_state)}
 
 
-FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block"]
+def networks(conn: relate.Connection) -> list[dict]:
+    """Pool networks: ranges that hit the same victim area codes, on the same days, with the same scam."""
+    out = []
+    for n in rows(conn, "MATCH (n:PoolNetwork) RETURN n.id AS id, n.pools AS pools, n.reports AS reports, "
+                        "n.numbers AS numbers ORDER BY reports DESC"):
+        n["members"] = rows(conn, """MATCH (c:FtcCampaign)-[:IN_NETWORK]->(:PoolNetwork {id: $id})
+                                     RETURN c.id AS id, c.reports AS reports, c.numbers AS numbers, c.subjects AS subjects
+                                     ORDER BY reports DESC""", {"id": n["id"]})
+        n["links"] = rows(conn, """MATCH (a:FtcCampaign)-[:IN_NETWORK]->(:PoolNetwork {id: $id})
+                                   MATCH (a)-[s:SIBLING]->(b:FtcCampaign)
+                                   RETURN a.id AS a, b.id AS b, s.shared AS shared ORDER BY shared DESC""", {"id": n["id"]})
+        out.append(n)
+    return out
+
+
+FTC_TOOL_NAMES =["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block"]
 
 
 def dispatch_ftc(conn: relate.Connection, name: str, args: dict):

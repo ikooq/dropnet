@@ -55,6 +55,15 @@ blocks that had a non-spoofed report before the split, catches **4.4 %** of late
 The FTC page lists ~25 business days; files already downloaded are kept, so running `ftc-build --fetch` weekly grows
 the window.
 
+## One operation, fifteen number ranges
+
+Pools are linked when their numbers hit the **same victims' area codes, on the same day, with the same scam type** at
+least 10 times (generic subjects left out) — a multi-hop path read straight off the graph:
+`(Pool)-[:USES_BLOCK]->(Block)<-[:IN_BLOCK]-(Number)<-[:FROM_NUMBER]-(Report)-[:VICTIM_AREA]->(AreaCode)<-[:VICTIM_AREA]-(Report)-…-(Pool)`.
+On the real data this finds **one network of 15 ranges behind 11,071 reports**, including the 217-863 pool; two of its
+toll-free ranges (866-386 and 877-578) struck the same area codes on the same day 23 times. Looser settings glue
+hundreds of pools into one meaningless blob — the thresholds are chosen to avoid that (`dropnet/ftc/networks.py`).
+
 ## How it uses Relate
 
 - **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,

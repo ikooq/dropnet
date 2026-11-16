@@ -293,6 +293,17 @@ async function loadReal() {
   }
   const prof = s.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share);
   $("#spoof-bars").innerHTML = prof.map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
+  const nets = await api("api/ftc/networks");
+  if (nets.length) {
+    const n = nets[0];
+    $("#net-panel").style.display = "";
+    $("#net-panel").innerHTML = `<h2>One operation, ${n.pools} number ranges</h2>
+      <p class="muted">These ranges hit the same victims' area codes, on the same days, with the same scam type — at least
+      10 times per pair. Read straight off the graph: Pool → Block → Number → Report → AreaCode ← Report ← … ← Pool.</p>
+      <p><b>${n.reports.toLocaleString()}</b> reports · <b>${(n.numbers || 0).toLocaleString()}</b> reported numbers</p>
+      <div class="whatif-pick">${n.members.map((m) => `<label data-id="${esc(m.id)}" style="cursor:pointer">${esc(m.id.replace("POOL-", ""))} · ${m.reports.toLocaleString()}</label>`).join("")}</div>`;
+    $("#net-panel").querySelectorAll("label[data-id]").forEach((l) => l.addEventListener("click", () => openFtc(l.dataset.id)));
+  }
   ftcCampaigns = await api("api/ftc/campaigns?limit=40&kind=pool");
   $("#ftc-list").innerHTML = ftcCampaigns.map((c) => `<button class="camp-card" data-id="${esc(c.id)}">
     <div class="id">${esc(c.id.replace("POOL-", "Pool "))}</div>

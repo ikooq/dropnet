@@ -28,9 +28,17 @@ function showTab(name) {
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
 async function refreshStats() {
-  const h = await api("api/health");
-  $("#stats").innerHTML = [["complaints", h.complaints], ["campaigns", h.campaigns], ["linked damage", kzt(h.damage_kzt)]]
-    .map(([k, v]) => `<div class="stat"><b>${esc(v)}</b><span>${k}</span></div>`).join("");
+  // The header speaks for the real data when it is built; the free-text demo module has its own tabs.
+  let items;
+  try {
+    const s = await api("api/ftc/summary");
+    items = [["real FTC reports", s.reports.toLocaleString()], ["reported numbers", s.numbers.toLocaleString()],
+      ["number pools", (s.campaigns.pool || 0).toLocaleString()]];
+  } catch {
+    const h = await api("api/health");
+    items = [["complaints (demo)", h.complaints], ["campaigns", h.campaigns], ["linked damage", kzt(h.damage_kzt)]];
+  }
+  $("#stats").innerHTML = items.map(([k, v]) => `<div class="stat"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join("");
 }
 
 /* ---------------------------------------------------------- path view */

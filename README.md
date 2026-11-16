@@ -113,13 +113,13 @@ Start Claude Code **from the activated venv** in this folder:
 | `data/dropnet.rl`, `data/raw/` | second module: free-text complaints (synthetic, Russian) |
 | `data/live/` | working copies the app writes to (git-ignored) |
 
-## Second module: free-text complaints, any language
+## Also included: a free-text demo module (synthetic data)
 
-Real reports name a number; many victims write a story instead. The second module turns free text (demo: synthetic
-Russian complaints) into a graph of phones, cards, IBANs, phishing domains, scammer aliases and bank transfers, links
-complaints through shared identifiers and **money trails up to three transfers deep**, attaches victims who kept no
-numbers by script similarity (Relate vector index), and writes case files with an evidence path and the victim's own
-quote for every link. Tabs *New complaint*, *Campaigns*, *Inbox* and *Query the graph*.
+Some victims write a story instead of naming a number. A smaller demo module (tabs *Free-text …*, data in
+`data/dropnet.rl`, **synthetic** Russian complaints) shows the same idea on free text: phones, cards, IBANs, phishing
+domains, aliases and bank transfers extracted with character spans, complaints linked through **money trails up to
+three transfers deep** and by script similarity (Relate vector index), and case files that quote the victim for every
+link. It is a demonstration of the extraction pipeline, not part of the real-data results above.
 
 ## What we learned about Relate 1.0.1 (shared for the team)
 

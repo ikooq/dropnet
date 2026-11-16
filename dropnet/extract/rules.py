@@ -6,7 +6,7 @@ import re
 from ..models import Extraction
 from . import normalize
 
-PHONE_RE = re.compile(r"(?<![\d*])(?:\+7|8)[ (]?\d{3}\)?[ -]?\d{3}[ -]?\d{2}[ -]?\d{2}(?![\d*])")
+PHONE_RE = re.compile(r"(?<![\d*])(?:\+7|8)[ (-]{0,2}\d{3}\)?[ -]{0,2}\d{3}[ -]?\d{2}[ -]?\d{2}(?![\d*])")
 CARD_RE = re.compile(r"(?<![\d*])\d{4}[ -]?\d{2}[\d*]{2}[ -]?[\d*]{4}[ -]?\d{4}(?![\d*])")
 IBAN_RE = re.compile(r"\bKZ\d{2}(?: ?[0-9A-Z]{4}){4}\b")
 URL_RE = re.compile(r"https?://[^\s,;«»\"']+")

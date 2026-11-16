@@ -17,7 +17,10 @@ def built(tmp_path_factory):
 
 @pytest.mark.parametrize("stmt", ["CREATE (n:X)", "match (n) set n.x = 1", "MATCH (n) DETACH DELETE n",
                                   "MERGE (n:X {a: 1})", "MATCH (n) REMOVE n.a", "CALL db.createLabel('X')",
-                                  "LOAD CSV FROM 'x' AS r RETURN r"])
+                                  "LOAD CSV FROM 'x' AS r RETURN r", "CALL/**/db.createLabel('X')",
+                                  "CALL `db`.`createLabel`('X')", "CALL\n// c\n db.createLabel('X')",
+                                  "MATCH (n) WITH n CALL { WITH n SET n.x = 1 } RETURN 1",
+                                  "CREATE/*x*/(n)"])
 def test_read_cypher_rejects_writes(built, stmt):
     with pytest.raises(ValueError):
         tools.read_cypher(built[0], stmt)
@@ -32,6 +35,26 @@ def test_read_cypher_allows_reads_and_vector_call(built):
                                 "CALL db.index.vector.queryNodes('complaint_script', 2, c.script_vec) YIELD node "
                                 "RETURN node.id AS id")
     assert r["rows"]
+
+
+def test_read_cypher_allows_keywords_inside_strings(built):
+    r = tools.read_cypher(built[0], "MATCH (c:Complaint) WHERE c.text CONTAINS 'set' RETURN count(c) AS `create`")
+    assert r["columns"] == ["create"]
+
+
+def test_store_never_holds_full_card_numbers(built):
+    import re
+    conn, _ = built
+    rows = tools.read_cypher(conn, "MATCH (c:Complaint) RETURN c.text AS t", limit=10_000)["rows"]
+    rows += tools.read_cypher(conn, "MATCH (x:Extraction) RETURN x.quote AS t", limit=10_000)["rows"]
+    raw = [r["t"] for r in rows]
+    # read raw values directly (bypassing tools.redact) through the engine
+    from dropnet import store
+    raw += [r["t"] for r in store.rows(conn, "MATCH (c:Complaint) RETURN c.text AS t")]
+    raw += [r["t"] for r in store.rows(conn, "MATCH (x:Extraction) RETURN x.quote AS t")]
+    # a full PAN: 16 digits not glued to other digits/letters (IBANs KZ00… are 18+ chars and excluded)
+    pan = re.compile(r"(?<![\dA-Z*])\d{4}[ -]?\d{2}\d{2}[ -]?\d{4}[ -]?\d{4}(?![\d*])")
+    assert not any(pan.search(t) for t in raw)
 
 
 def test_read_cypher_limit(built):

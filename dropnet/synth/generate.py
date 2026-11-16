@@ -311,9 +311,12 @@ def generate(seed: int = 1, n: int = 250, hard: bool = False) -> Dataset:
 def write_dataset(ds: Dataset, out_dir: Path) -> None:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    from ..privacy import redact
     with open(out_dir / "complaints.jsonl", "w", encoding="utf-8", newline="\n") as f:
         for c in ds.complaints:
-            f.write(json.dumps(c.to_json(), ensure_ascii=False) + "\n")
+            d = c.to_json()
+            d["text"] = redact(d["text"])
+            f.write(json.dumps(d, ensure_ascii=False) + "\n")
     with open(out_dir / "bank_transfers.jsonl", "w", encoding="utf-8", newline="\n") as f:
         for t in ds.transfers:
             f.write(json.dumps(t.to_json(), ensure_ascii=False) + "\n")

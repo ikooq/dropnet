@@ -16,6 +16,9 @@ dependencies = [
   "mcp>=2.3,<3",
 ]
 
+[project.scripts]
+dropnet = "dropnet.__main__:main"
+
 [project.optional-dependencies]
 agent = ["pydantic-ai"]
 ml = ["sentence-transformers"]

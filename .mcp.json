@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "dropnet": {
-      "command": "python",
-      "args": ["-m", "dropnet", "mcp"]
+      "command": "dropnet",
+      "args": ["mcp"]
     },
     "relate-native": {
       "command": "relate",

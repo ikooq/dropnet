@@ -94,15 +94,16 @@ python -m dropnet case CAMP-0026 --html --out case.html
 python -m dropnet ingest "Звонили с 8 799 012 34 56 ... перевела на карту 4000 00** **** 7763" --region Pavlodar
 python -m dropnet build                       # regenerate data and rebuild data/dropnet.rl (deterministic, ~2 s)
 python -m dropnet eval --hard --ablations     # linking quality on held-out seeds (see Results)
-python -m dropnet serve --reset               # start the UI from a fresh copy of the snapshot
-pip install -e ".[dev]" && pytest             # 131 tests
+python -m dropnet serve --reset               # start the UI from a fresh copy of the snapshot (do this after `build` or `git pull`)
+pip install -e ".[dev]" && pytest             # 146 tests
 ```
 
 ### Investigate with an AI agent (MCP)
 
-`.mcp.json` registers two MCP servers for Claude Code (or any MCP host) opened in this folder:
+`.mcp.json` registers two MCP servers for Claude Code (or any MCP host) opened in this folder. **Start Claude Code
+from a terminal where the venv is activated**, so the `dropnet` command (installed by `pip install -e .`) is on PATH.
 
-* **`dropnet`** — `python -m dropnet mcp`: `find_campaign`, `explain_link`, `top_mules`, `similar_scripts`,
+* **`dropnet`** — `dropnet mcp`: `find_campaign`, `explain_link`, `top_mules`, `similar_scripts`,
   `build_case`, `read_cypher` (read-only), `get_schema`, `list_campaigns`. If `dropnet serve` is running it proxies to
   it, so the agent sees complaints you ingested a second ago; otherwise it opens the snapshot read-only.
 * **`relate-native`** — Relate's own MCP server on the snapshot (`read_cypher`, `get_schema`); needs the
@@ -171,7 +172,7 @@ dropnet/report.py   case files
 dropnet/ingest.py   live ingest
 dropnet/web/        FastAPI + single-page UI (cytoscape.js)
 dropnet/mcp_server.py
-tests/              131 tests (pytest)
+tests/              146 tests (pytest)
 docs/               design, implementation plan, demo script
 ```
 
@@ -182,5 +183,9 @@ docs/               design, implementation plan, demo script
 * Extraction is rule-based on purpose (works offline, explainable spans). An optional LLM extractor is a natural next
   step.
 * The Relate store has one writer per file; the web app owns the live copy and MCP reads through its API.
+* Cards are keyed by their masked form (`4000 00** **** 1234`), so two different cards with the same first six and
+  last four digits would merge — acceptable for a demo, a real deployment would key on a bank-side token.
+* Card numbers are masked before anything is stored (`400000******1234`); `read_cypher` is guarded against writes
+  (comments, backticks and string literals are normalised before the check).
 
 License: MIT. Built for the Relate by Neo4j hackathon (2026).

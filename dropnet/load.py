@@ -11,6 +11,7 @@ from . import embed
 from .config import BANKS, TACTICS
 from .extract import normalize
 from .models import Complaint, Dataset, Extraction, Transfer
+from .privacy import redact
 from .store import rows
 
 
@@ -25,7 +26,7 @@ def _account_label(value: str) -> str:
 def write_complaints(conn: relate.Connection, complaints: Iterable[Complaint]) -> int:
     batch = [{
         "id": c.id, "filed_at": c.filed_at.isoformat(), "region": c.region, "channel": c.channel,
-        "amount_kzt": c.amount_kzt, "text": c.text, "text_en": c.text_en, "age": c.victim_age_band,
+        "amount_kzt": c.amount_kzt, "text": redact(c.text), "text_en": redact(c.text_en), "age": c.victim_age_band,
         "vec": embed.vectorize(c.text),
     } for c in complaints]
     rows(conn, """
@@ -45,7 +46,7 @@ def write_extractions(conn: relate.Connection, extractions: Iterable[Extraction]
     for e in extractions:
         by_kind.setdefault(e.kind, []).append({
             "eid": e.id, "cid": e.complaint_id, "kind": e.kind, "value": e.value, "s": e.span_start,
-            "e": e.span_end, "quote": e.quote, "extractor": e.extractor,
+            "e": e.span_end, "quote": redact(e.quote), "extractor": e.extractor,
             "channel": channels.get(e.complaint_id, "unknown"),
             "bank": _bank_for(e.value), "domain": normalize.domain(e.value) if e.kind == "url" else None,
             "label_ru": TACTICS.get(e.value, ("", ""))[0], "label_en": TACTICS.get(e.value, ("", ""))[1],

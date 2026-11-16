@@ -10,6 +10,13 @@ def test_phone_shapes(raw):
     assert normalize.phone(raw) == "+77990123456"
 
 
+@pytest.mark.parametrize("raw", ["+7 (799) 012-34-56", "8 (799) 012 34 56", "8-799-012-34-56", "+7-799-012-34-56",
+                                 "+7 (799) 0123456"])
+def test_common_kz_phone_shapes_are_extracted(raw):
+    exs = rules.extract("CMP-0020", f"Звонили с номера {raw}, представились банком.")
+    assert kinds(exs, "phone") == ["+77990123456"], raw
+
+
 def test_phone_rejects_short():
     assert normalize.phone("8 799 01") is None
 

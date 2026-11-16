@@ -78,6 +78,12 @@ def test_complaint_fields():
     assert re.search("[а-яА-Я]", c.text)
 
 
+def test_written_raw_files_have_no_full_card_numbers(tmp_path):
+    write_dataset(generate(seed=1), tmp_path)
+    pan = re.compile(r"(?<![\dA-Z*])\d{4}[ -]?\d{2}\d{2}[ -]?\d{4}[ -]?\d{4}(?![\d*])")
+    assert not pan.search((tmp_path / "complaints.jsonl").read_text(encoding="utf-8"))
+
+
 def test_ground_truth_json(tmp_path):
     write_dataset(generate(seed=1), tmp_path)
     truth = json.loads((tmp_path / "ground_truth.json").read_text(encoding="utf-8"))

@@ -68,7 +68,40 @@ def find_hubs(conn: relate.Connection, min_tactics: int = HUB_MIN_TACTICS,
         for f in found:
             hubs.add(f["key"])
             rows(conn, f"MATCH (n:{label} {{{key}: $k}}) SET n.hub = true", {"k": f["key"]})
+    for key in _bridge_hubs(strong_pairs(conn)):
+        _mark_hub(conn, key)
+    for label, key in ENTITY_KEYS.items():  # report every hub currently flagged, not only new ones
+        hubs.update(r["k"] for r in rows(conn, f"MATCH (n:{label}) WHERE n.hub = true RETURN n.{key} AS k"))
     return hubs
+
+
+def _mark_hub(conn: relate.Connection, via: str) -> None:
+    if via.startswith("persona:"):
+        rows(conn, "MATCH (n:Persona {name: $k}) SET n.hub = true", {"k": via[len("persona:"):]})
+        return
+    for label, key in ENTITY_KEYS.items():
+        rows(conn, f"MATCH (n:{label} {{{key}: $k}}) SET n.hub = true", {"k": via})
+
+
+def _bridge_hubs(pairs: list[tuple[str, str, str]], min_groups: int = 3) -> set[str]:
+    """An entity whose complaints fall into >= min_groups separate gangs once the entity itself is ignored
+    (e.g. a support line mentioned by victims of different gangs) is a hub, not a link."""
+    by_via: dict[str, set[str]] = defaultdict(set)
+    for a, b, via in pairs:
+        by_via[via].update((a, b))
+    out: set[str] = set()
+    for via, members in by_via.items():
+        if len(members) < 2 * min_groups:
+            continue
+        uf = _UF()
+        for a, b, v in pairs:
+            if v != via:
+                uf.union(a, b)
+        sizes = Counter(uf.find(x) for x in uf.p)
+        groups = {uf.find(m) for m in members if m in uf.p and sizes[uf.find(m)] >= 2}
+        if len(groups) >= min_groups:
+            out.add(via)
+    return out
 
 
 def _clear_hubs(conn: relate.Connection) -> None:

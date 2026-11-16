@@ -106,6 +106,23 @@ def test_hub_does_not_merge(tmp_path):
     conn.close()
 
 
+def test_single_tactic_hub_across_gangs(tmp_path):
+    """A marketplace support line appears in complaints of three different gangs (all MARKETPLACE_PREPAY,
+    all in one region). Each gang is linked by its own mule card; the support number must not glue them."""
+    hub = " Звонил в поддержку маркетплейса 8 799 000 00 00."
+    cs, i = [], 1
+    for gang in ("1111", "2222", "3333"):
+        for _ in range(3):
+            cs.append(_C(i, f"Продавец по объявлению взял предоплату на карту 4000 00{gang[:2]} {gang} {gang}.{hub}",
+                         "Almaty"))
+            i += 1
+    conn = build(tmp_path, Dataset(cs, [], {}))
+    camps = link.build_campaigns(conn, use_vectors=False)
+    assert len(camps) == 3 and all(c.size == 3 for c in camps)
+    assert "+77990000000" in link.find_hubs(conn)
+    conn.close()
+
+
 def test_script_only_trio(tmp_path):
     script = ("Личный куратор платформы «KazOil Invest» обещал гарантированный доход 30 % в месяц от акций "
               "нефтяной компании, первый взнос через карту {card}, потом налог за вывод.")

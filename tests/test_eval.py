@@ -37,6 +37,17 @@ def test_ablation_without_vectors_loses_script_campaign(tmp_path):
     assert novec.scores["recall"] < full.scores["recall"]
 
 
+def test_console_script_and_mcp_json():
+    import json as _json
+    import tomllib
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    scripts = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
+    assert scripts["dropnet"] == "dropnet.__main__:main"
+    cfg = _json.loads((root / ".mcp.json").read_text(encoding="utf-8"))["mcpServers"]["dropnet"]
+    assert cfg["command"] == "dropnet" and cfg["args"] == ["mcp"]
+
+
 def test_cli_eval_prints_table(tmp_path):
     out = subprocess.run([sys.executable, "-m", "dropnet", "eval", "--seeds", "2", "--n", "100"],
                          capture_output=True, text=True, encoding="utf-8", timeout=300)

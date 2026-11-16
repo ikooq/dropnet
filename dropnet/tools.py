@@ -21,31 +21,13 @@ KEY_OF = {"Complaint": "id", "Phone": "e164", "Card": "pan_masked", "Account": "
 
 _WRITE = re.compile(r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|LOAD|FOREACH|INSERT|ALTER|GRANT|REVOKE)\b",
                     re.IGNORECASE)
-_CALL = re.compile(r"\bCALL\s+([A-Za-z_][\w.]*)", re.IGNORECASE)
+_CALL = re.compile(r"\bCALL\b\s*([A-Za-z_][\w.]*)", re.IGNORECASE)
 _ALLOWED_CALLS = {"db.index.vector.querynodes", "db.labels", "db.relationshiptypes", "db.schema.visualization",
                   "db.propertykeys"}
 
 
 # ------------------------------------------------------------------- helpers
-_FULL_PAN = re.compile(r"(?<![\d*])\d{4}[ -]?\d{4}[ -]?\d{4}[ -]?\d{4}(?![\d*])")
-
-
-def _mask_pan(m: re.Match) -> str:
-    out, digit = [], 0
-    for ch in m.group(0):
-        if ch.isdigit():
-            out.append("*" if 6 <= digit < 12 else ch)
-            digit += 1
-        else:
-            out.append(ch)
-    return "".join(out)
-
-
-def redact(text: str | None) -> str | None:
-    """Mask the middle six digits of full card numbers, keeping length and separators."""
-    if text is None:
-        return None
-    return _FULL_PAN.sub(_mask_pan, text)
+from .privacy import redact  # noqa: E402  (re-exported: tools.redact)
 
 
 def jsonable(v: Any) -> Any:
@@ -75,10 +57,23 @@ def _node_ref(n: Any) -> dict:
 
 
 # --------------------------------------------------------------- read cypher
+_COMMENTS = re.compile(r"/\*.*?\*/|//[^\n]*", re.DOTALL)
+_STRINGS = re.compile(r"'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"")
+
+
+def _normalize_for_guard(statement: str) -> str:
+    """Drop comments and string literals, unquote backticked names: what remains is what the engine executes."""
+    s = _COMMENTS.sub(" ", statement)
+    s = _STRINGS.sub("''", s)
+    s = re.sub(r"\bAS\s*`[^`]*`", "AS _", s, flags=re.IGNORECASE)  # a backticked alias is a name, not a clause
+    return s.replace("`", "")
+
+
 def check_read_only(statement: str) -> None:
-    if _WRITE.search(statement):
+    s = _normalize_for_guard(statement)
+    if _WRITE.search(s):
         raise ValueError("read_cypher is read-only: write clauses are not allowed")
-    for m in _CALL.finditer(statement):
+    for m in _CALL.finditer(s):
         if m.group(1).lower() not in _ALLOWED_CALLS:
             raise ValueError(f"read_cypher: procedure {m.group(1)} is not allowed")
 

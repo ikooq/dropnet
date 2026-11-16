@@ -13,6 +13,30 @@ from .campaigns import pool_campaigns
 BLOCK_SIZE = 10_000
 
 
+def controls(conn: relate.Connection, split_day: str, min_numbers: int = 5, seeds: int = 5) -> dict:
+    """Is a pool more than a random reported block? Same number of blocks, drawn at random from every block with a
+    non-spoofed report before the split; and how many pool rules never catch anything later (dormant)."""
+    import random
+    pools = {p["block"] for p in pool_campaigns(conn, min_numbers, exclude_neighbor=True, until_day=split_day)}
+    candidates = sorted({r["b"] for r in rows(conn, """
+        MATCH (r:Report)-[:FROM_NUMBER]->(:Number)-[:IN_BLOCK]->(b:Block) WHERE r.day < $s AND r.neighbor = false
+        RETURN DISTINCT b.npa_nxx AS b""", {"s": split_day})})
+    later = {}
+    for r in rows(conn, """MATCH (r:Report)-[:FROM_NUMBER]->(:Number)-[:IN_BLOCK]->(b:Block) WHERE r.day >= $s
+                           RETURN b.npa_nxx AS b, count(r) AS c""", {"s": split_day}):
+        later[r["b"]] = r["c"]
+    total = sum(later.values()) or 1
+    pool_cov = sum(later.get(b, 0) for b in pools) / total
+    rand = []
+    for seed in range(seeds):
+        pick = random.Random(seed).sample(candidates, min(len(pools), len(candidates)))
+        rand.append(sum(later.get(b, 0) for b in pick) / total)
+    return {"pool_blocks": len(pools), "candidate_blocks": len(candidates),
+            "pool_blocks_coverage": round(pool_cov, 4), "random_blocks_coverage": round(sum(rand) / len(rand), 4),
+            "lift": round(pool_cov / (sum(rand) / len(rand)), 1) if sum(rand) else None,
+            "dormant_share": round(sum(1 for b in pools if not later.get(b)) / len(pools), 4) if pools else 0.0}
+
+
 def holdout(conn: relate.Connection, split_day: str, min_numbers: int = 5, min_reports: int = 2) -> dict:
     train_counts = {r["n"]: r["c"] for r in rows(conn, """
         MATCH (r:Report)-[:FROM_NUMBER]->(n:Number) WHERE r.day < $s

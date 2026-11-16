@@ -49,6 +49,12 @@ businesses — so Dropnet ranks ranges for a carrier's decision, it does not blo
 *non-spoofed* reports only; still, 1,358 caught calls carried a spoofed caller ID inside a pool range, and the what-if
 shows that count as a risk. Reproduce: `python -m dropnet ftc-eval`.
 
+**Is a pool more than a random block?** A control: the same number of blocks (3,681), drawn at random from the 44,306
+blocks that had a non-spoofed report before the split, catches **4.4 %** of later reports; the pool blocks catch
+**20.3 %** — a **4.7× lift**. **83 %** of pool rules caught at least one later report (16.7 % stayed dormant).
+The FTC page lists ~25 business days; files already downloaded are kept, so running `ftc-build --fetch` weekly grows
+the window.
+
 ## How it uses Relate
 
 - **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,

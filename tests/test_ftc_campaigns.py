@@ -74,6 +74,14 @@ def test_assess_number_spoofed_vs_pool(g):
     assert campaigns.assess_number(g, "9999999999")["verdict"] == "unknown"
 
 
+def test_controls_random_blocks_and_dormancy(g):
+    c = evaluate.controls(g, split_day="2026-11-05", min_numbers=5, seeds=3)
+    # one pool block in the fixture; a random reported block of the same count rarely hits the later reports
+    assert c["pool_blocks"] == 1 and c["dormant_share"] == 0.0
+    assert 0 <= c["random_blocks_coverage"] <= c["pool_blocks_coverage"]
+    assert c["candidate_blocks"] >= 1
+
+
 def test_holdout_evaluation(g):
     res = evaluate.holdout(g, split_day="2026-11-05", min_numbers=5, min_reports=2)
     base, ours = res["baseline"], res["dropnet"]

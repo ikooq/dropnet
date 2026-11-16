@@ -134,5 +134,13 @@
     "coverage": 0.1431,
     "new_numbers_caught": 9978,
     "spoofed_caught": 1168
+  },
+  "controls": {
+    "pool_blocks": 3681,
+    "candidate_blocks": 44306,
+    "pool_blocks_coverage": 0.2029,
+    "random_blocks_coverage": 0.0436,
+    "lift": 4.7,
+    "dormant_share": 0.1665
   }
 }

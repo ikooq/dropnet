@@ -14,7 +14,8 @@ def snap(tmp_path_factory):
 
 @pytest.fixture
 def client(snap, tmp_path):
-    app = create_app(snapshot=snap, live=tmp_path / "live" / "live.rl", reset=True)
+    app = create_app(snapshot=snap, live=tmp_path / "live" / "live.rl", reset=True,
+                     ftc_snapshot=tmp_path / "no-ftc.rl")
     with TestClient(app) as c:
         yield c
 
@@ -99,9 +100,9 @@ def test_explain(client):
 
 def test_reset_restores_snapshot(snap, tmp_path):
     live = tmp_path / "l" / "live.rl"
-    with TestClient(create_app(snapshot=snap, live=live, reset=True)) as c:
+    with TestClient(create_app(snapshot=snap, live=live, reset=True, ftc_snapshot=live.parent / "no-ftc.rl")) as c:
         c.post("/api/ingest", json={"text": "Перевела 10 000 тг на карту 4000 0012 3456 7890."})
-    with TestClient(create_app(snapshot=snap, live=live, reset=False)) as c:
+    with TestClient(create_app(snapshot=snap, live=live, reset=False, ftc_snapshot=live.parent / "no-ftc.rl")) as c:
         assert c.get("/api/health").json()["complaints"] == 151
-    with TestClient(create_app(snapshot=snap, live=live, reset=True)) as c:
+    with TestClient(create_app(snapshot=snap, live=live, reset=True, ftc_snapshot=live.parent / "no-ftc.rl")) as c:
         assert c.get("/api/health").json()["complaints"] == 150

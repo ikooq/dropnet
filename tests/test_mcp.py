@@ -50,7 +50,7 @@ def test_proxy_sees_live_ingest(snap, tmp_path):
     import uvicorn
     from dropnet.web.app import create_app
     port = free_port()
-    server = uvicorn.Server(uvicorn.Config(create_app(snapshot=snap, live=tmp_path / "live.rl", reset=True),
+    server = uvicorn.Server(uvicorn.Config(create_app(snapshot=snap, live=tmp_path / "live.rl", reset=True, ftc_snapshot=tmp_path / "no-ftc.rl"),
                                            host="127.0.0.1", port=port, log_level="error"))
     t = threading.Thread(target=server.run, daemon=True)
     t.start()

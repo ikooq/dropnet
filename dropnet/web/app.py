@@ -5,15 +5,17 @@ The committed snapshot is never written. On start the app copies it to a live st
 """
 from __future__ import annotations
 
+import json
 import re
 import shutil
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -26,6 +28,12 @@ class IngestIn(BaseModel):
     text: str
     region: str | None = None
     amount_kzt: int | None = None
+
+
+class WhatIfIn(BaseModel):
+    blocks: list[str] | None = None
+    numbers: list[str] | None = None
+    since_day: str | None = None
 
 
 class CypherIn(BaseModel):
@@ -102,28 +110,85 @@ def _samples(conn) -> list[dict]:
 
 
 def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = config.LIVE_PATH,
-               reset: bool = False) -> FastAPI:
+               reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR / "ftc.rl",
+               ftc_live: Path | str = config.DATA_DIR / "live" / "ftc.rl",
+               ftc_eval: Path | str = config.DATA_DIR / "ftc" / "eval.json") -> FastAPI:
     snapshot, live = Path(snapshot), Path(live)
+    ftc_snapshot, ftc_live, ftc_eval = Path(ftc_snapshot), Path(ftc_live), Path(ftc_eval)
     state: dict[str, Any] = {}
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
-        # Relate connections are thread-affine: one dedicated thread owns the live store and runs every query.
-        # That also makes it the store's only writer.
+        # Relate connections are thread-affine: one dedicated thread owns the live stores and runs every query.
+        # That also makes it the stores' only writer.
         prepare_live(snapshot, live, reset)
         pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate")
         state["pool"] = pool
         state["conn"] = pool.submit(store.open_store, live).result()
+        if ftc_snapshot.exists():
+            prepare_live(ftc_snapshot, ftc_live, reset)
+            state["ftc"] = pool.submit(store.open_store, ftc_live).result()
         try:
             yield
         finally:
-            pool.submit(state.pop("conn").close).result()
+            for key in ("conn", "ftc"):
+                if key in state:
+                    pool.submit(state.pop(key).close).result()
             pool.shutdown(wait=True)
 
     app = FastAPI(title="Dropnet", lifespan=lifespan)
 
     def run(fn, *a, **kw):
         return state["pool"].submit(lambda: fn(state["conn"], *a, **kw)).result()
+
+    def run_ftc(fn, *a, **kw):
+        if "ftc" not in state:
+            raise HTTPException(404, "FTC data not built: run `python -m dropnet ftc-build`")
+        return state["pool"].submit(lambda: fn(state["ftc"], *a, **kw)).result()
+
+    from ..ftc import api as ftc_api, campaigns as ftc_campaigns, whatif as ftc_whatif
+
+    @app.get("/api/ftc/summary")
+    def ftc_summary():
+        s = run_ftc(ftc_api.summary)
+        s["profile"] = run_ftc(ftc_campaigns.spoofing_profile)
+        s["eval"] = json.loads(ftc_eval.read_text(encoding="utf-8")) if ftc_eval.exists() else None
+        return s
+
+    @app.get("/api/ftc/campaigns")
+    def ftc_campaign_list(limit: int = 60, kind: str | None = None):
+        return run_ftc(ftc_api.campaign_list, min(limit, 500), kind)
+
+    @app.get("/api/ftc/campaigns/{cid}/graph")
+    def ftc_graph(cid: str):
+        g = run_ftc(ftc_api.campaign_graph, cid)
+        if g is None:
+            raise HTTPException(404, "unknown campaign")
+        return g
+
+    @app.get("/api/ftc/campaigns/{cid}/export")
+    def ftc_export(cid: str):
+        tmp = Path(tempfile.mkdtemp(prefix="dropnet-case-")) / f"{re.sub(r'[^A-Z0-9-]', '', cid)}.rl"
+        try:
+            run_ftc(ftc_whatif.export_case, cid, tmp)
+        except KeyError:
+            raise HTTPException(404, "unknown campaign")
+        return FileResponse(tmp, filename=tmp.name, media_type="application/octet-stream")
+
+    @app.get("/api/ftc/states")
+    def ftc_states():
+        return run_ftc(ftc_api.states)
+
+    @app.get("/api/ftc/number/{number}")
+    def ftc_number(number: str):
+        return run_ftc(ftc_campaigns.assess_number, number)
+
+    @app.post("/api/ftc/whatif")
+    def ftc_whatif_route(body: WhatIfIn):
+        try:
+            return run_ftc(ftc_whatif.whatif, blocks=body.blocks, numbers=body.numbers, since_day=body.since_day)
+        except ValueError as e:
+            raise HTTPException(400, str(e))
 
     @app.get("/api/health")
     def health():
@@ -200,9 +265,11 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
 
     @app.post("/api/tools/{name}")
     def tool(name: str, args: dict[str, Any] = Body(default_factory=dict)):
-        if name not in tools.TOOL_NAMES:
+        if name not in tools.TOOL_NAMES and name not in ftc_api.FTC_TOOL_NAMES:
             raise HTTPException(404, f"unknown tool {name}")
         try:
+            if name in ftc_api.FTC_TOOL_NAMES:
+                return run_ftc(ftc_api.dispatch_ftc, name, args)
             return run(tools.dispatch, name, args)
         except (KeyError, ValueError) as e:
             raise HTTPException(400, f"{type(e).__name__}: {e}")

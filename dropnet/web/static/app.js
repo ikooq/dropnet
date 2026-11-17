@@ -348,7 +348,7 @@ async function openFtc(id) {
     try {
       const r = await post("api/ftc/whatif", { blocks, since_day: ftcSplit });
       $("#whatif-out").innerHTML = `<p>Reports filed from ${esc(ftcSplit || "the first day")}: <b>${r.reports_stopped.toLocaleString()}</b> from
-        <b>${r.numbers_covered.toLocaleString()}</b> numbers matched ${r.rules} block rule${r.rules > 1 ? "s" : ""}
+        <b>${r.numbers_with_reports_in_period.toLocaleString()}</b> reported numbers matched ${r.applied_rules} block rule${r.rules > 1 ? "s" : ""}
         (each block covers 10,000 numbers); ${r.campaigns_touched.length} campaigns touched.
         ${r.spoofed_reports_in_scope ? `<br><span class="muted">${r.spoofed_reports_in_scope.toLocaleString()} matching reports had matching area codes; this does not prove spoofing.</span>` : ""}</p>`;
     } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }

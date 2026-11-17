@@ -1,7 +1,7 @@
 """What-if analysis inside a Relate transaction, and one-file case export.
 
-whatif() writes candidate blocking rules as :Rule nodes in an explicit transaction, measures what they would
-would match historical reports by graph traversal, and rolls back — the store is never changed, and other readers never see the
+whatif() writes candidate blocking rules as :Rule nodes in an explicit transaction, measures which
+historical reports they match by graph traversal, and rolls back — the store is never changed, and other readers never see the
 hypothetical rules (Relate isolates uncommitted state).
 """
 from __future__ import annotations
@@ -61,6 +61,7 @@ def whatif(conn: relate.Connection, blocks=None, numbers=None, since_day: str | 
             "unknown_blocks": [b for b in blocks if b not in applied_blocks],
             "unknown_numbers": [n for n in numbers if n not in applied_numbers],
             "reports_stopped": hit["reports"], "numbers_covered": covered,
+            "numbers_with_reports_in_period": hit["numbers"],
             "spoofed_reports_in_scope": hit["spoofed"] or 0, "campaigns_touched": touched, "since_day": since_day,
             "note": "Historical complaint matches only, not prevented calls; unknown rules have no matching node in the loaded graph. The transaction was rolled back."}
 

@@ -16,6 +16,8 @@ def test_whatif_since_day_and_campaigns(g):  # noqa: F811
     campaigns.write_campaigns(g, min_numbers=5)
     r = whatif.whatif(g, blocks=["866771"], since_day="2026-11-05")
     assert r["reports_stopped"] == 1
+    assert r["numbers_with_reports_in_period"] == 1
+    assert r["numbers_covered"] == 7  # all known numbers in the range, across the entire dataset
     assert r["campaigns_touched"] == ["POOL-866771"]
 
 

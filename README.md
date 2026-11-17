@@ -190,6 +190,23 @@ victim's own area code, owners probably innocent — and would **dismiss 246 (24
 an active pool**. With Dropnet the agent receives the right verdict for every one of them (via the hook or the
 `assess_number` MCP tool), together with the spoofing caution.
 
+**A real agent, not a simulation.** `python -m dropnet ftc-live-agent-eval` asks Claude Code (headless, model Haiku)
+what a person should do about 40 real reported numbers (14 likely spoofed, 14 in a pool, 6 repeat callers, 6
+one-offs; seed 0). Every run is isolated: an empty folder, no web or shell tools, and in the second arm one MCP
+tool, `assess_number`. Results in `data/ftc/live_agent_eval.json`:
+
+| | without Dropnet | with Dropnet: facts only (v1) | with Dropnet: facts + advice |
+|---|---:|---:|---:|
+| right verdict | 0 / 40 (37 × "unknown") | 39 / 40 | **39 / 40** |
+| right action (block the range / the number / nothing) | 6 / 40 | 23 / 40 | **40 / 40** |
+| innocent owner of a spoofed number blamed or blocked | **14 / 14** | 9 / 14 | **0 / 14** |
+| rented range blocked when the number is in a pool | 0 / 14 | 12 / 14 | **14 / 14** |
+
+Without the graph the agent cannot know, and its default is to block the number — which, for a spoofed call, cuts
+off an innocent subscriber every time. The first version of the tool returned only facts; told "the owner is probably
+innocent", the agent still blocked the number "to be safe" in 9 of 14 cases. The tool now also returns its `advice`
+in words, and the harm went to zero.
+
 ### With an AI agent
 
 Start Claude Code **from the activated venv** in this folder:

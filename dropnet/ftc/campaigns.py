@@ -19,6 +19,24 @@ CAUTION = ("Caller ID is easily faked. A number reported once, from the victim's
            "spoofed — its real owner may be innocent. Treat this as evidence about a call, not about a person.")
 
 
+# What to do, not only what is known: in a live test an agent that was told "the owner is probably innocent" still
+# blocked the owner's number "to be safe" in 9 of 14 cases. The tool now says it in words.
+ADVICE = {
+    "likely_spoofed": {"block": "nothing", "owner_likely_innocent": True,
+                       "say": "Do not block this number or its range and do not blame its owner: the caller faked it to "
+                              "look local, so a block would cut off an innocent subscriber. Report the call to the FTC."},
+    "pool": {"block": "range", "owner_likely_innocent": False,
+             "say": "Block the range (the first six digits): scammers rotate through it, so a range rule also stops "
+                    "numbers nobody has reported yet. It silences 10,000 numbers, so it is a carrier's decision."},
+    "repeat": {"block": "number", "owner_likely_innocent": False,
+               "say": "Block this number: it was reported again and again from other area codes."},
+    "single": {"block": "nothing", "owner_likely_innocent": None,
+               "say": "Not enough evidence to block or blame: one or two reports and no pool behind it."},
+    "unknown": {"block": "nothing", "owner_likely_innocent": None,
+                "say": "No FTC reports for this number in the loaded window; that does not prove it is safe."},
+}
+
+
 def pool_campaigns(conn: relate.Connection, min_numbers: int = POOL_MIN_NUMBERS, exclude_neighbor: bool = True,
                    until_day: str | None = None, limit: int | None = None) -> list[dict]:
     found = rows(conn, f"""
@@ -88,7 +106,7 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
                b.npa_nxx AS block, count(DISTINCT st) AS states, collect(DISTINCT s.code) AS subjects,
                sum(CASE WHEN rep.neighbor THEN 1 ELSE 0 END) AS neighbor""", {"n": d})
     if not r or r[0]["reports"] is None:
-        return {"number": d, "verdict": "unknown", "reports": 0, "caution": CAUTION}
+        return {"number": d, "verdict": "unknown", "advice": ADVICE["unknown"], "reports": 0, "caution": CAUTION}
     a = r[0]
     pool = rows(conn, """
         MATCH (b:Block {npa_nxx: $b})<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(rep:Report)
@@ -102,6 +120,7 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
         verdict = "repeat"
     else:
         verdict = "single"
-    return {"number": d, "verdict": verdict, "reports": a["reports"], "first_day": a["first"], "last_day": a["last"],
-            "states": a["states"], "subjects": a["subjects"], "neighbor_share": round(neighbor_share, 3),
-            "block": a["block"], "block_numbers": pool, "toll_free": a["toll_free"], "caution": CAUTION}
+    return {"number": d, "verdict": verdict, "advice": ADVICE[verdict], "reports": a["reports"], "first_day": a["first"],
+            "last_day": a["last"], "states": a["states"], "subjects": a["subjects"],
+            "neighbor_share": round(neighbor_share, 3), "block": a["block"], "block_numbers": pool,
+            "toll_free": a["toll_free"], "caution": CAUTION}

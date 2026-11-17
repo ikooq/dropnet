@@ -47,6 +47,13 @@ function renderStatic() {
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
     .map((p) => hbar(esc(LABEL[p.subject] || p.label), p.neighbor_share, 1)).join("");
+  const la = ev && ev.live_agent;
+  if (la) {
+    const off = la.without_dropnet, on = la.with_dropnet;
+    $("#agent-note").innerHTML = `We asked a real AI agent what to do about ${on.answered} reported numbers. Without Dropnet it
+      blocked the innocent owner's number for <b>${off.spoofed_owner_blamed} of ${off.spoofed_total}</b> faked calls. With
+      Dropnet's tool: <b>${on.spoofed_owner_blamed} of ${on.spoofed_total}</b>, and the right action for ${on.block_correct} of ${on.answered}.`;
+  }
   $("#source").textContent = data.caution;
 }
 

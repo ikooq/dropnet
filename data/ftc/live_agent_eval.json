@@ -1,0 +1,1605 @@
+{
+ "model": "haiku",
+ "seed": 0,
+ "per_category": {
+  "s": 14,
+  "p": 14,
+  "r": 6,
+  "1": 6
+ },
+ "numbers": 40,
+ "score": {
+  "without_dropnet": {
+   "answered": 40,
+   "verdict_correct": 0,
+   "block_correct": 6,
+   "spoofed_owner_blamed": 14,
+   "spoofed_total": 14,
+   "pool_range_blocked": 0,
+   "pool_total": 14,
+   "said_unknown": 37
+  },
+  "with_dropnet": {
+   "answered": 40,
+   "verdict_correct": 39,
+   "block_correct": 40,
+   "spoofed_owner_blamed": 0,
+   "spoofed_total": 14,
+   "pool_range_blocked": 14,
+   "pool_total": 14,
+   "said_unknown": 0
+  },
+  "with_dropnet_v1_facts_only": {
+   "answered": 40,
+   "verdict_correct": 39,
+   "block_correct": 23,
+   "spoofed_owner_blamed": 9,
+   "spoofed_total": 14,
+   "pool_range_blocked": 12,
+   "pool_total": 14,
+   "said_unknown": 0
+  }
+ },
+ "rows": [
+  {
+   "number": "9725716933",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no call-history, reputation, or carrier data for this number, and spoofed caller IDs are common, so blocking only this number is the narrowest safe choice."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no call-history, reputation, or carrier data for this number, and spoofed caller IDs are common, so blocking only this number is the narrowest safe choice.\"}",
+    "turns": 1,
+    "seconds": 9.5
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, and its caller ID is faked to look local (neighbor spoofing), so blocking it or its 972571 range would cut off an innocent subscriber; reporting the call to the FTC is the useful step."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, and its caller ID is faked to look local (neighbor spoofing), so blocking it or its 972571 range would cut off an innocent subscriber; reporting the call to the FTC is the useful step.\"}",
+    "turns": 2,
+    "seconds": 16.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This number was reported once, with neighbor-style spoofing (100% of its calls faked to look local), so its real owner is probably an innocent person whose number was used as caller ID, and blocking the number or its 10,000-number block would mostly hit innocent people."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This number was reported once, with neighbor-style spoofing (100% of its calls faked to look local), so its real owner is probably an innocent person whose number was used as caller ID, and blocking the number or its 10,000-number block would mostly hit innocent people.\"}",
+    "turns": 2,
+    "seconds": 21.5
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7173032155",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and scam calls from US numbers are often spoofed, so the owner is probably a bystander; blocking the single number avoids blocking 10,000 possibly legitimate numbers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and scam calls from US numbers are often spoofed, so the owner is probably a bystander; blocking the single number avoids blocking 10,000 possibly legitimate numbers.\"}",
+    "turns": 1,
+    "seconds": 10.1
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, and the call was faked to look local (neighbor spoofing), so blocking it or its 717-303-xxxx range would cut off an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, and the call was faked to look local (neighbor spoofing), so blocking it or its 717-303-xxxx range would cut off an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 17.2
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "This number was reported once (medical-scam subject, 2026-10-26) and its neighbor-spoof share is 100%, so the caller ID was most likely faked and the real owner is probably an innocent person; blocking the single number is the proportionate step, since blocking the whole 717-303 range would hit many innocent numbers."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"This number was reported once (medical-scam subject, 2026-10-26) and its neighbor-spoof share is 100%, so the caller ID was most likely faked and the real owner is probably an innocent person; blocking the single number is the proportionate step, since blocking the whole 717-303 range would hit many innocent",
+    "turns": 2,
+    "seconds": 19.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7324285898",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no call-report or carrier data for this number, and scam calls often spoof numbers belonging to uninvolved people, so blocking just this number is the safe choice."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no call-report or carrier data for this number, and scam calls often spoof numbers belonging to uninvolved people, so blocking just this number is the safe choice.\"}",
+    "turns": 1,
+    "seconds": 11.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, from the caller's own area code, and its neighbor-spoofing share is 100%, so the caller most likely faked it and blocking it or its range would hit an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, from the caller's own area code, and its neighbor-spoofing share is 100%, so the caller most likely faked it and blocking it or its range would hit an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 16.2
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "It was reported once (IMPOSTER_GOV, neighbor-style spoofing) and its block has no other numbers in the pool, so the caller ID was most likely faked and the range would only block innocent numbers."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"It was reported once (IMPOSTER_GOV, neighbor-style spoofing) and its block has no other numbers in the pool, so the caller ID was most likely faked and the range would only block innocent numbers.\"}",
+    "turns": 2,
+    "seconds": 20.3
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8888082596",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no call-report or carrier data for this number, and toll-free numbers are often spoofed, so blocking only this number is the safest step that avoids blocking legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no call-report or carrier data for this number, and toll-free numbers are often spoofed, so blocking only this number is the safest step that avoids blocking legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 9.8
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This toll-free number sits in block 888808, where 14 numbers have been reported, which points to a scammer-rented range, though it rests on a single report from one day and caller ID can be faked, so the owner could still be an innocent party."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This toll-free number sits in block 888808, where 14 numbers have been reported, which points to a scammer-rented range, though it rests on a single report from one day and caller ID can be faked, so the owner could still be an innocent party.\"}",
+    "turns": 2,
+    "seconds": 20.5
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "Only 1 report, but the number sits in a toll-free 888-808 block with 14 reported numbers, so it looks like a rented pool; caution: caller ID can be faked, so the owner may still be an innocent party."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"Only 1 report, but the number sits in a toll-free 888-808 block with 14 reported numbers, so it looks like a rented pool; caution: caller ID can be faked, so the owner may still be an innocent party.\"}",
+    "turns": 2,
+    "seconds": 22.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8888581081",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and toll-free and caller IDs are often spoofed, so blocking only this number is a proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and toll-free and caller IDs are often spoofed, so blocking only this number is a proportionate step.\"}",
+    "turns": 1,
+    "seconds": 10.7
+   },
+   "with": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "Four reports from three states over about a month, and the calls were not faked to look local, so the number itself is being used repeatedly."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"Four reports from three states over about a month, and the calls were not faked to look local, so the number itself is being used repeatedly.\"}",
+    "turns": 2,
+    "seconds": 18.7
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "Four reports from three states over about a month, with no neighbor-spoofing, point to this toll-free number itself being used, while the range holds only three known numbers, so blocking the whole 10,000-number block would hit many unrelated numbers."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"Four reports from three states over about a month, with no neighbor-spoofing, point to this toll-free number itself being used, while the range holds only three known numbers, so blocking the whole 10,000-number block would hit many unrelated numbers.\"}",
+    "turns": 2,
+    "seconds": 20.4
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "2087059180",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reports or lookup data for this number, and scammers often spoof caller ID, so blocking only this number avoids blocking the 10,000-number range that could include legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reports or lookup data for this number, and scammers often spoof caller ID, so blocking only this number avoids blocking the 10,000-number range that could include legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 10.5
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report (2026-11-03) and no number pool behind it, so there is not enough evidence to block or blame; caller ID is easily faked, so the real owner may be innocent."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report (2026-11-03) and no number pool behind it, so there is not enough evidence to block or blame; caller ID is easily faked, so the real owner may be innocent.\"}",
+    "turns": 2,
+    "seconds": 18.1
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "This number was reported once, on 2026-11-03, from one state, and its block has no other reports, so the caller ID may be spoofed and blocking only this number avoids blocking 10,000 others."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"This number was reported once, on 2026-11-03, from one state, and its block has no other reports, so the caller ID may be spoofed and blocking only this number avoids blocking 10,000 others.\"}",
+    "turns": 2,
+    "seconds": 19.2
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7869263198",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and scam calls often spoof a displayed number, so blocking just this number is the safe default that avoids blocking 10,000 possibly legitimate numbers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and scam calls often spoof a displayed number, so blocking just this number is the safe default that avoids blocking 10,000 possibly legitimate numbers.\"}",
+    "turns": 1,
+    "seconds": 9.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report (Oct 14, 2026, debt-related) with no pool or repeat pattern, and caller ID is easily faked, so there is not enough evidence to block or blame the number's owner."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report (Oct 14, 2026, debt-related) with no pool or repeat pattern, and caller ID is easily faked, so there is not enough evidence to block or blame the number's owner.\"}",
+    "turns": 2,
+    "seconds": 17.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "The number has one report (a debt-collection call on 2026-10-14) and its block has no other reported numbers, so blocking just this number is the proportionate step, and the owner may be an innocent party whose caller ID was spoofed."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"The number has one report (a debt-collection call on 2026-10-14) and its block has no other reported numbers, so blocking just this number is the proportionate step, and the owner may be an innocent party whose caller ID was spoofed.\"}",
+    "turns": 2,
+    "seconds": 18.5
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "6159935478",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no call-report or carrier data for this number, and numbers like this are often spoofed, so blocking only this exact number is the safe, targeted choice."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no call-report or carrier data for this number, and numbers like this are often spoofed, so blocking only this exact number is the safe, targeted choice.\"}",
+    "turns": 1,
+    "seconds": 9.3
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This number was reported once, from the caller's own area code, and every report was a neighbor-spoofed call, so the number was probably faked and its real owner is likely innocent; blocking it or its 615-993 range would cut off innocent subscribers."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This number was reported once, from the caller's own area code, and every report was a neighbor-spoofed call, so the number was probably faked and its real owner is likely innocent; blocking it or its 615-993 range would cut off innocent subscribers.\"}",
+    "turns": 2,
+    "seconds": 16.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Reported once, on one day, and the number's block has no other known scam numbers, so it is most likely a spoofed caller ID and blocking this single number is enough."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Reported once, on one day, and the number's block has no other known scam numbers, so it is most likely a spoofed caller ID and blocking this single number is enough.\"}",
+    "turns": 2,
+    "seconds": 19.6
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5806690307",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup or report data for this number, and scam calls often spoof innocent numbers, so block only this number and avoid the 10,000-number range, which could block legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup or report data for this number, and scam calls often spoof innocent numbers, so block only this number and avoid the 10,000-number range, which could block legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 10.5
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "All 5 reports came from one state on one day and every call was faked to look local, which points to spoofing rather than the owner, though the tool's 'repeat' label conflicts with this."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"All 5 reports came from one state on one day and every call was faked to look local, which points to spoofing rather than the owner, though the tool's 'repeat' label conflicts with this.\"}",
+    "turns": 2,
+    "seconds": 24.1
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Five reports on one day in one state, and all were faked to look local, so the owner of 580-669-0307 is probably an innocent person whose number was spoofed, and blocking the number alone adds little."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Five reports on one day in one state, and all were faked to look local, so the owner of 580-669-0307 is probably an innocent person whose number was spoofed, and blocking the number alone adds little.\"}",
+    "turns": 2,
+    "seconds": 22.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8134498018",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and scammers often spoof caller ID, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and scammers often spoof caller ID, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 9.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, and its caller ID was faked to look local (neighbor spoofing), so blocking it or its 813-449-8018 range would cut off an innocent subscriber; report the call to the FTC instead."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, and its caller ID was faked to look local (neighbor spoofing), so blocking it or its 813-449-8018 range would cut off an innocent subscriber; report the call to the FTC instead.\"}",
+    "turns": 2,
+    "seconds": 29.5
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Reported once, from the caller's own area code, and the number is likely faked, so blocking this single number only filters this call and avoids blocking 10,000 numbers that may include innocent people."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Reported once, from the caller's own area code, and the number is likely faked, so blocking this single number only filters this call and avoids blocking 10,000 numbers that may include innocent people.\"}",
+    "turns": 2,
+    "seconds": 19.7
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8445940366",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no caller-ID lookup or complaint data for this number, and 844 toll-free numbers are often spoofed or resold, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no caller-ID lookup or complaint data for this number, and 844 toll-free numbers are often spoofed or resold, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 10.8
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number is one of 182 reported numbers in the 844-594 block, which scammers rotate through, though it has only one report so far and caller ID can be faked."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number is one of 182 reported numbers in the 844-594 block, which scammers rotate through, though it has only one report so far and caller ID can be faked.\"}",
+    "turns": 2,
+    "seconds": 29.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number is one of 182 known numbers in the 844-594 toll-free block, which looks rented for calling, and it was reported only once, so its owner is probably not the scammer; caller ID is easily faked, so treat this as evidence about the call, not the person."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number is one of 182 known numbers in the 844-594 toll-free block, which looks rented for calling, and it was reported only once, so its owner is probably not the scammer; caller ID is easily faked, so treat this as evidence about the call, not the person.\"}",
+    "turns": 2,
+    "seconds": 22.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7754571446",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and one call from a 775 (Nevada) number is more often spoofed than the owner's own activity, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and one call from a 775 (Nevada) number is more often spoofed than the owner's own activity, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 9.9
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "The number is one of 6 reported numbers in the 775-457 block, a scammer-used pool, though it has only one report so far."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"The number is one of 6 reported numbers in the 775-457 block, a scammer-used pool, though it has only one report so far.\"}",
+    "turns": 2,
+    "seconds": 24.4
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Only one report from one state, and the tool's 'pool' label covers just 6 numbers in its block, so this is weak evidence of a rented range; the caller ID is probably spoofed, so the owner is likely innocent."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Only one report from one state, and the tool's 'pool' label covers just 6 numbers in its block, so this is weak evidence of a rented range; the caller ID is probably spoofed, so the owner is likely innocent.\"}",
+    "turns": 2,
+    "seconds": 22.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "3643000085",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Area code 364 doesn't appear to be assigned in the US numbering plan, so the caller ID is probably forged and blocking this one number is enough."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Area code 364 doesn't appear to be assigned in the US numbering plan, so the caller ID is probably forged and blocking this one number is enough.\"}",
+    "turns": 1,
+    "seconds": 10.2
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "The number belongs to block 364300, which has 9 reported numbers from 2 reports, so scammers appear to be rotating through the range and blocking the whole 10,000-number range covers unreported numbers too."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"The number belongs to block 364300, which has 9 reported numbers from 2 reports, so scammers appear to be rotating through the range and blocking the whole 10,000-number range covers unreported numbers too.\"}",
+    "turns": 2,
+    "seconds": 20.5
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number belongs to a 364-300 block where 9 numbers were reported (2 reports, DEBT calls, 1 state, no local-area faking), so the scam likely runs from the block rather than this one line, and the owner may be an innocent subscriber, since caller ID is easy to fake."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number belongs to a 364-300 block where 9 numbers were reported (2 reports, DEBT calls, 1 state, no local-area faking), so the scam likely runs from the block rather than this one line, and the owner may be an innocent subscriber, since caller ID is easy to fake.\"}",
+    "turns": 2,
+    "seconds": 21.5
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5125672734",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I can't look up this number's history or carrier data, and a single unwanted call doesn't show the owner is a scammer, since caller ID is often spoofed; blocking just this number is the narrowest safe step, while blocking the 10,000-number range would be overbroad without evidence."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I can't look up this number's history or carrier data, and a single unwanted call doesn't show the owner is a scammer, since caller ID is often spoofed; blocking just this number is the narrowest safe step, while blocking the 10,000-number range would be overbroad without evidence.\"}",
+    "turns": 1,
+    "seconds": 10.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This single report from a local 512 area code fits neighbor spoofing, so the caller probably faked the number and blocking it or its 512-567 range would cut off an innocent subscriber; report the call to the FTC instead."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This single report from a local 512 area code fits neighbor spoofing, so the caller probably faked the number and blocking it or its 512-567 range would cut off an innocent subscriber; report the call to the FTC instead.\"}",
+    "turns": 2,
+    "seconds": 18.2
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Single report from one state, in the caller's own area code (neighbor spoofing), so the number was probably faked and blocking it would mostly hit an innocent owner."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Single report from one state, in the caller's own area code (neighbor spoofing), so the number was probably faked and blocking it would mostly hit an innocent owner.\"}",
+    "turns": 2,
+    "seconds": 20.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7274364718",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reputation or lookup data for this number, and 727 numbers are often spoofed, so block only this number rather than the 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reputation or lookup data for this number, and 727 numbers are often spoofed, so block only this number rather than the 10,000-number range.\"}",
+    "turns": 1,
+    "seconds": 9.2
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This number was reported once, and the call was faked to look local (neighbor spoofing), so the real owner is probably an innocent person whose number was borrowed; blocking the number or its range would cut off that person without stopping the caller."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This number was reported once, and the call was faked to look local (neighbor spoofing), so the real owner is probably an innocent person whose number was borrowed; blocking the number or its range would cut off that person without stopping the caller.\"}",
+    "turns": 2,
+    "seconds": 17.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, from the caller's own area code, and the fraud reports show it was faked to look local, so its real owner is probably an innocent person and blocking the number or its 10,000-number block would mostly hit innocent callers."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, from the caller's own area code, and the fraud reports show it was faked to look local, so its real owner is probably an innocent person and blocking the number or its 10,000-number block would mostly hit innocent callers.\"}",
+    "turns": 2,
+    "seconds": 18.7
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8339069958",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reports or lookup data for this number, and toll-free numbers are often spoofed, so the listed owner is probably not the caller; blocking only this number avoids cutting off the 10,000-number range, which may include legitimate businesses."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reports or lookup data for this number, and toll-free numbers are often spoofed, so the listed owner is probably not the caller; blocking only this number avoids cutting off the 10,000-number range, which may include legitimate businesses.\"}",
+    "turns": 1,
+    "seconds": 10.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This is a toll-free number from block 833906, which has 131 numbers in the pool and an IMPOSTER_GOV report, so scammers appear to be rotating through the range."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This is a toll-free number from block 833906, which has 131 numbers in the pool and an IMPOSTER_GOV report, so scammers appear to be rotating through the range.\"}",
+    "turns": 2,
+    "seconds": 21.2
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This toll-free number is one of 131 reported numbers in the 833-906 block, a pattern that suggests a rented pool, but it has only one report, so its owner may be an innocent party whose number or block was used by the caller."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This toll-free number is one of 131 reported numbers in the 833-906 block, a pattern that suggests a rented pool, but it has only one report, so its owner may be an innocent party whose number or block was used by the caller.\"}",
+    "turns": 2,
+    "seconds": 22.9
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "2622747873",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reputation or complaint data for this number, and caller ID spoofing is common, so the owner is probably not the caller; blocking the single number is safer than blocking 10,000 numbers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reputation or complaint data for this number, and caller ID spoofing is common, so the owner is probably not the caller; blocking the single number is safer than blocking 10,000 numbers.\"}",
+    "turns": 1,
+    "seconds": 9.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report (2026-10-23) and no pool or repeat pattern, so the caller ID may be spoofed and the number's owner may be innocent."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report (2026-10-23) and no pool or repeat pattern, so the caller ID may be spoofed and the number's owner may be innocent.\"}",
+    "turns": 2,
+    "seconds": 18.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Only one report from this number (Oct 23, 2026), and caller ID is easily spoofed, so the owner may be an innocent person whose number was faked; blocking just this number is proportionate."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Only one report from this number (Oct 23, 2026), and caller ID is easily spoofed, so the owner may be an innocent person whose number was faked; blocking just this number is proportionate.\"}",
+    "turns": 2,
+    "seconds": 19.4
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5487620526",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no access to call-report databases to check this number, and most unwanted calls use spoofed caller IDs, so the listed owner is probably an uninvolved party; blocking the single number is low-cost, while blocking a 10,000-number range risks blocking legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no access to call-report databases to check this number, and most unwanted calls use spoofed caller IDs, so the listed owner is probably an uninvolved party; blocking the single number is low-cost, while blocking a 10,000-number range risks blocking legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 12.2
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number is one of 61 reported numbers in block 548762, which points to a rented range, though it rests on a single report and the owner may still be an innocent person whose caller ID was spoofed."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number is one of 61 reported numbers in block 548762, which points to a rented range, though it rests on a single report and the owner may still be an innocent person whose caller ID was spoofed.\"}",
+    "turns": 2,
+    "seconds": 23.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "The number is one of 61 reported numbers in the 548-762 block, which points to a rented number pool, and it was reported only once, so its owner may be an innocent party whose caller ID was faked."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"The number is one of 61 reported numbers in the 548-762 block, which points to a rented number pool, and it was reported only once, so its owner may be an innocent party whose caller ID was faked.\"}",
+    "turns": 2,
+    "seconds": 19.1
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8707441582",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I can't look up this number's owner or call history, and US scam calls often spoof innocent numbers, so block only this number and report it to the FTC or your carrier."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I can't look up this number's owner or call history, and US scam calls often spoof innocent numbers, so block only this number and report it to the FTC or your carrier.\"}",
+    "turns": 1,
+    "seconds": 9.1
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number sits in an 870-744 block with 18 reported numbers and only one report for this one, so the block looks rotated by scammers while the owner's guilt is unproven, and caller ID can be faked."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number sits in an 870-744 block with 18 reported numbers and only one report for this one, so the block looks rotated by scammers while the owner's guilt is unproven, and caller ID can be faked.\"}",
+    "turns": 2,
+    "seconds": 23.2
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "The number is one of 18 numbers from the 870-744 block that appear in reports, with only one report on this number (2026-10-13), so it looks like a rented range and the individual owner may be a spoofed innocent."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"The number is one of 18 numbers from the 870-744 block that appear in reports, with only one report on this number (2026-10-13), so it looks like a rented range and the individual owner may be a spoofed innocent.\"}",
+    "turns": 2,
+    "seconds": 21.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "7138008361",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reputation or lookup data for this number, and 713 caller IDs are often spoofed, so blocking only this number is low-cost while blocking the whole 713-800 range would likely hit innocent callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reputation or lookup data for this number, and 713 caller IDs are often spoofed, so blocking only this number is low-cost while blocking the whole 713-800 range would likely hit innocent callers.\"}",
+    "turns": 1,
+    "seconds": 11.7
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "A single report (IMPOSTER_GOV, 2026-10-22) from a local-looking number, where neighbor spoofing accounts for 100% of calls, means the caller probably faked the number, so blocking it or its 713-800 range would cut off an innocent subscriber instead of the scammer."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"A single report (IMPOSTER_GOV, 2026-10-22) from a local-looking number, where neighbor spoofing accounts for 100% of calls, means the caller probably faked the number, so blocking it or its 713-800 range would cut off an innocent subscriber instead of the scammer.\"}",
+    "turns": 2,
+    "seconds": 18.7
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Reported once, with 713 caller ID that matches the local area code; the number looks spoofed, and blocking the whole 713-800 range would hit 10,000 numbers for no evidenced benefit."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Reported once, with 713 caller ID that matches the local area code; the number looks spoofed, and blocking the whole 713-800 range would hit 10,000 numbers for no evidenced benefit.\"}",
+    "turns": 2,
+    "seconds": 20.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "2173748989",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reputation or lookup data for 217-374-8989, and scam calls often spoof innocent numbers, so block only this number unless more calls come from the same range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reputation or lookup data for 217-374-8989, and scam calls often spoof innocent numbers, so block only this number unless more calls come from the same range.\"}",
+    "turns": 1,
+    "seconds": 9.9
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, from the caller's own area code, and the call was neighbor-spoofed, so the caller likely faked it and blocking it or its range would hit an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, from the caller's own area code, and the call was neighbor-spoofed, so the caller likely faked it and blocking it or its range would hit an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 18.7
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "This number was reported once, from the caller's own area code, and the block shows no other numbers, so it is most likely a faked caller ID and blocking the single number is the proportionate step, not the 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"This number was reported once, from the caller's own area code, and the block shows no other numbers, so it is most likely a faked caller ID and blocking the single number is the proportionate step, not the 10,000-number range.\"}",
+    "turns": 2,
+    "seconds": 23.1
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "3136260982",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no access to scam databases or carrier reports for this number, and 313 numbers are often spoofed, so blocking only this number is the low-risk choice."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no access to scam databases or carrier reports for this number, and 313 numbers are often spoofed, so blocking only this number is the low-risk choice.\"}",
+    "turns": 1,
+    "seconds": 10.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report (Oct 12, 2026) from one state, with no pool or repeat activity, so there is not enough evidence to block or blame the owner, and caller ID is easily spoofed."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report (Oct 12, 2026) from one state, with no pool or repeat activity, so there is not enough evidence to block or blame the owner, and caller ID is easily spoofed.\"}",
+    "turns": 2,
+    "seconds": 20.0
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Only one report from 2026-10-12 in one state, and caller ID is easily faked, so the owner is probably an innocent party whose number was spoofed."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Only one report from 2026-10-12 in one state, and caller ID is easily faked, so the owner is probably an innocent party whose number was spoofed.\"}",
+    "turns": 2,
+    "seconds": 19.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5202317796",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and most calls from unfamiliar numbers are spoofed, so blocking only this number is the safe minimum and avoids blocking legitimate callers in the 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and most calls from unfamiliar numbers are spoofed, so blocking only this number is the safe minimum and avoids blocking legitimate callers in the 10,000-number range.\"}",
+    "turns": 1,
+    "seconds": 11.4
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number has only one report, but seven reported numbers share its block 520231, which suggests scammers are rotating through a rented range, so blocking the whole range also covers numbers nobody has reported yet."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number has only one report, but seven reported numbers share its block 520231, which suggests scammers are rotating through a rented range, so blocking the whole range also covers numbers nobody has reported yet.\"}",
+    "turns": 2,
+    "seconds": 23.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "The number was reported once on 2026-10-27, and it belongs to block 520231, where 7 numbers have been reported, so it looks like a pooled range whose owner is probably an innocent party."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"The number was reported once on 2026-10-27, and it belongs to block 520231, where 7 numbers have been reported, so it looks like a pooled range whose owner is probably an innocent party.\"}",
+    "turns": 2,
+    "seconds": 24.6
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5748478289",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I can't look up this number's reports or ownership, and caller ID is often spoofed, so blocking only this number avoids blocking legitimate callers in the same 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I can't look up this number's reports or ownership, and caller ID is often spoofed, so blocking only this number avoids blocking legitimate callers in the same 10,000-number range.\"}",
+    "turns": 1,
+    "seconds": 11.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, on 2026-10-27, and the caller faked it to look local (neighbor spoofing), so blocking it or its 574-847 range would cut off an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, on 2026-10-27, and the caller faked it to look local (neighbor spoofing), so blocking it or its 574-847 range would cut off an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 18.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Reported once on 2026-10-27 from a single state, and the number is fully neighbor-spoofed (its area code and prefix match the victim's local area), so the real owner is probably an innocent person whose caller ID was faked."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Reported once on 2026-10-27 from a single state, and the number is fully neighbor-spoofed (its area code and prefix match the victim's local area), so the real owner is probably an innocent person whose caller ID was faked.\"}",
+    "turns": 2,
+    "seconds": 20.4
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8003607315",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no complaint or lookup data for this number, and toll-free numbers are often spoofed or belong to legitimate businesses, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no complaint or lookup data for this number, and toll-free numbers are often spoofed or belong to legitimate businesses, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 11.2
+   },
+   "with": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "This toll-free number was reported 3 times from 3 states between Oct 15 and Nov 12, 2026, and its block contains no other numbers in use."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"This toll-free number was reported 3 times from 3 states between Oct 15 and Nov 12, 2026, and its block contains no other numbers in use.\"}",
+    "turns": 2,
+    "seconds": 19.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Three reports from three states over about four weeks suggest a repeat caller, but caller ID is easy to fake, so the number's owner may be a victim of spoofing rather than the scammer, and the block holds only this one known number."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Three reports from three states over about four weeks suggest a repeat caller, but caller ID is easy to fake, so the number's owner may be a victim of spoofing rather than the scammer, and the block holds only this one known number.\"}",
+    "turns": 2,
+    "seconds": 22.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "6263087673",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reporting or lookup data for this number, and one call doesn't establish the owner's involvement; 626 numbers are often spoofed, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reporting or lookup data for this number, and one call doesn't establish the owner's involvement; 626 numbers are often spoofed, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 12.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, from the victim's own area code, and its calls were faked to look local, so the real owner is probably an innocent subscriber and blocking the number or its range would hit them."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, from the victim's own area code, and its calls were faked to look local, so the real owner is probably an innocent subscriber and blocking the number or its range would hit them.\"}",
+    "turns": 2,
+    "seconds": 19.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "This number was reported once, on 2026-11-11, and the block shows no other numbers in its pool, and the call looks faked to match the caller's area code, so the owner is probably an innocent party and only this number should be blocked."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"This number was reported once, on 2026-11-11, and the block shows no other numbers in its pool, and the call looks faked to match the caller's area code, so the owner is probably an innocent party and only this number should be blocked.\"}",
+    "turns": 2,
+    "seconds": 19.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8592032885",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no complaint or carrier data for this number, and caller ID is often spoofed, so the owner is probably a bystander; blocking just this number avoids blocking the other 9,999 numbers in the range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no complaint or carrier data for this number, and caller ID is often spoofed, so the owner is probably a bystander; blocking just this number avoids blocking the other 9,999 numbers in the range.\"}",
+    "turns": 1,
+    "seconds": 11.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "This number was reported 3 times between 2026-10-15 and 2026-10-27, but two-thirds of the calls in its block were neighbor-spoofed, so the owner may still be a victim of caller-ID faking."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"This number was reported 3 times between 2026-10-15 and 2026-10-27, but two-thirds of the calls in its block were neighbor-spoofed, so the owner may still be a victim of caller-ID faking.\"}",
+    "turns": 2,
+    "seconds": 26.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Three reports from one state over Oct 15\u201327, 2026, but caller ID is easily faked, so the number's real owner may be an innocent person whose number was spoofed; the 10,000-number block holds only 4 numbers in the data, so blocking the single number is the proportionate choice."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Three reports from one state over Oct 15\u201327, 2026, but caller ID is easily faked, so the number's real owner may be an innocent person whose number was spoofed; the 10,000-number block holds only 4 numbers in the data, so blocking the single number is the proportionate choice.\"}",
+    "turns": 2,
+    "seconds": 21.7
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "4245084441",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "A single unwanted call doesn't show the number's owner is the scammer, since caller ID is often spoofed, and blocking only this number avoids blocking legitimate callers in the same 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"A single unwanted call doesn't show the number's owner is the scammer, since caller ID is often spoofed, and blocking only this number avoids blocking legitimate callers in the same 10,000-number range.\"}",
+    "turns": 1,
+    "seconds": 10.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number is one of 13 reported numbers in the 424-508 block, which scammers appear to be cycling through, and it was not faked to look local, so the block is the better thing to stop."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number is one of 13 reported numbers in the 424-508 block, which scammers appear to be cycling through, and it was not faked to look local, so the block is the better thing to stop.\"}",
+    "turns": 2,
+    "seconds": 21.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number is one of 13 reported numbers from the 424-508 block (one report, Oct 27, 2026), which suggests a rented pool, and caller ID is easily faked, so the owner may be an innocent person."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number is one of 13 reported numbers from the 424-508 block (one report, Oct 27, 2026), which suggests a rented pool, and caller ID is easily faked, so the owner may be an innocent person.\"}",
+    "turns": 2,
+    "seconds": 21.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "9375335398",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "One unwanted call gives no evidence about the number's owner, which is often spoofed, and blocking a 10,000-number range would risk blocking legitimate callers."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"One unwanted call gives no evidence about the number's owner, which is often spoofed, and blocking a 10,000-number range would risk blocking legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 10.7
+   },
+   "with": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "Reported 3 times from one state on a single day with no neighbor-spoofing signal, so block just this number; caller ID can still be faked, so the owner may be innocent."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"Reported 3 times from one state on a single day with no neighbor-spoofing signal, so block just this number; caller ID can still be faked, so the owner may be innocent.\"}",
+    "turns": 2,
+    "seconds": 27.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "The number made 3 reports on one day, all from one state, with no neighbor-spoofing signal, and its block holds only this one number, so blocking the number alone is proportionate."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"The number made 3 reports on one day, all from one state, with no neighbor-spoofing signal, and its block holds only this one number, so blocking the number alone is proportionate.\"}",
+    "turns": 2,
+    "seconds": 21.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5812234247",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I can't check live carrier or spam-report databases, and 581 is a Canadian area code, so the single call doesn't show whether the number is spoofed, rented, or repeatedly used; blocking the one number is low-cost, while blocking the 10,000-number range would likely catch legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I can't check live carrier or spam-report databases, and 581 is a Canadian area code, so the single call doesn't show whether the number is spoofed, rented, or repeatedly used; blocking the one number is low-cost, while blocking the 10,000-number range would likely catch legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 11.1
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report (DEBT, 2026-10-19) and no pool or repeat pattern, so the number may be spoofed and the evidence doesn't justify blocking the number or its range."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report (DEBT, 2026-10-19) and no pool or repeat pattern, so the number may be spoofed and the evidence doesn't justify blocking the number or its range.\"}",
+    "turns": 2,
+    "seconds": 24.7
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Only one FTC report (DEBT, Oct 19 2026) and its block holds just this number, so blocking the number alone is proportionate; caller ID is easily faked, so the owner may be an innocent person whose number was spoofed."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Only one FTC report (DEBT, Oct 19 2026) and its block holds just this number, so blocking the number alone is proportionate; caller ID is easily faked, so the owner may be an innocent person whose number was spoofed.\"}",
+    "turns": 2,
+    "seconds": 21.3
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "4325845000",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup or complaint data for this number, and caller ID is often spoofed, so blocking only this number is the proportionate step."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup or complaint data for this number, and caller ID is often spoofed, so blocking only this number is the proportionate step.\"}",
+    "turns": 1,
+    "seconds": 9.8
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number is one of 21 reported numbers in the 432584 block, which is being used for debt-collection scam calls, so blocking the whole range stops the rotation; the single report on this exact number could still be spoofed."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number is one of 21 reported numbers in the 432584 block, which is being used for debt-collection scam calls, so blocking the whole range stops the rotation; the single report on this exact number could still be spoofed.\"}",
+    "turns": 2,
+    "seconds": 23.4
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number sits in block 432584, where 21 numbers have been reported, which suggests a rented range of spoofed numbers rather than the owner's own line."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number sits in block 432584, where 21 numbers have been reported, which suggests a rented range of spoofed numbers rather than the owner's own line.\"}",
+    "turns": 2,
+    "seconds": 22.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "9403876300",
+   "code": "1",
+   "truth": "single_report",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup or report data for this number, and scammers often spoof real numbers, so blocking only this number is the least likely to hit innocent callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup or report data for this number, and scammers often spoof real numbers, so blocking only this number is the least likely to hit innocent callers.\"}",
+    "turns": 1,
+    "seconds": 10.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Only one report in one state (Oct 12, 2026) with no pool or repeat pattern, and caller ID is easily faked, so the number's owner is probably an innocent party whose number was spoofed."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Only one report in one state (Oct 12, 2026) with no pool or repeat pattern, and caller ID is easily faked, so the number's owner is probably an innocent party whose number was spoofed.\"}",
+    "turns": 2,
+    "seconds": 23.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "It was reported once, on one day, and its block holds only 2 numbers, so the caller ID may be spoofed; blocking the single number is narrower than blocking the 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"It was reported once, on one day, and its block holds only 2 numbers, so the caller ID may be spoofed; blocking the single number is narrower than blocking the 10,000-number range.\"}",
+    "turns": 2,
+    "seconds": 21.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "5187774259",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup or reputation data for this number, and caller ID is often spoofed, so blocking only this number is the proportionate step and a whole 10,000-number range is not justified by one call."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup or reputation data for this number, and caller ID is often spoofed, so blocking only this number is the proportionate step and a whole 10,000-number range is not justified by one call.\"}",
+    "turns": 1,
+    "seconds": 11.0
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "518-777-4259 is one of 25 reported numbers in the 518-777 block, which looks like a rented pool that scammers rotate through, so blocking the whole 10,000-number range also stops unreported numbers."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"518-777-4259 is one of 25 reported numbers in the 518-777 block, which looks like a rented pool that scammers rotate through, so blocking the whole 10,000-number range also stops unreported numbers.\"}",
+    "turns": 2,
+    "seconds": 25.7
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "Reported once on 2026-10-27 as one of 25 numbers in the 518-777 block, which looks like a rented pool rather than one scammer's own line, so the individual owner is probably not the caller."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"Reported once on 2026-10-27 as one of 25 numbers in the 518-777 block, which looks like a rented pool rather than one scammer's own line, so the individual owner is probably not the caller.\"}",
+    "turns": 2,
+    "seconds": 21.9
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "4092241517",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no complaint or carrier data for this number, and caller ID is often spoofed, so blocking only this number is the low-risk choice."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no complaint or carrier data for this number, and caller ID is often spoofed, so blocking only this number is the low-risk choice.\"}",
+    "turns": 1,
+    "seconds": 10.2
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "The number was reported once, from the caller's own area code, and every report was a neighbor-spoofed call, so the caller most likely faked it; blocking it or its range would hit an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"The number was reported once, from the caller's own area code, and every report was a neighbor-spoofed call, so the caller most likely faked it; blocking it or its range would hit an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 24.0
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This number was reported once, from one state, and the caller ID is likely faked to look local (neighbor spoofing), so its real owner is probably an innocent person and blocking it would stop little while risking collateral."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This number was reported once, from one state, and the caller ID is likely faked to look local (neighbor spoofing), so its real owner is probably an innocent person and blocking it would stop little while risking collateral.\"}",
+    "turns": 2,
+    "seconds": 22.7
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "4355578412",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and caller ID is easy to spoof, so the owner is more likely a bystander than the caller; blocking the single number avoids cutting off 10,000 numbers that may belong to innocent people."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and caller ID is easy to spoof, so the owner is more likely a bystander than the caller; blocking the single number avoids cutting off 10,000 numbers that may belong to innocent people.\"}",
+    "turns": 1,
+    "seconds": 12.4
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "Two reports from one state within a week, all faked to look local (neighbor spoofing, share 1.0), so the number's real owner is probably an innocent party whose caller ID was forged; blocking it or its 435-557 range would cut off innocent subscribers."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"Two reports from one state within a week, all faked to look local (neighbor spoofing, share 1.0), so the number's real owner is probably an innocent party whose caller ID was forged; blocking it or its 435-557 range would cut off innocent subscribers.\"}",
+    "turns": 2,
+    "seconds": 23.9
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "The number was reported twice in one week from one state, and its neighboring numbers are faked to look local, so the caller ID was probably spoofed and the real owner is likely innocent."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"The number was reported twice in one week from one state, and its neighboring numbers are faked to look local, so the caller ID was probably spoofed and the real owner is likely innocent.\"}",
+    "turns": 2,
+    "seconds": 20.0
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8336455814",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no reporting or lookup data for this number, one call is not evidence against its owner, and 833 toll-free numbers are often spoofed, so blocking the single number is the proportionate step while a 10,000-number range would risk blocking legitimate callers."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no reporting or lookup data for this number, one call is not evidence against its owner, and 833 toll-free numbers are often spoofed, so blocking the single number is the proportionate step while a 10,000-number range would risk blocking legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 10.8
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "This number is one of 101 reported numbers in the 833-645 block, which scammers appear to rotate through, so blocking the whole range also stops unreported numbers."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"This number is one of 101 reported numbers in the 833-645 block, which scammers appear to rotate through, so blocking the whole range also stops unreported numbers.\"}",
+    "turns": 2,
+    "seconds": 23.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This toll-free number is one of 101 reported numbers in the 833-645 block, which suggests a rented pool, but it has only one report and caller ID is easily faked, so the number's owner may be innocent."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This toll-free number is one of 101 reported numbers in the 833-645 block, which suggests a rented pool, but it has only one report and caller ID is easily faked, so the number's owner may be innocent.\"}",
+    "turns": 2,
+    "seconds": 42.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8332540473",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and toll-free caller IDs are often spoofed, so the listed owner may be an unrelated party; blocking only this number is low-cost and avoids collateral blocking."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and toll-free caller IDs are often spoofed, so the listed owner may be an unrelated party; blocking only this number is low-cost and avoids collateral blocking.\"}",
+    "turns": 1,
+    "seconds": 12.3
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": false,
+     "block": "range",
+     "reason": "Two reports in two states put this toll-free number in a 186-number pool within block 833254, which scammers rotate through, so blocking the whole range stops unreported numbers too."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": false, \"block\": \"range\", \"reason\": \"Two reports in two states put this toll-free number in a 186-number pool within block 833254, which scammers rotate through, so blocking the whole range stops unreported numbers too.\"}",
+    "turns": 2,
+    "seconds": 26.6
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "This number is one of 186 reported numbers from the 833-254 block, which points to a rotated pool, and caller ID is easy to fake, so the number's owner is probably an innocent party."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"This number is one of 186 reported numbers from the 833-254 block, which points to a rotated pool, and caller ID is easy to fake, so the number's owner is probably an innocent party.\"}",
+    "turns": 2,
+    "seconds": 20.7
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "4303999188",
+   "code": "p",
+   "truth": "rented_range",
+   "without": {
+    "answer": {
+     "verdict": "single_report",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "One unwanted call gives no evidence of a pattern, and many scam calls use spoofed numbers, so blocking this specific number is proportionate while blocking the 10,000-number range would risk blocking legitimate callers."
+    },
+    "raw": "{\"verdict\": \"single_report\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"One unwanted call gives no evidence of a pattern, and many scam calls use spoofed numbers, so blocking this specific number is proportionate while blocking the 10,000-number range would risk blocking legitimate callers.\"}",
+    "turns": 1,
+    "seconds": 11.8
+   },
+   "with": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "range",
+     "reason": "One report from 430-399 with 5 numbers seen in that block suggests a rotated pool, and caller ID is easy to fake, so the owner is probably not the scammer."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"range\", \"reason\": \"One report from 430-399 with 5 numbers seen in that block suggests a rotated pool, and caller ID is easy to fake, so the owner is probably not the scammer.\"}",
+    "turns": 2,
+    "seconds": 28.3
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "rented_range",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "The number is one of 5 reported numbers in the 430399 block, but it was reported only once, and caller ID is easily faked, so the owner is probably an innocent party whose number was spoofed or drawn from a rented pool."
+    },
+    "raw": "{\"verdict\": \"rented_range\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"The number is one of 5 reported numbers in the 430399 block, but it was reported only once, and caller ID is easily faked, so the owner is probably an innocent party whose number was spoofed or drawn from a rented pool.\"}",
+    "turns": 2,
+    "seconds": 22.8
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "8669488305",
+   "code": "r",
+   "truth": "repeat_caller",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and toll-free caller IDs are often spoofed, so blocking this single number is the conservative choice that avoids blocking legitimate callers in the 10,000-number range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and toll-free caller IDs are often spoofed, so blocking this single number is the conservative choice that avoids blocking legitimate callers in the 10,000-number range.\"}",
+    "turns": 1,
+    "seconds": 12.3
+   },
+   "with": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "Three reports across two states on 2026-11-11 point to repeated use of this toll-free number, though caller ID can be spoofed, so the owner may still be innocent."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"Three reports across two states on 2026-11-11 point to repeated use of this toll-free number, though caller ID can be spoofed, so the owner may still be innocent.\"}",
+    "turns": 2,
+    "seconds": 20.8
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "repeat_caller",
+     "owner_likely_innocent": false,
+     "block": "number",
+     "reason": "Three reports from two states on 2026-11-11, none faked to look local, point to the number itself being used, and blocking the whole 866948 range would cover only 3 known numbers, so blocking this number is enough."
+    },
+    "raw": "{\"verdict\": \"repeat_caller\", \"owner_likely_innocent\": false, \"block\": \"number\", \"reason\": \"Three reports from two states on 2026-11-11, none faked to look local, point to the number itself being used, and blocking the whole 866948 range would cover only 3 known numbers, so blocking this number is enough.\"}",
+    "turns": 2,
+    "seconds": 20.3
+   },
+   "with_v2_done": true
+  },
+  {
+   "number": "6103707329",
+   "code": "s",
+   "truth": "likely_spoofed",
+   "without": {
+    "answer": {
+     "verdict": "unknown",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "I have no lookup data for this number, and single calls from numbers like this are often spoofed, so blocking only this number avoids blocking many legitimate callers in the same range."
+    },
+    "raw": "{\"verdict\": \"unknown\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"I have no lookup data for this number, and single calls from numbers like this are often spoofed, so blocking only this number avoids blocking many legitimate callers in the same range.\"}",
+    "turns": 1,
+    "seconds": 9.6
+   },
+   "with": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "nothing",
+     "reason": "This single report came from the victim's own area code, and every report in this block was neighbor-spoofed, so the caller probably faked the number and blocking it or its range would cut off an innocent subscriber."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"nothing\", \"reason\": \"This single report came from the victim's own area code, and every report in this block was neighbor-spoofed, so the caller probably faked the number and blocking it or its range would cut off an innocent subscriber.\"}",
+    "turns": 2,
+    "seconds": 25.4
+   },
+   "with_v1": {
+    "answer": {
+     "verdict": "likely_spoofed",
+     "owner_likely_innocent": true,
+     "block": "number",
+     "reason": "Only one report, from the same area code as the victim, and the number is not part of a pooled block, which fits a faked caller ID rather than a scammer's own line."
+    },
+    "raw": "{\"verdict\": \"likely_spoofed\", \"owner_likely_innocent\": true, \"block\": \"number\", \"reason\": \"Only one report, from the same area code as the victim, and the number is not part of a pooled block, which fits a faked caller ID rather than a scammer's own line.\"}",
+    "turns": 2,
+    "seconds": 19.6
+   },
+   "with_v2_done": true
+  }
+ ]
+}

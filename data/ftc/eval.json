@@ -765,5 +765,39 @@
       },
       "ours_spoofed_numbers_hit": 0.028
     }
+  },
+  "live_agent": {
+    "model": "haiku",
+    "numbers": 40,
+    "without_dropnet": {
+      "answered": 40,
+      "verdict_correct": 0,
+      "block_correct": 6,
+      "spoofed_owner_blamed": 14,
+      "spoofed_total": 14,
+      "pool_range_blocked": 0,
+      "pool_total": 14,
+      "said_unknown": 37
+    },
+    "with_dropnet": {
+      "answered": 40,
+      "verdict_correct": 39,
+      "block_correct": 40,
+      "spoofed_owner_blamed": 0,
+      "spoofed_total": 14,
+      "pool_range_blocked": 14,
+      "pool_total": 14,
+      "said_unknown": 0
+    },
+    "with_dropnet_v1_facts_only": {
+      "answered": 40,
+      "verdict_correct": 39,
+      "block_correct": 23,
+      "spoofed_owner_blamed": 9,
+      "spoofed_total": 14,
+      "pool_range_blocked": 12,
+      "pool_total": 14,
+      "said_unknown": 0
+    }
   }
 }

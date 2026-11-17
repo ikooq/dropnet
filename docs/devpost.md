@@ -33,6 +33,11 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 - **Dropnet inside Relate's own CLI.** A Relate command extension: `relate run dropnet-ftc --path <FTC files> -d graph`
   turns raw files into the graph and its pools (296,273 reports → 6,091 pools in 33 s, the same as the full build).
   The same file is also served over Bolt (official neo4j driver) and the HTTP Query API v2, both tested.
+- **Tested on a real AI agent.** Claude Code (headless, Haiku) was asked what to do about 40 real reported numbers,
+  isolated runs, no web. Without Dropnet: 0 of 40 right verdicts, and it blocked the innocent owner's number for all
+  14 spoofed calls. With Dropnet's `assess_number` MCP tool: 39 of 40 verdicts, 40 of 40 right actions, 0 of 14
+  innocent owners hit, and the range blocked for 14 of 14 pool numbers. The test also caught our own mistake: with
+  facts alone the agent still blocked 9 of 14 innocent numbers "to be safe", so the tool now says its advice in words.
 - **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported
   number as a scammer would blame 395 (39.5 %) likely-spoofed numbers whose owners are probably innocent, and dismiss
   246 (24.6 %) once-reported numbers that belong to an active pool. With Dropnet's hook / MCP tool it gets the right

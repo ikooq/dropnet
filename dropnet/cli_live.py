@@ -181,7 +181,19 @@ def cmd_robustness(a) -> int:
     return 0
 
 
+def cmd_live_agent(a) -> int:
+    import json
+    from .ftc import live_agent_eval
+    r = live_agent_eval.run(model=a.model, seed=a.seed)
+    print(json.dumps(r["score"], indent=2))
+    return 0
+
+
 def register(sub) -> None:
+    la = sub.add_parser("ftc-live-agent-eval", help="a real Claude Code agent, with and without Dropnet's MCP tool")
+    la.add_argument("--model", default="haiku")
+    la.add_argument("--seed", type=int, default=0)
+    la.set_defaults(fn=cmd_live_agent)
     rb = sub.add_parser("ftc-robustness", help="rolling splits, bootstrap intervals, threshold sweep, ablations")
     rb.set_defaults(fn=cmd_robustness)
     rx = sub.add_parser("relate-ext", help="install Dropnet as a Relate extension: `relate run dropnet-ftc`")

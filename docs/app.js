@@ -166,7 +166,10 @@ function openPool(id) {
 // docs/data/lookup.txt: every reported number + every pool block (~1 MB gzipped), fetched once.
 let lookupPromise = null;
 function loadLookup() {
-  return lookupPromise ??= fetch("data/lookup.txt").then((r) => r.text()).then((text) => {
+  return lookupPromise ??= fetch("data/lookup.txt").then((r) => {
+    if (!r.ok) throw new Error(`Lookup request failed: ${r.status}`);
+    return r.text();
+  }).then((text) => {
     const nums = new Map(), blocks = new Map(), byBlock = new Map();
     let span = "";
     for (const line of text.split(/\r?\n/)) {
@@ -180,14 +183,19 @@ function loadLookup() {
       if (!byBlock.has(b)) byBlock.set(b, []);
       byBlock.get(b).push([+p[0].slice(6), rec]);
     }
+    if (!span || nums.size === 0) throw new Error("Lookup data is empty or invalid");
     return { nums, blocks, byBlock, span };
+  }).catch((error) => {
+    lookupPromise = null;
+    throw error;
   });
 }
 
-const grid = { block: null, cells: null, focus: -1 };
+const grid = { block: null, cells: null, focus: -1, animation: 0 };
 function drawGrid(L, block, focus, animate) {
   const cv = $("#grid"), ctx = cv.getContext("2d"), N = 100, s = cv.width / N;
   const rows = L.byBlock.get(block) || [];
+  const animation = ++grid.animation;
   grid.block = block; grid.focus = focus;
   grid.cells = new Map(rows.map(([i, r]) => [i, r]));
   const col = { rep: css("--signal"), spoof: css("--clear"), dim: css("--dim"), paper: css("--paper"), ink: css("--ink") };
@@ -214,6 +222,7 @@ function drawGrid(L, block, focus, animate) {
   rows.sort(() => Math.random() - 0.5);
   const t0 = performance.now(), dur = 650;
   (function step(t) {
+    if (animation !== grid.animation) return;
     const k = Math.min(rows.length, Math.ceil(rows.length * Math.min(1, (t - t0) / dur)));
     paintBase(); paint(k);
     if (k < rows.length) requestAnimationFrame(step); else ring();
@@ -237,13 +246,19 @@ const VERDICT = {
   r: ["pool", "Reported again and again", "People in other area codes reported this one number many times."],
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
+let latestLookup = 0;
 async function check(raw, example = false) {
+  const request = ++latestLookup;
   const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
   if (n.length !== 10) { $("#num-out").innerHTML = `<p>Enter a 10-digit US number, like 866-771-6581.</p>`; return; }
   if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
   let L;
   if (!example) $("#num-out").innerHTML = `<p class="quiet">Loading the complaint lookup…</p>`;
-  try { L = await loadLookup(); } catch { $("#num-out").innerHTML = `<p>The list of reported numbers didn't load. Check your connection and try again.</p>`; return; }
+  try { L = await loadLookup(); } catch {
+    if (request === latestLookup && !example) $("#num-out").innerHTML = `<p>The list of reported numbers didn't load. Check your connection and try again.</p>`;
+    return;
+  }
+  if (request !== latestLookup) return;
   const hit = L.nums.get(n), block = L.blocks.get(n.slice(0, 6));
   drawGrid(L, n.slice(0, 6), example ? -1 : +n.slice(6), true);
   caption(L, n.slice(0, 6));

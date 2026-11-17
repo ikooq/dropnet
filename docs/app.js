@@ -232,6 +232,7 @@ async function check(raw, example = false) {
   if (n.length !== 10) { $("#num-out").innerHTML = `<p>Enter a 10-digit US number, like 866-771-6581.</p>`; return; }
   if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
   let L;
+  if (!example) $("#num-out").innerHTML = `<p class="quiet">Loading the complaint lookup…</p>`;
   try { L = await loadLookup(); } catch { $("#num-out").innerHTML = `<p>The list of reported numbers didn't load. Check your connection and try again.</p>`; return; }
   const hit = L.nums.get(n), block = L.blocks.get(n.slice(0, 6));
   drawGrid(L, n.slice(0, 6), example ? -1 : +n.slice(6), true);

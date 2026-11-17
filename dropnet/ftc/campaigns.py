@@ -12,6 +12,7 @@ import relate
 
 from ..store import rows
 from .parse import SUBJECT_LABEL, TOLL_FREE
+from .date_quality import chronology
 
 POOL_MIN_NUMBERS = 5
 REPEAT_MIN_REPORTS = 100
@@ -117,9 +118,20 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
         count = range_rows[0]["nums"] if range_rows else 0
         return {"number": d, "verdict": "unknown", "advice": ADVICE["unknown"], "reports": 0,
                 "block": block, "block_numbers": count, "in_pool_range": count >= POOL_MIN_NUMBERS,
-                "repeated_number_signal": False,
+                "repeated_number_signal": False, "date_quality": {"call_after_filing": 0, "missing": 0, "invalid": 0, "examples": []},
                 "caution": CAUTION}
     a = r[0]
+    date_rows = rows(conn, """MATCH (n:Number {number: $n})<-[:FROM_NUMBER]-(rep:Report)
+        RETURN rep.id AS id, rep.day AS filing, rep.violation_day AS call""", {"n": d})
+    quality = {"call_after_filing": 0, "missing": 0, "invalid": 0, "examples": []}
+    for row in date_rows:
+        status = chronology(row["filing"], row["call"])
+        if status != "valid":
+            quality[status] += 1
+            if status == "call_after_filing":
+                quality["examples"].append({"report_id": row["id"], "filing_date": row["filing"],
+                                            "reported_call_date": row["call"]})
+    quality["examples"] = sorted(quality["examples"], key=lambda x: (x["report_id"] or ""))[:5]
     pool = rows(conn, """
         MATCH (b:Block {npa_nxx: $b})<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(rep:Report)
         WHERE rep.neighbor = false RETURN count(DISTINCT n) AS nums""", {"b": a["block"]})[0]["nums"]
@@ -135,5 +147,5 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
     return {"number": d, "verdict": verdict, "advice": ADVICE[verdict], "reports": a["reports"], "first_day": a["first"],
             "last_day": a["last"], "states": a["states"], "subjects": a["subjects"],
             "neighbor_share": round(neighbor_share, 3), "block": a["block"], "block_numbers": pool,
-            "toll_free": a["toll_free"], "repeated_number_signal": a["reports"] >= REPEATED_NUMBER_MIN_REPORTS,
+            "toll_free": a["toll_free"], "date_quality": quality, "repeated_number_signal": a["reports"] >= REPEATED_NUMBER_MIN_REPORTS,
             "caution": CAUTION}

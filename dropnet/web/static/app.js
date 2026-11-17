@@ -372,7 +372,9 @@ async function assess(number) {
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
     ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
     ${a.block_numbers} reported numbers meeting pool criteria · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` +
-    (a.repeated_number_signal ? `<p>This number appears in at least 3 complaints. Repeated reports are a lead for review, not proof of wrongdoing or independent callers.</p>` : "") :
+    (a.repeated_number_signal ? `<p>This number appears in at least 3 complaints. Repeated reports are a lead for review, not proof of wrongdoing or independent callers.</p>` : "") +
+    (a.date_quality?.call_after_filing ? `<div class="caution">Date warning: ${a.date_quality.call_after_filing} complaint(s) report a call date later than the filing date. Source values are unchanged; the cause is unknown.<ul>${a.date_quality.examples.map(x => `<li>Report ${esc(x.report_id)}: filed ${esc(x.filing_date)}, reported call ${esc(x.reported_call_date)}</li>`).join("")}</ul>Showing up to five examples.</div>` : "") +
+    (a.date_quality && (a.date_quality.missing || a.date_quality.invalid) ? `<div class="caution">Date check unavailable for ${a.date_quality.missing} missing and ${a.date_quality.invalid} invalid date pair(s).</div>` : "") :
     a.in_pool_range ? `<p>No reports for this number in the loaded window; its range contains ${a.block_numbers} reported numbers meeting the pool criteria. This does not establish who called.</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
   document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
 }

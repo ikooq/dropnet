@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from dropnet.ftc.parse import SUBJECT_LABEL, read_reports
+from dropnet.ftc.date_quality import chronology
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / 'docs' / 'independent-review'
@@ -71,16 +72,25 @@ def main():
         for r, source in entries:
             rows.append([case, r.id, source, r.created_day, r.violation_day, r.number, block,
                          r.subject, SUBJECT_LABEL.get(r.subject, r.subject), r.victim_npa,
-                         'yes' if r.neighbor else 'no' if r.victim_npa else 'unknown'])
+                         'yes' if r.neighbor else 'no' if r.victim_npa else 'unknown',
+                         chronology(r.created_day, r.violation_day)])
         for r, _ in entries[:5]:
             cards.append(f'| `{r.id}` | {r.created_day or "unknown"} | {r.violation_day or "unknown"} | '
                          f'`{r.number}` | {SUBJECT_LABEL.get(r.subject, r.subject)} | {r.victim_npa or "unknown"} |')
+        flagged = [r for r in rs if chronology(r.created_day, r.violation_day) == 'call_after_filing']
+        missing = sum(chronology(r.created_day, r.violation_day) == 'missing' for r in rs)
+        invalid = sum(chronology(r.created_day, r.violation_day) == 'invalid' for r in rs)
+        cards += ['', f'**Date quality:** {len(flagged)} reported call date(s) after filing; '
+                  f'{missing} missing and {invalid} invalid date pair(s). Source dates are unchanged.']
+        for r in flagged:
+            cards.append(f'- Warning: report `{r.id}` filed {r.created_day}; reported call {r.violation_day}. Cause unknown.')
         cards += ['', '**Limits:** The data do not confirm a common operator, fraud or the caller’s identity. '
+
                   'A shared filing date is not proof of calls on the same day. Independent corroboration is needed.', '']
     with (PACK / 'case-evidence.csv').open('w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f, lineterminator='\n')
         writer.writerow(['case_id','report_id','source_file','filing_date','reported_call_date','reported_caller_id',
-                         'six_digit_prefix','subject_code','subject_label','consumer_area_code','area_codes_match'])
+                         'six_digit_prefix','subject_code','subject_label','consumer_area_code','area_codes_match','date_status'])
         writer.writerows(rows)
     (PACK / 'case-cards-expanded.md').write_text('\n'.join(cards), encoding='utf-8', newline='\n')
     print(f'Generated {len(selection)} cards and {len(rows)} linked complaint rows')

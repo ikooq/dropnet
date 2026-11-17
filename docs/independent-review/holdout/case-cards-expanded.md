@@ -30,6 +30,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `79677d131374` | 2026-10-14 | 2026-10-05 | `7607562389` | Reducing debt (credit cards, mortgage, student loans) | 208 |
 | `a8c60f212d0a` | 2026-11-05 | 2026-11-05 | `7607562533` | Reducing debt (credit cards, mortgage, student loans) | 561 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C02
@@ -52,6 +54,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `205eb5cf41dd` | 2026-11-06 | 2026-11-05 | `5205302563` | Reducing debt (credit cards, mortgage, student loans) | 818 |
 | `315aeafe5413` | 2026-10-22 | 2026-10-19 | `5205302486` | Other | 915 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C03
@@ -71,6 +75,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `20baeb26b8b3` | 2026-11-06 | 2026-11-06 | `2029228871` | Pretending to be government, business, family or friends | 512 |
 | `b2696236b74a` | 2026-10-29 | 2026-10-28 | `2029224495` | Work from home & business opportunities | 707 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C04
@@ -88,6 +94,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | Report ID | Filing date | Reported call date | Caller ID | Topic | Consumer area code |
 |---|---|---|---|---|---|
 | `bffcc3de56ab` | 2026-10-27 | 2026-10-27 | `2762778231` | Pretending to be government, business, family or friends | 703 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -111,6 +119,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `51b81e2db94f` | 2026-10-27 | 2026-10-06 | `8507610233` | Pretending to be government, business, family or friends | 347 |
 | `57a8af49ae9c` | 2026-10-31 | 2026-10-31 | `8507614966` | Other | 336 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C06
@@ -131,6 +141,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `9c9df3427525` | 2026-10-16 | 2026-10-16 | `8066005862` | Pretending to be government, business, family or friends | 806 |
 | `c7bfd8558099` | 2026-11-06 | 2026-10-31 | `8066000768` | Other | 312 |
 | `cb61d9eab98e` | 2026-10-28 | 2026-10-22 | `8066000524` | Pretending to be government, business, family or friends | 646 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -154,6 +166,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `2c582469b86d` | 2026-11-11 | 2026-11-11 | `8779210905` | Reducing debt (credit cards, mortgage, student loans) | 828 |
 | `4b16cfbb2f35` | 2026-11-06 | 2026-11-03 | `8779211016` | Pretending to be government, business, family or friends | 973 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C08
@@ -175,6 +189,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `a415d623efb2` | 2026-10-28 | 2026-10-15 | `2025051134` | Other | 256 |
 | `a57beb616b84` | 2026-10-30 | 2026-10-30 | `2025052953` | Other | 773 |
 | `a7534a8cdd43` | 2026-10-23 | 2026-10-23 | `2025057159` | Other | 951 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -198,6 +214,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `918772d87f78` | 2026-10-20 | 2026-10-16 | `4125209053` | Other | 484 |
 | `9a3d14d9116f` | 2026-10-25 | 2026-10-20 | `4125203488` | Dropped call or no message | 714 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C10
@@ -219,6 +237,9 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `0ff9ac0031d5` | 2026-10-16 | 2026-10-15 | `9419922788` | Reducing debt (credit cards, mortgage, student loans) | 631 |
 | `1c1408756a9d` | 2026-10-15 | 2026-10-16 | `9419922355` | Reducing debt (credit cards, mortgage, student loans) | 412 |
 | `2377ba078726` | 2026-10-19 | 2026-10-19 | `9419925745` | Other | 626 |
+
+**Date quality:** 1 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+- Warning: report `1c1408756a9d` filed 2026-10-15; reported call 2026-10-16. Cause unknown.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -242,6 +263,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `588e241bb5d4` | 2026-11-05 | 2026-11-04 | `8447324185` | Reducing debt (credit cards, mortgage, student loans) | 309 |
 | `8c4abc62d935` | 2026-11-06 | 2026-11-05 | `8447323113` | Reducing debt (credit cards, mortgage, student loans) | 586 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C12
@@ -264,6 +287,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `212e17497ba7` | 2026-11-09 | 2026-11-08 | `8154203798` | Reducing debt (credit cards, mortgage, student loans) | 773 |
 | `25b165f7b81a` | 2026-11-02 | 2026-11-02 | `8154206604` | Dropped call or no message | 815 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C13
@@ -285,6 +310,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `d758fff89f80` | 2026-10-15 | 2026-10-15 | `9413002619` | Reducing debt (credit cards, mortgage, student loans) | 818 |
 | `f81499127b0f` | 2026-11-04 | 2026-11-03 | `9413002518` | Other | 304 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C14
@@ -302,6 +329,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | Report ID | Filing date | Reported call date | Caller ID | Topic | Consumer area code |
 |---|---|---|---|---|---|
 | `cef0211e2749` | 2026-10-23 | 2026-10-19 | `4846690512` | Other | 703 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -322,6 +351,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `ae40413e79c8` | 2026-11-06 | 2026-11-06 | `5802051470` | Dropped call or no message | 580 |
 | `c06c3fd3ef37` | 2026-11-09 | 2026-11-09 | `5802054665` | No subject provided | 318 |
 | `cd394345d855` | 2026-11-04 | 2026-11-04 | `5802057717` | Dropped call or no message | 580 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -345,6 +376,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `847ca89be0d8` | 2026-10-28 | 2026-10-28 | `9709754394` | Other | 401 |
 | `949b5f3d6908` | 2026-11-04 | 2026-10-31 | `9709754871` | Other | 504 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C17
@@ -362,6 +395,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | Report ID | Filing date | Reported call date | Caller ID | Topic | Consumer area code |
 |---|---|---|---|---|---|
 | `42c6b2fbca74` | 2026-10-26 | 2026-10-25 | `6133860403` | Reducing debt (credit cards, mortgage, student loans) | 412 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -385,6 +420,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `7666e4908e22` | 2026-10-19 | 2026-10-19 | `2132238657` | Pretending to be government, business, family or friends | 510 |
 | `789d4c52953c` | 2026-11-03 | 2026-11-03 | `2132238447` | Other | 317 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C19
@@ -406,6 +443,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `527c01d609ad` | 2026-10-09 | 2026-10-08 | `6468133054` | Other | 760 |
 | `94eba3a38c25` | 2026-10-26 | 2026-10-21 | `6468133666` | No subject provided | 505 |
 | `b7bb54c5b529` | 2026-10-15 | 2026-10-14 | `6468133320` | Reducing debt (credit cards, mortgage, student loans) | 801 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -429,6 +468,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `287d0f47bb35` | 2026-10-23 | 2026-10-22 | `3057034583` | Other | 941 |
 | `385175211cee` | 2026-10-29 | 2026-07-07 | `3057036174` | Medical & prescriptions | 305 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C21
@@ -450,6 +491,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `3d28a9e99236` | 2026-10-30 | 2026-10-30 | `5203817122` | Reducing debt (credit cards, mortgage, student loans) | 813 |
 | `418e9ad973e9` | 2026-11-09 | 2026-11-09 | `5203816439` | Medical & prescriptions | 520 |
 | `4a431d215e9e` | 2026-11-07 | 2026-11-06 | `5203817401` | Other | 520 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -473,6 +516,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `042632260bc3` | 2026-10-09 | 2026-10-09 | `8447241808` | Reducing debt (credit cards, mortgage, student loans) | 619 |
 | `05eb9d4949fb` | 2026-10-26 | 2026-10-26 | `8447241107` | Other | 714 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C23
@@ -494,6 +539,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `ad708a906907` | 2026-11-12 | 2026-11-11 | `4125398081` | Reducing debt (credit cards, mortgage, student loans) | 602 |
 | `b846f4fb3177` | 2026-10-31 | 2026-10-27 | `4125398726` | Reducing debt (credit cards, mortgage, student loans) | 714 |
 | `e7d8f1783f12` | 2026-10-26 | 2026-10-26 | `4125398029` | Other | 412 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -517,6 +564,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `a014c44a3394` | 2026-10-13 | 2026-10-07 | `8722915749` | Dropped call or no message | 815 |
 | `ad332b8b9eb2` | 2026-10-26 | 2026-10-22 | `8722915718` | Other | 630 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C25
@@ -538,6 +587,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `3e65843c2ceb` | 2026-10-22 | 2026-10-22 | `6233569289` | Home improvement & cleaning | 480 |
 | `59844a28de41` | 2026-11-06 | 2026-11-06 | `6233566021` | Medical & prescriptions | 623 |
 | `5d28f4934f96` | 2026-11-04 | 2026-11-04 | `6233569942` | Other | 484 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -561,6 +612,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `3cc46ef61d2c` | 2026-10-14 | 2026-10-14 | `5025132212` | Other | 858 |
 | `4a54a366365f` | 2026-10-12 | 2026-10-12 | `5025132378` | Other | 818 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C27
@@ -582,6 +635,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `123de3d19c2f` | 2026-10-13 | 2026-10-01 | `8665502722` | Other | 616 |
 | `17949163fbb6` | 2026-11-02 | 2026-10-31 | `8665501192` | Reducing debt (credit cards, mortgage, student loans) | 262 |
 | `18043d2df186` | 2026-10-16 | 2026-10-12 | `8665503676` | Other | 559 |
+
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
@@ -605,6 +660,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `55916450d4a4` | 2026-11-12 | 2026-11-12 | `2622055012` | Home improvement & cleaning | 262 |
 | `5bc0e7e7919f` | 2026-11-07 | 2026-11-07 | `2622054064` | Other | 262 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C29
@@ -627,6 +684,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `5d972179374e` | 2026-11-05 | 2026-11-05 | `2343567972` | Other | 713 |
 | `8743985cdcf4` | 2026-11-11 | 2026-11-11 | `2343567033` | Reducing debt (credit cards, mortgage, student loans) | 631 |
 
+**Date quality:** 0 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.
 
 ## C30
@@ -648,5 +707,8 @@ Each card shows up to five examples chosen deterministically by report ID, not b
 | `171c4e445b2f` | 2026-11-03 | 2026-11-01 | `6604447548` | Reducing debt (credit cards, mortgage, student loans) | 978 |
 | `1b669d99e1f8` | 2026-10-31 | 2026-10-24 | `6604447964` | Other | 808 |
 | `2b9602edb563` | 2026-10-15 | 2026-10-12 | `6604444891` | Reducing debt (credit cards, mortgage, student loans) | 508 |
+
+**Date quality:** 1 reported call date(s) after filing; 0 missing and 0 invalid date pair(s). Source dates are unchanged.
+- Warning: report `1187bdeb54d6` filed 2026-10-20; reported call 2026-10-21. Cause unknown.
 
 **Limits:** The data do not confirm a common operator, fraud or the caller’s identity. A shared filing date is not proof of calls on the same day. Independent corroboration is needed.

@@ -1,0 +1,40 @@
+{
+  "candidate_counts": {
+    "control": 51341,
+    "strong": 1940,
+    "threshold": 4151
+  },
+  "case_counts": {
+    "control": 10,
+    "strong": 10,
+    "threshold": 10
+  },
+  "files": {
+    "DNC_Complaint_Numbers_2026-10-12.csv.gz": "4a55cf2d9bc30287f72c33bceed2035042343a417cb32a9a3eb88fd4ad329eae",
+    "DNC_Complaint_Numbers_2026-10-13.csv.gz": "48c66cab86c9946826d7685a6fcff944908108bb1e22227deab57bb60eecf376",
+    "DNC_Complaint_Numbers_2026-10-14.csv.gz": "1b670bb7a34cfa1902bb91bf87de674c7bceb8128c9e86fe43be4bd796ff446a",
+    "DNC_Complaint_Numbers_2026-10-15.csv.gz": "208a8bd6752914cf0b789317ecd60c39bd732eb91765c29a989fa7af90806704",
+    "DNC_Complaint_Numbers_2026-10-16.csv.gz": "38a8dc30cb0fa9abd01f1597528e061e46a0f02fc5cd325d68476f19eb061b5c",
+    "DNC_Complaint_Numbers_2026-10-19.csv.gz": "55fd928c700b57136690aa89d326f2385689ab3908297d891f41bc6f01f1f6e5",
+    "DNC_Complaint_Numbers_2026-10-20.csv.gz": "cf0a413f7bf6f2df7e3257b444d21b851c7c13f5eaea5b4104507a22772a73a6",
+    "DNC_Complaint_Numbers_2026-10-21.csv.gz": "9358585a1a0e289db1ce6367526df0a4dabf565639bbec0ba63dc2db5228189c",
+    "DNC_Complaint_Numbers_2026-10-22.csv.gz": "4097f66660732b1431e96ff4625630781b1d9173316d7c7ebcf088501c27276f",
+    "DNC_Complaint_Numbers_2026-10-23.csv.gz": "66090100682656c5b434f54acfd2eba3e053567dd4a161331d611473c31429bc",
+    "DNC_Complaint_Numbers_2026-10-26.csv.gz": "2aa82e7c9edfe760e7b816cab1b1976aabad9666fdd8b3d3e661234b2cfdad6d",
+    "DNC_Complaint_Numbers_2026-10-27.csv.gz": "3ae59f6631294358917a1b230efbf889dbceef73ed414430173e10c010b77d41",
+    "DNC_Complaint_Numbers_2026-10-28.csv.gz": "dad870570d7cdb5499ec4eb0e6ec8954583bdbdbaef28796063184c0c50837bc",
+    "DNC_Complaint_Numbers_2026-10-29.csv.gz": "226819055be2fd6ce0dbdcf800017b5bf43f491c670874399e7bb7b81720dd7b",
+    "DNC_Complaint_Numbers_2026-10-30.csv.gz": "3db1dba086c4ca1e057d5d1c927e0699991430d973d974ea05347e10a1ef23b4",
+    "DNC_Complaint_Numbers_2026-11-02.csv.gz": "f5a1d8cae6a2a5b916345fc8324c11c083a193a2c48aab27a3422a80504fde75",
+    "DNC_Complaint_Numbers_2026-11-03.csv.gz": "86e79d8cb55f84e97bda85923d8b40978a523802c4aea26fcc5d646d5579451c",
+    "DNC_Complaint_Numbers_2026-11-04.csv.gz": "2e6b7d2251ae9befcd9c9e814832c283d1dd6924b1c07fdeece6234b6a980508",
+    "DNC_Complaint_Numbers_2026-11-05.csv.gz": "7e41300d81578a754bec6afea9f84ba73f85e4e3bee4586e29a010161aefe6ef",
+    "DNC_Complaint_Numbers_2026-11-06.csv.gz": "bcdac351f29b22824fcea1324f1483c501848791a89ef2444d929b5cb1f8e4f3",
+    "DNC_Complaint_Numbers_2026-11-09.csv.gz": "84057ea3eae8d3397622f363cb5b7dc5ba98628292dfce8e6ff6b26472fdd9a0",
+    "DNC_Complaint_Numbers_2026-11-10.csv.gz": "fe2f115120213528fc0d3d950950ea4f36f3881b134e4f4b0c7b476ffbacf2d2",
+    "DNC_Complaint_Numbers_2026-11-11.csv.gz": "d3e28887fdb90b6ad253c029aae1156ff41f75ede3e5e9149edb4cd73a4fcbd1",
+    "DNC_Complaint_Numbers_2026-11-12.csv.gz": "75c8e70519896286260e974c7205cff28141e63e805a46cbd3204ff16840b441",
+    "DNC_Complaint_Numbers_2026-11-13.csv.gz": "725e8ff4f2d9e1be1e52348514179387be881a220608d905344239e5e150f2b2"
+  },
+  "seed": 20261117
+}

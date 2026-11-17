@@ -1,0 +1,185 @@
+{
+  "seed": 20261117,
+  "selection": [
+    {
+      "case_id": "C01",
+      "stratum": "strong",
+      "block": "657245",
+      "eligible_distinct_numbers": 22
+    },
+    {
+      "case_id": "C02",
+      "stratum": "control",
+      "block": "779212",
+      "eligible_distinct_numbers": 1
+    },
+    {
+      "case_id": "C03",
+      "stratum": "control",
+      "block": "315582",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C04",
+      "stratum": "threshold",
+      "block": "276265",
+      "eligible_distinct_numbers": 5
+    },
+    {
+      "case_id": "C05",
+      "stratum": "strong",
+      "block": "888942",
+      "eligible_distinct_numbers": 12
+    },
+    {
+      "case_id": "C06",
+      "stratum": "control",
+      "block": "352418",
+      "eligible_distinct_numbers": 1
+    },
+    {
+      "case_id": "C07",
+      "stratum": "control",
+      "block": "838277",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C08",
+      "stratum": "threshold",
+      "block": "925690",
+      "eligible_distinct_numbers": 8
+    },
+    {
+      "case_id": "C09",
+      "stratum": "control",
+      "block": "872224",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C10",
+      "stratum": "threshold",
+      "block": "833940",
+      "eligible_distinct_numbers": 7
+    },
+    {
+      "case_id": "C11",
+      "stratum": "threshold",
+      "block": "208435",
+      "eligible_distinct_numbers": 5
+    },
+    {
+      "case_id": "C12",
+      "stratum": "strong",
+      "block": "510838",
+      "eligible_distinct_numbers": 13
+    },
+    {
+      "case_id": "C13",
+      "stratum": "threshold",
+      "block": "770430",
+      "eligible_distinct_numbers": 5
+    },
+    {
+      "case_id": "C14",
+      "stratum": "threshold",
+      "block": "775653",
+      "eligible_distinct_numbers": 6
+    },
+    {
+      "case_id": "C15",
+      "stratum": "strong",
+      "block": "423686",
+      "eligible_distinct_numbers": 27
+    },
+    {
+      "case_id": "C16",
+      "stratum": "threshold",
+      "block": "943235",
+      "eligible_distinct_numbers": 7
+    },
+    {
+      "case_id": "C17",
+      "stratum": "strong",
+      "block": "217863",
+      "eligible_distinct_numbers": 17
+    },
+    {
+      "case_id": "C18",
+      "stratum": "strong",
+      "block": "502304",
+      "eligible_distinct_numbers": 53
+    },
+    {
+      "case_id": "C19",
+      "stratum": "strong",
+      "block": "520702",
+      "eligible_distinct_numbers": 14
+    },
+    {
+      "case_id": "C20",
+      "stratum": "control",
+      "block": "780820",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C21",
+      "stratum": "strong",
+      "block": "657225",
+      "eligible_distinct_numbers": 16
+    },
+    {
+      "case_id": "C22",
+      "stratum": "control",
+      "block": "313214",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C23",
+      "stratum": "control",
+      "block": "866469",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C24",
+      "stratum": "control",
+      "block": "514721",
+      "eligible_distinct_numbers": 1
+    },
+    {
+      "case_id": "C25",
+      "stratum": "threshold",
+      "block": "929376",
+      "eligible_distinct_numbers": 5
+    },
+    {
+      "case_id": "C26",
+      "stratum": "threshold",
+      "block": "857777",
+      "eligible_distinct_numbers": 6
+    },
+    {
+      "case_id": "C27",
+      "stratum": "strong",
+      "block": "510291",
+      "eligible_distinct_numbers": 12
+    },
+    {
+      "case_id": "C28",
+      "stratum": "threshold",
+      "block": "415870",
+      "eligible_distinct_numbers": 6
+    },
+    {
+      "case_id": "C29",
+      "stratum": "control",
+      "block": "817687",
+      "eligible_distinct_numbers": 2
+    },
+    {
+      "case_id": "C30",
+      "stratum": "strong",
+      "block": "610610",
+      "eligible_distinct_numbers": 19
+    }
+  ]
+}

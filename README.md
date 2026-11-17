@@ -96,3 +96,5 @@ pip install -e ".[dev]" && pytest          # run the test suite
 ## Development and disclosure
 
 Built for the Relate by Neo4j Hackathon 2026. MIT license. FTC and FCC public datasets are used as described above. AI coding tools assisted implementation and documentation; the team is responsible for reviewing and testing the result. Historical agent-run artifacts were generated with Claude Code; consult their metadata for the particular model and settings.
+
+Independent human review: see [the prepared review protocol and blinded cases](docs/independent-review/README.md). No independent ratings have been collected yet.

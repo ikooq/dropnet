@@ -37,4 +37,4 @@ To count one reviewer's answers, run `python scripts/summarize_independent_revie
 
 **The completed human review used the original `cases.md`, not the expanded cards.** Do not present its findings as validation of the expanded version. To assess these additions, conduct a new review; for evaluating revised selection rules, use a separate holdout.
 
-A separate [new-block follow-up pack](holdout/README.md) is prepared but has not been reviewed. It uses the same FTC snapshot and is not temporally independent.
+A separate [new-block follow-up pack](holdout/README.md) includes one set of completed responses; see its follow-up report for attribution limitations. It uses the same FTC snapshot and is not temporally independent.

@@ -22,7 +22,7 @@ def _clean(values, n: int, what: str) -> list[str]:
         if len(d) != n:
             raise ValueError(f"{what} must have {n} digits: {v!r}")
         out.append(d)
-    return out
+    return list(dict.fromkeys(out))
 
 
 def whatif(conn: relate.Connection, blocks=None, numbers=None, since_day: str | None = None) -> dict:
@@ -35,6 +35,9 @@ def whatif(conn: relate.Connection, blocks=None, numbers=None, since_day: str | 
              {"b": blocks})
         rows(conn, "UNWIND $n AS n MATCH (x:Number {number: n}) CREATE (:Rule {kind: 'number', value: n})-[:BLOCKS]->(x)",
              {"n": numbers})
+        matched_rules = rows(conn, "MATCH (r:Rule) RETURN r.kind AS kind, r.value AS value")
+        applied_blocks = {r["value"] for r in matched_rules if r["kind"] == "block"}
+        applied_numbers = {r["value"] for r in matched_rules if r["kind"] == "number"}
         hit = rows(conn, """
             MATCH (rule:Rule)-[:BLOCKS]->(t)
             OPTIONAL MATCH (t)<-[:IN_BLOCK]-(viaBlock:Number)
@@ -54,9 +57,12 @@ def whatif(conn: relate.Connection, blocks=None, numbers=None, since_day: str | 
     finally:
         conn.rollback()
         conn.autocommit = True
-    return {"rules": len(blocks) + len(numbers), "reports_stopped": hit["reports"], "numbers_covered": covered,
+    return {"rules": len(blocks) + len(numbers), "applied_rules": len(matched_rules),
+            "unknown_blocks": [b for b in blocks if b not in applied_blocks],
+            "unknown_numbers": [n for n in numbers if n not in applied_numbers],
+            "reports_stopped": hit["reports"], "numbers_covered": covered,
             "spoofed_reports_in_scope": hit["spoofed"] or 0, "campaigns_touched": touched, "since_day": since_day,
-            "note": "Computed in a Relate transaction and rolled back: nothing was written."}
+            "note": "Historical complaint matches only, not prevented calls; unknown rules have no matching node in the loaded graph. The transaction was rolled back."}
 
 
 def export_case(conn: relate.Connection, campaign_id: str, out: Path) -> dict:

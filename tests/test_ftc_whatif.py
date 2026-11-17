@@ -36,3 +36,12 @@ def test_export_case_single_file(g, tmp_path):  # noqa: F811
     assert store.rows(c, "MATCH (:FtcCampaign {id: 'POOL-866771'})-[:USES_BLOCK]->(b:Block)<-[:IN_BLOCK]-(n:Number)"
                          "<-[:FROM_NUMBER]-(r:Report) RETURN count(r) AS n")[0]["n"] == 19
     c.close()
+
+
+def test_whatif_deduplicates_and_discloses_unknown_rules(g):
+    r = whatif.whatif(g, blocks=["866771", "866-771", "999999"], numbers=["9999999999"])
+    assert r["rules"] == 3 and r["applied_rules"] == 1
+    assert r["unknown_blocks"] == ["999999"]
+    assert r["unknown_numbers"] == ["9999999999"]
+    assert r["reports_stopped"] == 19
+    assert store.rows(g, "MATCH (r:Rule) RETURN count(r) AS n")[0]["n"] == 0

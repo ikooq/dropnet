@@ -1,10 +1,10 @@
 # Independent review protocol
 
-**Status: prepared; no independent ratings have been collected.** This pack tests whether the supplied evidence is clear and whether a reviewer considers a range worth investigating. It does not validate fraud, caller identity, common control, blocking decisions, real-world benefit, or model accuracy.
+**Status: one human review of the original cards is summarized in `HUMAN_REVIEW.md`; expert review has not been established.** This pack tests whether the supplied evidence is clear and whether a reviewer considers a range worth investigating. It does not validate fraud, caller identity, common control, blocking decisions, real-world benefit, or model accuracy.
 
 ## For the coordinator
 
-1. Recruit a reviewer who did not develop or tune DropNet. Record relevant expertise and any relationship to the team. A non-expert can assess clarity; do not describe that as expert validation. No reviewer is implied to have participated yet.
+1. Recruit a reviewer who did not develop or tune DropNet. Record relevant expertise and any relationship to the team. A non-expert can assess clarity; do not describe that as expert validation. The initial reviewer’s experience and the limits of independence are documented separately.
 2. Give the reviewer only `REVIEWER.md`, `cases.md`, and a copy of `answers.csv`. Do not give them the selection key or tell them the group sizes before they finish. Counts in the cards may nevertheless reveal signals: this is single-blind with respect to labels, not full blinding.
 3. Ask them to complete all 30 cases independently before discussing results. Preserve unanswered and unsure cases. Do not fill answers for the reviewer, change their responses, or tune rules against these cases before the initial evaluation is recorded. Keep a dated original. Responses may contain personal details; obtain consent before sharing.
 4. Report answers separately for each selection stratum; counts and proportions use all 10 selected cases in that stratum as the denominator, including missing and unsure. A combined percentage over the deliberately balanced sample is not an estimate for all ranges. Include uncertainty, selection limitations and cases where the reviewer disagreed. There is no independent ground truth in this pack and no precision/recall claim is justified.

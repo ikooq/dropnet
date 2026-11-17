@@ -45,3 +45,10 @@ def test_whatif_deduplicates_and_discloses_unknown_rules(g):
     assert r["unknown_numbers"] == ["9999999999"]
     assert r["reports_stopped"] == 19
     assert store.rows(g, "MATCH (r:Rule) RETURN count(r) AS n")[0]["n"] == 0
+
+
+def test_whatif_all_unknown_rules_reports_zero(g):
+    r = whatif.whatif(g, blocks=["999998"])
+    assert r["applied_rules"] == 0
+    assert r["unknown_blocks"] == ["999998"]
+    assert r["reports_stopped"] == 0 and r["numbers_covered"] == 0

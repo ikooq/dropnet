@@ -42,8 +42,9 @@ def test_relate_opens_the_vault(tmp_path):
     out = tmp_path / "vault"
     vault.export(c, out, top=10)
     c.close()
-    r = subprocess.run([cli, "--snapshot-format", "markdown", "--markdown-body-properties", "text", "--database",
+    r = subprocess.run([cli, "--mode", "json", "--snapshot-format", "markdown", "--markdown-body-properties", "text", "--database",
                         str(out), "query", "MATCH (p:Pool)-[:IN_NETWORK]->(n:Network) RETURN count(p) AS n"],
                        capture_output=True, text=True, env={**os.environ, "RELATE_TELEMETRY": "off"}, timeout=120)
     assert r.returncode == 0, r.stderr
-    assert "2" in r.stdout.split("rows")[1].splitlines()[1]
+    import json
+    assert json.loads(r.stdout)["data"][0]["n"] == 2

@@ -98,3 +98,5 @@ pip install -e ".[dev]" && pytest          # run the test suite
 Built for the Relate by Neo4j Hackathon 2026. MIT license. FTC and FCC public datasets are used as described above. AI coding tools assisted implementation and documentation; the team is responsible for reviewing and testing the result. Historical agent-run artifacts were generated with Claude Code; consult their metadata for the particular model and settings.
 
 Independent human review: see [the prepared review protocol and blinded cases](docs/independent-review/README.md). One human review of the original cards and its limitations are documented in the review pack.
+
+In the full local app, number lookup flags reported call dates later than filing dates and counts missing or invalid dates without changing the source values. The GitHub Pages demo uses a sample and does not provide this full-data date check.

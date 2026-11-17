@@ -49,3 +49,10 @@ FTC Do Not Call complaints; FCC consumer complaints for a separate comparison; s
 ## Limitations
 
 Complaints and caller IDs are unverified; area-code matches are only indicators. Some consumer area codes are missing and treated as non-matches by the current pool heuristic. Co-occurrence links use complaint filing day, not necessarily call day. The sample window is short and there is no denominator of legitimate calls. The local demo server is intended for a trusted environment and is not suitable for sensitive real complaints.
+
+
+## Human review and data quality
+
+Two exploratory 30-case reviews examined whether complaint summaries warranted follow-up. The follow-up used different number ranges from the same historical snapshot; prior answers were available and the review was not fully blinded. These judgments do not establish fraud or measure detection accuracy. Methods and limitations are documented in the repository.
+
+In the full local app, number lookup flags reported call dates later than filing dates and preserves the original source values. The browser demo is a sample and does not expose this full-data check.

@@ -243,14 +243,14 @@ function caption(L, block) {
 const VERDICT = {
   s: ["likely_spoofed", "Area-code match in reports", "The caller and consumer area codes match in each report. This may indicate spoofing, but it does not prove it or identify the caller."],
   p: ["pool", "In a range with concentrated complaints", "Several numbers in this range appear in complaints. This does not establish who made the calls or a common operator."],
-  r: ["pool", "Reported again and again", "People in other area codes reported this one number many times."],
+  r: ["pool", "Reported again and again", "This number appears in three or more reports in the loaded window."],
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
 let latestLookup = 0;
 async function check(raw, example = false) {
   const request = ++latestLookup;
   const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
-  if (n.length !== 10) { $("#num-out").innerHTML = `<p>Enter a 10-digit US number, like 866-771-6581.</p>`; return; }
+  if (!/^[2-9]\d{9}$/.test(n)) { $("#num-out").innerHTML = `<p>Enter a 10-digit US or Canadian number, like 866-771-6581.</p>`; return; }
   if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
   let L;
   if (!example) $("#num-out").innerHTML = `<p class="quiet">Loading the complaint lookup…</p>`;
@@ -271,7 +271,8 @@ async function check(raw, example = false) {
     html = `<p class="verdict pool">Not reported in this window, but its range has concentrated complaints</p><p>${fmt(block.numbers)} numbers from
       ${esc(rangeOf(n.slice(0, 6)))} were reported ${fmt(block.reports)} times.${data.eval ? ` In our test, ${fmt(data.eval.dropnet.new_numbers_caught)} later complaints involved numbers absent from the training reports.` : ""}</p>`;
   } else {
-    html = `<p class="verdict">No reports for this number or its range</p><p class="quiet">Between ${esc(L.span)}. That doesn't prove the call was safe.</p>`;
+    const otherReported = (L.byBlock.get(n.slice(0, 6)) || []).length;
+    html = `<p class="verdict">No reports for this number in the loaded window</p><p class="quiet">Between ${esc(L.span)}. ${otherReported ? `${fmt(otherReported)} other number${otherReported === 1 ? "" : "s"} in this range ${otherReported === 1 ? "was" : "were"} reported, but the range does not meet the pool threshold. ` : "No numbers in this range were reported in the loaded window. "}That doesn't prove the call was safe.</p>`;
   }
   $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`

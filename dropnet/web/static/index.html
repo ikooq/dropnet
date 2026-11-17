@@ -52,9 +52,9 @@
     <div class="panel" id="net-panel" style="margin-bottom:18px;display:none"></div>
     <div class="panel lookup">
       <h2>Check a reported number</h2>
-      <div class="row"><input id="num-in" placeholder="e.g. 833-766-1884" inputmode="tel">
+      <div class="row"><input id="num-in" aria-label="US or Canadian phone number" placeholder="e.g. 833-766-1884" inputmode="tel">
         <button class="primary" id="num-go">Assess</button></div>
-      <div id="num-out"></div>
+      <div id="num-out" aria-live="polite"></div>
     </div>
     <div class="camp-layout">
       <aside class="camp-list" id="ftc-list"></aside>

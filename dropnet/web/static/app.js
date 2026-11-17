@@ -354,9 +354,20 @@ async function openFtc(id) {
     } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   });
 }
+let latestAssessment = 0;
 async function assess(number) {
+  const request = ++latestAssessment;
   $("#num-in").value = fmtNum(number);
-  const a = await api(`api/ftc/number/${encodeURIComponent(number)}`);
+  $("#num-out").textContent = "Checking the loaded FTC reports…";
+  let a;
+  try {
+    if (!String(number).trim()) throw new Error("Enter a 10-digit US or Canadian number.");
+    a = await api(`api/ftc/number/${encodeURIComponent(number)}`);
+  } catch (e) {
+    if (request === latestAssessment) $("#num-out").innerHTML = `<div class="err">${esc(e.message)}</div>`;
+    return;
+  }
+  if (request !== latestAssessment) return;
   const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
     ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has

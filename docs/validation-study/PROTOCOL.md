@@ -1,0 +1,30 @@
+# Preregistered evaluation protocol: DropNet lookup and complaint review
+
+Status: prepared; no participant has completed this protocol, and no improvement in investigative efficiency has been established. The protocol is fixed before results are inspected; disclose any deviations rather than editing the method retrospectively.
+
+## Research questions and scope
+
+1. Can a reviewer with relevant complaint-analysis, fraud-investigation or telecom experience understand the evidence and identify cases meriting further inquiry? This is a blinded, exploratory review of 30 newly sampled ranges.
+2. On 12 predetermined lookup tasks from the same FTC data snapshot, how do time and correctness compare when a participant uses an FTC-derived CSV versus the local DropNet lookup? This is a controlled simulation, not proof of a real investigation outcome or reduced fraud. The baseline is a compact, prefiltered table containing only the 12 study numbers, so it is intentionally favourable to table use and does not reflect a complete workflow; both conditions see the same underlying complaint records. The sample is not representative.
+
+## Selection and source
+
+Run `python scripts/prepare_validation_study.py --output PATH_TO_EMPTY_DIRECTORY` from the repository root. It verifies source hashes against the original manifest. The 12 performance tasks use distinct six-digit blocks excluding all 60 blocks shown in the two earlier review rounds. Seed 20261118, twelve cases: six with at least one call date after filing, six without; each half includes three cases of each kind and balances reports with at least three complaints. Dates must all parse, numbers have at most 30 complaints. The 30 qualitative cases use seed 20261119 and exclude all previous 60 and the 12 task blocks; 10 are sampled per predefined strong, threshold and control stratum. These are different blocks from the same historical dataset, not new-period data, independent callers, or representative population samples.
+
+The answer key and group assignments are private during the exercise; do not send `coordinator/lookup-key.json`, `expert-review/selection-key.json` or source code that would reveal them to participants. Case cards contain counts that may hint at the heuristic: blinded to group labels and prior answers, not completely masked to evidence. Because this is a public repository and deterministic seeds can reveal selection, record whether the participant saw the generator, keys, earlier ratings or analyses; if so do not call their assessment blinded. Do not distribute the whole output directory.
+
+## Participants and allocation
+
+Seek at least four participants, preferably with relevant professional experience. Balance assignment A/B in order of recruitment (A, B, B, A, repeat) before testing; capture experience, independence from model development, whether prior answers or key were seen, AI assistance, consent, and task interruptions. This small convenience sample cannot support broad generalization. Do not call someone a confirmed expert without a real basis. Never assign fabricated people, expertise, answers, times, or success.
+
+Each participant completes all 12 unique tasks, six per condition. A uses baseline T01–T06 then DropNet T07–T12; B uses DropNet T01–T06 then baseline T07–T12. Participants must not consult the other condition during a task. Counterbalancing controls method order partially; different task difficulty and learning effects remain. Provide the same short practice with each method using a number outside these 12 tasks before timing. Start the local server and load the graph before the study, with timing from reading each task to recording both answers. Record seconds and interruptions; explain self-timing and setup exclusions. Do not repeatedly train after seeing results. Give each participant a fresh answer template.
+
+For each task, report (1) exact number of complaints for the given caller ID, and (2) yes/no/unsure whether any reported call date is later than its filing date. The baseline participant filters `baseline_complaints.csv` by exact number; an empty or invalid date would require unsure, though selected cases have valid dates. The DropNet participant uses local `/api/ftc/number/{number}` or the number lookup interface; use the same chosen interaction for every participant, document which was used. A blank warning is interpreted as no only if all date pairs are valid. `lookup-key.json` is derived from raw records and should be compared to the Relate snapshot before study. Clock time includes task lookup and both decisions, not graph/server startup.
+
+## Predefined outcomes and reporting
+
+Primary: median completed-task seconds and exact count/date correctness per participant and method; report numerators, attempted, missing, and unsure. Report all participants and both assignment groups; compare within-participant method medians and accuracy descriptively, not as a causal or statistically conclusive estimate. Report incomplete sessions and all exclusions. Do not treat unsure or missing as correct. Do not claim an improvement if the data do not support it. Cross-case task design and 12 deliberately selected samples can confound the comparison; account for this in the write-up. `scripts/summarize_validation_study.py` validates assignments and produces descriptive summaries only. Archive immutable answers with consent, disclose conflicts and deviations, and get consent before publication.
+
+## Expert case review
+
+Give a separate reviewer, ideally one not involved in development or the timed task, only the 30 blinded `expert-review/cases.md`, a copy of `expert-review/answers.csv`, and the supplied reviewer instructions. Ask for professional context, independence, use of assistance, exposure to prior results, and consent. The reviewer judges clarity and usefulness as a lead, not fraud or ownership. Evaluate 10 per stratum including uncertain cases; do not call this precision/recall. For evidence-based impact on real investigations, a further field study with actual operators and an independently verified outcome is required.

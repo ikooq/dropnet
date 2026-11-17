@@ -65,5 +65,11 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
                    "first_day": min(r.created_day for r in reports), "last_day": max(r.created_day for r in reports)})
     eval_path = Path(eval_path)
     eval_path.parent.mkdir(parents=True, exist_ok=True)
+    if eval_path.exists():  # keep the sections other commands wrote (controls, FCC, robustness, agent tests)
+        try:
+            old = json.loads(eval_path.read_text(encoding="utf-8"))
+            result = {**{k: v for k, v in old.items() if k not in result}, **result}
+        except json.JSONDecodeError:
+            pass
     eval_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     return result

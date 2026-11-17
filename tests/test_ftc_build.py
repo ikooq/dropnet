@@ -22,10 +22,13 @@ def test_build_end_to_end(tmp_path):
     with gzip.open(raw / "DNC_Complaint_Numbers_2026-11-09.csv.gz", "wt", encoding="utf-8") as f:
         f.write(HEADER + "\n".join(lines) + "\n")
     out = tmp_path / "ftc.rl"
+    (tmp_path / "eval.json").write_text(json.dumps({"live_agent": {"kept": True}, "test_reports": -1}), encoding="utf-8")
     r = build.build(out=out, raw=raw, eval_path=tmp_path / "eval.json", log=lambda *_: None)
     assert r["stats"]["reports"] == 54 and r["campaigns"] >= 1
     assert r["dropnet"]["coverage"] >= r["baseline"]["coverage"]
-    assert json.loads((tmp_path / "eval.json").read_text(encoding="utf-8"))["test_reports"] == r["test_reports"]
+    saved = json.loads((tmp_path / "eval.json").read_text(encoding="utf-8"))
+    assert saved["test_reports"] == r["test_reports"]  # a fresh result wins
+    assert saved["live_agent"] == {"kept": True}  # sections other commands wrote survive a rebuild
     target = out if out.exists() else out.with_suffix("")
     conn = store.open_store(target, read_only=True)
     assert store.rows(conn, "MATCH (c:FtcCampaign {id: 'POOL-866771'}) RETURN c.numbers AS n")[0]["n"] == 6

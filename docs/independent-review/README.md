@@ -30,3 +30,9 @@ Reproduction assumes the same input file bytes, parser and compatible Python run
 Do not replace “pending” with fabricated findings.
 
 To count one reviewer's answers, run `python scripts/summarize_independent_review.py path/to/completed_answers.csv`. Missing rows and blank fields count as missing; invalid or duplicate cases are rejected. This produces descriptive counts only, not an overall population estimate.
+
+## Expanded evidence cards
+
+`case-cards-expanded.md` and `case-evidence.csv` add a hypothesis, all caller-ID complaint counts, example complaint links, and every linked complaint row for each original case. Generate them with `python scripts/expand_review_cases.py`. The script verifies all input hashes against the original manifest and leaves the original `cases.md` and answers unchanged. Report IDs derive from source filename and row, not FTC-assigned case IDs. Source categories are coded by the project parser; no full complaint narratives are supplied. Reported call dates are raw source fields and can be missing or inconsistent; filing dates are distinct. Examples are the first five sorted by report ID, not a representative sample.
+
+**The completed human review used the original `cases.md`, not the expanded cards.** Do not present its findings as validation of the expanded version. To assess these additions, conduct a new review; for evaluating revised selection rules, use a separate holdout.

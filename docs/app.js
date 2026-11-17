@@ -122,33 +122,43 @@ function openPool(id) {
   $("#head").innerHTML = `<h3>${esc(rangeOf(blk))}</h3><span>${fmt(c.reports)} reports</span><span>${c.numbers} numbers</span>
     <span>${c.states} states</span><span>${day(c.f)} to ${day(c.l)}</span>`;
   const nums = q(`MATCH (:Pool {id: $id})-[:USES_BLOCK]->(b:Block)<-[:IN_BLOCK]-(n:Number) RETURN b.npa_nxx AS b, n.number AS n, n.reports AS r`, { id });
+  nums.sort((a, b) => b.r - a.r || a.n.localeCompare(b.n));
+  const displayedNums = nums.slice(0, 20);
+  const displayedSet = new Set(displayedNums.map((x) => x.n));
   const states = q(`MATCH (:Pool {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)-[r:CALLED_INTO]->(s:State)
-                    RETURN n.number AS n, s.name AS s, r.reports AS c ORDER BY c DESC`, { id });
+                    RETURN n.number AS n, s.name AS s, r.reports AS c ORDER BY c DESC`, { id }).filter((x) => displayedSet.has(x.n));
   const subj = q(`MATCH (:Pool {id: $id})-[:USES_BLOCK]->(:Block)<-[:IN_BLOCK]-(n:Number)-[r:ABOUT]->(s:Subject)
-                  RETURN n.number AS n, s.code AS s, r.reports AS c`, { id });
+                  RETURN n.number AS n, s.code AS s, r.reports AS c`, { id }).filter((x) => displayedSet.has(x.n));
   const topStates = new Set(Object.entries(states.reduce((m, x) => ((m[x.s] = (m[x.s] || 0) + x.c), m), {}))
-    .sort((a, b) => b[1] - a[1]).slice(0, 12).map(([s]) => s));
+     .sort((a, b) => b[1] - a[1]).slice(0, 6).map(([s]) => s));
+  const topSubjects = new Set(Object.entries(subj.reduce((m, x) => ((m[x.s] = (m[x.s] || 0) + x.c), m), {}))
+    .sort((a, b) => b[1] - a[1]).slice(0, 4).map(([s]) => s));
   const C = { Block: css("--c-block"), Number: css("--c-number"), State: css("--c-state"), Subject: css("--c-subject") };
   const nodes = new Map(), edges = [];
   const add = (i, kind, label, w) => nodes.has(i) || nodes.set(i, { data: { id: i, kind, label, color: C[kind], w } });
-  for (const x of nums) {
+  for (const x of displayedNums) {
     add("B" + x.b, "Block", rangeOf(x.b), 40);
     add("N" + x.n, "Number", x.n.slice(-4), 8 + Math.min(26, Math.sqrt(x.r) * 2));
     edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "B" + x.b, type: "IN_BLOCK" } });
   }
   for (const x of states) if (topStates.has(x.s)) { add("S" + x.s, "State", x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "S" + x.s, type: "CALLED_INTO" } }); }
-  for (const x of subj) { add("T" + x.s, "Subject", LABEL[x.s] || x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "T" + x.s, type: "ABOUT" } }); }
+  for (const x of subj) if (topSubjects.has(x.s)) { add("T" + x.s, "Subject", LABEL[x.s] || x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "T" + x.s, type: "ABOUT" } }); }
   if (cy) cy.destroy();
   cy = cytoscape({ container: $("#ftc-graph"), elements: [...nodes.values(), ...edges], wheelSensitivity: 0.25,
     style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)",
         "font-size": 9, "font-family": "Archivo, sans-serif", color: css("--ink"), "text-valign": "bottom", "text-margin-y": 3 } },
       { selector: "node[kind = 'Block'], node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 11, "font-weight": 700 } },
-      { selector: "node[kind = 'Number']", style: { label: "" } },
+      { selector: "node[kind = 'Number'], node[kind = 'State'], node[kind = 'Subject']", style: { label: "" } },
       { selector: "edge", style: { width: 1, "line-color": css("--rule"), "curve-style": "haystack" } },
       { selector: "edge[type = 'IN_BLOCK']", style: { width: 1.5, "line-color": css("--muted") } }],
     layout: { name: "cose", animate: false, nodeRepulsion: 14000, idealEdgeLength: 70, padding: 24 } });
+  $("#graph-detail").textContent = "Select a state or category to see its name; select a number to check it.";
+  cy.on("tap", "node[kind = 'State'], node[kind = 'Subject']", (e) => {
+    const item = e.target.data();
+    $("#graph-detail").textContent = `${item.kind === "State" ? "Consumer state" : "Complaint category"}: ${item.label}`;
+  });
   cy.on("tap", "node[kind = 'Number']", (e) => { check(e.target.id().slice(1)); $(".hero").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); });
-  $("#legend").innerHTML = [["Range", C.Block], ["Reported number (tap to check)", C.Number], ["State called", C.State], ["Scam type", C.Subject]]
+  $("#legend").innerHTML = [["Range", C.Block], ["Reported number (tap to check)", C.Number], ["Consumer state", C.State], ["Complaint category", C.Subject]]
     .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("");
 }
 

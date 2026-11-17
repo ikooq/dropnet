@@ -62,12 +62,13 @@
 
   <section class="pools">
     <h2>The 200 biggest ranges, as a graph</h2>
-    <p class="quiet">Pool totals exclude area-code matches for the threshold; the graph can include all reports. Consumer states and complaint categories do not establish where a caller was located.</p>
+    <p class="quiet">Pool totals exclude area-code matches for the threshold; the graph can include all reports. To keep the graph readable, it shows up to 20 sample numbers and their six most-reported consumer states and four most-reported categories. The full dataset has more records. Consumer states do not establish where a caller was located.</p>
     <div class="camp-layout">
       <ol class="camp-list" id="list"></ol>
       <div class="camp-main">
         <div class="camp-head" id="head"></div>
         <div class="graph-wrap"><div id="ftc-graph"></div><div class="legend" id="legend"></div></div>
+        <p class="quiet" id="graph-detail" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -82,6 +83,6 @@
   </section>
 </main>
 <footer><p id="source"></p><p>Built on Relate by Neo4j, WebAssembly build. Data: FTC Do Not Call complaints, US public data.</p></footer>
-<script type="module" src="app.js?v=9"></script>
+<script type="module" src="app.js?v=10"></script>
 </body>
 </html>

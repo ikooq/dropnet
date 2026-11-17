@@ -1,0 +1,383 @@
+case_id,report_id,source_file,filing_date,reported_call_date,reported_caller_id,six_digit_prefix,subject_code,subject_label,consumer_area_code,area_codes_match
+C01,0306f684ba6b,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-10,7607562833,760756,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C01,79677d131374,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-05,7607562389,760756,DEBT,"Reducing debt (credit cards, mortgage, student loans)",208,no
+C01,a8c60f212d0a,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,7607562533,760756,DEBT,"Reducing debt (credit cards, mortgage, student loans)",561,no
+C02,0a51ba452158,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-22,5205303040,520530,OTHER,Other,520,yes
+C02,11fd127ce0ee,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,5205307580,520530,OTHER,Other,520,yes
+C02,1f3615b56b76,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,5205305832,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",919,no
+C02,205eb5cf41dd,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-05,5205302563,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",818,no
+C02,315aeafe5413,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-19,5205302486,520530,OTHER,Other,915,no
+C02,34f0b8daac75,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,5205303420,520530,DROPPED,Dropped call or no message,617,no
+C02,3706b9f2da51,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,5205304610,520530,OTHER,Other,732,no
+C02,77d6a21e869f,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,5205303116,520530,OTHER,Other,917,no
+C02,77d6b62c2a47,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-09-30,5205302899,520530,OTHER,Other,520,yes
+C02,7a04a8a6a9ed,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-23,5205302574,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",575,no
+C02,81014fdd2b42,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,5205302299,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",704,no
+C02,8c17fdd5e147,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-03,5205302891,520530,OTHER,Other,520,yes
+C02,967650f008f8,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-29,5205305330,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",561,no
+C02,aa6c98acd9fb,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,5205305444,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",917,no
+C02,bf993822109b,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-10-27,5205304340,520530,OTHER,Other,832,no
+C02,c884ff54a2cf,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,5205302096,520530,OTHER,Other,773,no
+C02,d860ff0f9946,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-10,5205305904,520530,DEBT,"Reducing debt (credit cards, mortgage, student loans)",714,no
+C02,e056976a3fc5,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-02,5205305666,520530,NONE,No subject provided,928,no
+C03,20baeb26b8b3,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-06,2029228871,202922,IMPOSTER_GOV,"Pretending to be government, business, family or friends",512,no
+C03,b2696236b74a,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-28,2029224495,202922,WORK,Work from home & business opportunities,707,no
+C04,bffcc3de56ab,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-27,2762778231,276277,IMPOSTER_GOV,"Pretending to be government, business, family or friends",703,no
+C05,023329c9e555,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,8507611978,850761,OTHER,Other,850,yes
+C05,232c79919b45,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-29,8507619056,850761,OTHER,Other,417,no
+C05,48c81184812a,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-27,8507619492,850761,OTHER,Other,310,no
+C05,51b81e2db94f,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-06,8507610233,850761,IMPOSTER_GOV,"Pretending to be government, business, family or friends",347,no
+C05,57a8af49ae9c,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-31,8507614966,850761,OTHER,Other,336,no
+C05,a45c74c275bd,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-13,8507611916,850761,OTHER,Other,586,no
+C06,292d89d359ee,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-10-27,8066000896,806600,OTHER,Other,501,no
+C06,9c9df3427525,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-16,8066005862,806600,IMPOSTER_GOV,"Pretending to be government, business, family or friends",806,yes
+C06,c7bfd8558099,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-10-31,8066000768,806600,OTHER,Other,312,no
+C06,cb61d9eab98e,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-22,8066000524,806600,IMPOSTER_GOV,"Pretending to be government, business, family or friends",646,no
+C07,001d24ecd043,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-06,8779210957,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",202,no
+C07,102748deb564,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,8779210785,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",847,no
+C07,2359e27d2c33,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-06,8779210957,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",608,no
+C07,2c582469b86d,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,8779210905,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",828,no
+C07,4b16cfbb2f35,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-03,8779211016,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",973,no
+C07,4c07f9e1903c,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-06,8779210957,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",931,no
+C07,4dc50056d8cb,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-11-10,8779210932,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",602,no
+C07,59bcb03cef2f,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-11-10,8779210925,877921,OTHER,Other,910,no
+C07,61f60ec2b0f6,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-11-10,8779210925,877921,OTHER,Other,910,no
+C07,62b768507c0b,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,8779211011,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",302,no
+C07,6b59d550c930,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-11,8779210905,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",904,no
+C07,6c4a5f27752f,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,8779210987,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",904,no
+C07,7d77abd6ba74,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,8779218450,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",678,no
+C07,9ca3e65fb681,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,8779210905,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",530,no
+C07,d8ffc109b31f,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-21,8779210710,877921,OTHER,Other,602,no
+C07,ea4daf915c41,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-10,8779210925,877921,OTHER,Other,918,no
+C07,f556c37a667f,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,8779210987,877921,IMPOSTER_GOV,"Pretending to be government, business, family or friends",630,no
+C07,f90dc8c7cf28,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-11-05,8779210785,877921,DEBT,"Reducing debt (credit cards, mortgage, student loans)",925,no
+C08,056f856e63e1,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-10-25,2025051134,202505,IMPOSTER_GOV,"Pretending to be government, business, family or friends",256,no
+C08,1bc6e059c4cf,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-29,2025052569,202505,IMPOSTER_GOV,"Pretending to be government, business, family or friends",863,no
+C08,a415d623efb2,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-15,2025051134,202505,OTHER,Other,256,no
+C08,a57beb616b84,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-30,2025052953,202505,OTHER,Other,773,no
+C08,a7534a8cdd43,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-23,2025057159,202505,OTHER,Other,951,no
+C08,c2e890289c15,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-06,2025054322,202505,DEBT,"Reducing debt (credit cards, mortgage, student loans)",202,yes
+C08,dceed9423505,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,2025053870,202505,IMPOSTER_GOV,"Pretending to be government, business, family or friends",253,no
+C08,ef0ee5364181,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-20,2025051134,202505,OTHER,Other,256,no
+C08,f9d93f1c276a,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-11-02,2025053039,202505,IMPOSTER_GOV,"Pretending to be government, business, family or friends",619,no
+C09,2fce8d966258,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-02,4125208025,412520,OTHER,Other,412,yes
+C09,3108cc0f0975,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-17,2026-10-17,4125209148,412520,IMPOSTER_GOV,"Pretending to be government, business, family or friends",412,yes
+C09,7cd53e2e9509,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,4125209382,412520,OTHER,Other,412,yes
+C09,918772d87f78,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-16,4125209053,412520,OTHER,Other,484,no
+C09,9a3d14d9116f,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-25,2026-10-20,4125203488,412520,DROPPED,Dropped call or no message,714,no
+C10,08ad7708c3aa,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,9419927793,941992,OTHER,Other,704,no
+C10,0c0c9885a375,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-10-17,9419925613,941992,IMPOSTER_GOV,"Pretending to be government, business, family or friends",602,no
+C10,0ff9ac0031d5,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-15,9419922788,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",631,no
+C10,1c1408756a9d,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-16,9419922355,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",412,no
+C10,2377ba078726,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,9419925745,941992,OTHER,Other,626,no
+C10,23be8123f71f,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-15,9419920569,941992,OTHER,Other,508,no
+C10,4820db7c06cc,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-17,9419925710,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",757,no
+C10,4e82511ab510,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,9419929774,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",312,no
+C10,91a6fcdabb21,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-18,2026-10-18,9419925893,941992,WORK,Work from home & business opportunities,505,no
+C10,95de38d1e226,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,9419922448,941992,OTHER,Other,407,no
+C10,9e57ffc051d0,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-08,9419922805,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",386,no
+C10,c874b4b8ca25,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-15,9419923323,941992,OTHER,Other,207,no
+C10,de8931d786b2,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,9419928934,941992,IMPOSTER_GOV,"Pretending to be government, business, family or friends",941,yes
+C10,e663a38a1397,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-15,9419929314,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",917,no
+C10,f73b18418dfc,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-20,9419922713,941992,IMPOSTER_GOV,"Pretending to be government, business, family or friends",814,no
+C10,f85111c9c9cd,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-15,9419922772,941992,DEBT,"Reducing debt (credit cards, mortgage, student loans)",616,no
+C11,0e5c5e436633,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-04,8447326188,844732,OTHER,Other,813,no
+C11,44e3d1572a3a,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-04,8447322740,844732,OTHER,Other,702,no
+C11,57529113b829,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-03,8447328188,844732,OTHER,Other,904,no
+C11,588e241bb5d4,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-04,8447324185,844732,DEBT,"Reducing debt (credit cards, mortgage, student loans)",309,no
+C11,8c4abc62d935,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-05,8447323113,844732,DEBT,"Reducing debt (credit cards, mortgage, student loans)",586,no
+C11,9560a0582598,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,8447323113,844732,DEBT,"Reducing debt (credit cards, mortgage, student loans)",310,no
+C11,d8bf273a54f9,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,8447326188,844732,DEBT,"Reducing debt (credit cards, mortgage, student loans)",609,no
+C11,e000d6a208c8,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-27,8447321276,844732,IMPOSTER_GOV,"Pretending to be government, business, family or friends",831,no
+C11,f5ae6ed3eaa2,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-10-28,8447321810,844732,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C12,0e526efde956,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-18,2026-10-15,8154209801,815420,DROPPED,Dropped call or no message,815,yes
+C12,0f95c21ed90a,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-03,8154205956,815420,ENERGY,"Energy, solar & utilities",608,no
+C12,19703278139a,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-26,8154209796,815420,DROPPED,Dropped call or no message,815,yes
+C12,212e17497ba7,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-11-08,8154203798,815420,DEBT,"Reducing debt (credit cards, mortgage, student loans)",773,no
+C12,25b165f7b81a,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-11-02,8154206604,815420,DROPPED,Dropped call or no message,815,yes
+C12,4518e2746415,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-19,8154209713,815420,DROPPED,Dropped call or no message,815,yes
+C12,4c10e1b9f662,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-04,8154203489,815420,NONE,No subject provided,773,no
+C12,51dce68d42ad,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,8154209658,815420,NONE,No subject provided,815,yes
+C12,5f52c1b455bf,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8154209801,815420,OTHER,Other,630,no
+C12,65d314d6c757,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-23,8154209642,815420,DROPPED,Dropped call or no message,815,yes
+C12,7403b6621dad,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,8154208060,815420,OTHER,Other,815,yes
+C12,9b0dde0c18c3,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-22,8154209812,815420,DROPPED,Dropped call or no message,815,yes
+C12,9b2f46182e2e,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,8154203739,815420,DEBT,"Reducing debt (credit cards, mortgage, student loans)",857,no
+C12,aa2a24deb9b3,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-07,8154206842,815420,OTHER,Other,815,yes
+C12,cdcf0ac5eabe,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-27,8154209776,815420,DROPPED,Dropped call or no message,815,yes
+C12,d373377ac116,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-28,8154208944,815420,OTHER,Other,815,yes
+C13,0e21f3428e53,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,9413002952,941300,OTHER,Other,732,no
+C13,7a126af5b9ae,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-19,9413002515,941300,DEBT,"Reducing debt (credit cards, mortgage, student loans)",501,no
+C13,d758fff89f80,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-15,9413002619,941300,DEBT,"Reducing debt (credit cards, mortgage, student loans)",818,no
+C13,f81499127b0f,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-03,9413002518,941300,OTHER,Other,304,no
+C14,cef0211e2749,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-19,4846690512,484669,OTHER,Other,703,no
+C15,ae40413e79c8,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-06,5802051470,580205,DROPPED,Dropped call or no message,580,yes
+C15,c06c3fd3ef37,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-11-09,5802054665,580205,NONE,No subject provided,318,no
+C15,cd394345d855,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,5802057717,580205,DROPPED,Dropped call or no message,580,yes
+C16,0f37de21f6ab,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-11-02,9709754210,970975,DEBT,"Reducing debt (credit cards, mortgage, student loans)",513,no
+C16,4cb0a8a5a685,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-22,9709754871,970975,OTHER,Other,504,no
+C16,4d8ac705bdba,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-31,9709754952,970975,OTHER,Other,917,no
+C16,847ca89be0d8,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,9709754394,970975,OTHER,Other,401,no
+C16,949b5f3d6908,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-10-31,9709754871,970975,OTHER,Other,504,no
+C16,a7cefb7882c5,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-23,9709754699,970975,OTHER,Other,844,no
+C16,fa560e132067,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-17,2026-10-15,9709754987,970975,DEBT,"Reducing debt (credit cards, mortgage, student loans)",713,no
+C16,ff52ed5dc88f,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-03,9709754384,970975,DROPPED,Dropped call or no message,704,no
+C17,42c6b2fbca74,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-25,6133860403,613386,DEBT,"Reducing debt (credit cards, mortgage, student loans)",412,no
+C18,02f90c0718f2,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-29,2132238813,213223,NONE,No subject provided,323,no
+C18,10def48f5f3a,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,2132238692,213223,OTHER,Other,805,no
+C18,2c3694807adc,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,2132232193,213223,OTHER,Other,818,no
+C18,7666e4908e22,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,2132238657,213223,IMPOSTER_GOV,"Pretending to be government, business, family or friends",510,no
+C18,789d4c52953c,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-03,2132238447,213223,OTHER,Other,317,no
+C18,85ece4c518e9,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-13,2132238082,213223,DEBT,"Reducing debt (credit cards, mortgage, student loans)",661,no
+C18,8f810640b333,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-16,2132238460,213223,DROPPED,Dropped call or no message,717,no
+C18,9d70283ea611,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-22,2132238717,213223,DROPPED,Dropped call or no message,805,no
+C18,a28cab91032e,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-26,2132238460,213223,DROPPED,Dropped call or no message,717,no
+C18,ae1e895a1dd0,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-14,2132238765,213223,DEBT,"Reducing debt (credit cards, mortgage, student loans)",661,no
+C18,b2d6bcd0be9c,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-05,2132238717,213223,OTHER,Other,661,no
+C18,b6db7029c3c9,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,2132238722,213223,OTHER,Other,805,no
+C18,be9dc60a5021,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-13,2132238096,213223,DEBT,"Reducing debt (credit cards, mortgage, student loans)",661,no
+C18,c3f62f7888a5,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,2132238692,213223,DEBT,"Reducing debt (credit cards, mortgage, student loans)",661,no
+C18,e07e16d1c6fc,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-09-22,2132238460,213223,DROPPED,Dropped call or no message,717,no
+C18,f291d56f9187,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-13,2132238790,213223,OTHER,Other,323,no
+C18,fffbdea594e6,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-09-29,2132238455,213223,OTHER,Other,973,no
+C19,00b562659128,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-19,6468132556,646813,OTHER,Other,619,no
+C19,5259fa85c5d5,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-23,6468131998,646813,DEBT,"Reducing debt (credit cards, mortgage, student loans)",479,no
+C19,527c01d609ad,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,6468133054,646813,OTHER,Other,760,no
+C19,94eba3a38c25,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-21,6468133666,646813,NONE,No subject provided,505,no
+C19,b7bb54c5b529,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-14,6468133320,646813,DEBT,"Reducing debt (credit cards, mortgage, student loans)",801,no
+C19,d734f00cc7f6,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-17,2026-10-17,6468132343,646813,NONE,No subject provided,815,no
+C19,fa8def47c751,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,6468133235,646813,DEBT,"Reducing debt (credit cards, mortgage, student loans)",415,no
+C20,086bb2e93952,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-08,3057031582,305703,OTHER,Other,305,yes
+C20,0e2c800ca121,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-25,2026-10-25,3057034120,305703,OTHER,Other,813,no
+C20,17e730a991cd,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-22,3057034470,305703,OTHER,Other,904,no
+C20,287d0f47bb35,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-22,3057034583,305703,OTHER,Other,941,no
+C20,385175211cee,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-07-07,3057036174,305703,MEDICAL,Medical & prescriptions,305,yes
+C20,3ded40ad7817,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-10-25,3057034096,305703,DROPPED,Dropped call or no message,630,no
+C20,48440d2ccd2b,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-18,2026-10-18,3057035543,305703,OTHER,Other,772,no
+C20,5687e3040142,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-10,3057035725,305703,OTHER,Other,561,no
+C20,6f19adfc2a64,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-07,3057031582,305703,OTHER,Other,305,yes
+C20,849836749efc,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,3057037630,305703,OTHER,Other,561,no
+C20,ace91c8f7271,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-11,3057035743,305703,IMPOSTER_GOV,"Pretending to be government, business, family or friends",419,no
+C20,b6afd3f7dea5,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-30,3057030627,305703,MEDICAL,Medical & prescriptions,305,yes
+C20,cfa49d448ef5,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-25,2026-10-25,3057034551,305703,OTHER,Other,863,no
+C20,d25061593786,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-22,3057038413,305703,OTHER,Other,239,no
+C20,ee7fcf065f10,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-11,2026-10-11,3057035202,305703,OTHER,Other,561,no
+C20,fd79736f8bff,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-14,3057037952,305703,OTHER,Other,305,yes
+C21,1fe1b8607ad2,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,5203817626,520381,IMPOSTER_GOV,"Pretending to be government, business, family or friends",602,no
+C21,391aaa57d013,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-11-09,5203814326,520381,OTHER,Other,601,no
+C21,3d28a9e99236,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-30,5203817122,520381,DEBT,"Reducing debt (credit cards, mortgage, student loans)",813,no
+C21,418e9ad973e9,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-11-09,5203816439,520381,MEDICAL,Medical & prescriptions,520,yes
+C21,4a431d215e9e,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-06,5203817401,520381,OTHER,Other,520,yes
+C21,554d6b1afd89,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-27,5203815860,520381,OTHER,Other,423,no
+C21,571ca3640d75,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,5203817914,520381,OTHER,Other,520,yes
+C21,63ff38b018b3,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-27,5203814326,520381,OTHER,Other,601,no
+C21,a59855dfc154,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-06,5203814860,520381,NONE,No subject provided,916,no
+C21,d02ebb0cf946,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,5203817275,520381,MEDICAL,Medical & prescriptions,623,no
+C21,dfae97ccb736,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-21,5203815232,520381,MEDICAL,Medical & prescriptions,520,yes
+C22,0197c542de3f,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-18,2026-10-05,8447241279,844724,OTHER,Other,732,no
+C22,02f52ef3082b,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241876,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",703,no
+C22,03c68df899c8,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241808,844724,OTHER,Other,928,no
+C22,042632260bc3,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241808,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",619,no
+C22,05eb9d4949fb,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,8447241107,844724,OTHER,Other,714,no
+C22,081fd7b4b65b,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-08,8447240872,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",708,no
+C22,082ddd10ddfd,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-09,8447241941,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",318,no
+C22,0906d211355b,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241848,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",413,no
+C22,0a707e87d848,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241948,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",770,no
+C22,0ea86c259cb1,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-06,8447241498,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",732,no
+C22,0fc9353e8d9c,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241108,844724,OTHER,Other,310,no
+C22,11f44bbe1ad9,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241876,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",205,no
+C22,122713f29542,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241286,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C22,1536c5ec5094,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-09,8447241927,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",707,no
+C22,18f3ccd0b814,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241286,844724,OTHER,Other,515,no
+C22,1ec0471c86ca,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241863,844724,OTHER,Other,202,no
+C22,254d08ca8f2a,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-10,8447240809,844724,OTHER,Other,707,no
+C22,2eb373fe7829,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-12,8447241952,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",781,no
+C22,2eceb1601ff5,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-12,8447241962,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",815,no
+C22,2f0502153b20,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-07,8447241852,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",321,no
+C22,33005bbe2bc4,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-09,8447241703,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",616,no
+C22,3f7026be8e1b,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241108,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",415,no
+C22,42a49f466723,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-10-10,8447241961,844724,OTHER,Other,973,no
+C22,42d71c0a4c92,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241871,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",706,no
+C22,43d51c7a0d7b,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-06,8447240716,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",385,no
+C22,44999f19da24,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241268,844724,OTHER,Other,844,yes
+C22,44a577e2ec14,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241277,844724,OTHER,Other,760,no
+C22,454c37b70fb6,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447240820,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",602,no
+C22,4992fc540cbd,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-08,8447241871,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",517,no
+C22,4a32186c53b8,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241333,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",303,no
+C22,4d22761cb646,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-07,8447241853,844724,OTHER,Other,901,no
+C22,5228a36cd2fa,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241704,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",617,no
+C22,52add6c4af06,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241291,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",931,no
+C22,53cbcf78519e,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241897,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",336,no
+C22,558955d6b8c4,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-05,8447241911,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",310,no
+C22,56ceb1c6e3c2,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-11,2026-10-10,8447240809,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",703,no
+C22,618816dbac44,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-08,2026-10-09,8447241286,844724,NONE,No subject provided,626,no
+C22,628370acd266,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241703,844724,NONE,No subject provided,707,no
+C22,70a6626ecd89,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241961,844724,OTHER,Other,661,no
+C22,7158623004c4,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-10,8447240809,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",609,no
+C22,74548e2bcd03,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241781,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",626,no
+C22,785951c58854,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241876,844724,OTHER,Other,480,no
+C22,78dd7fd26668,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-12,8447241962,844724,OTHER,Other,305,no
+C22,79e9ee1773ee,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241277,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",602,no
+C22,7c113b5c184a,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241819,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",910,no
+C22,818fa2c0d51f,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241865,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",208,no
+C22,8516682303cf,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-07,8447241857,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",916,no
+C22,878b06a17a8c,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241306,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",773,no
+C22,899ea19b3627,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-08,8447240726,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",310,no
+C22,8b05b0298121,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-09,8447241306,844724,NONE,No subject provided,615,no
+C22,912aa2a09290,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241962,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",844,yes
+C22,94db36db1f32,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241848,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",413,no
+C22,9a4bf5dc56e0,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-06,8447241524,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",828,no
+C22,9c803fb47f66,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241277,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",815,no
+C22,a0acd6db402e,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241927,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",301,no
+C22,a3cc5880aed1,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8447241703,844724,OTHER,Other,404,no
+C22,a57a523f6f3b,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-08,8447241865,844724,NONE,No subject provided,954,no
+C22,a87bd300cd06,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-12,8447241819,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C22,ad45249b0e37,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241945,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",407,no
+C22,af193fdbf519,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-08,8447241855,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",786,no
+C22,b098f6a7da19,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-08,8447241871,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",781,no
+C22,b1a50563a0fe,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241876,844724,NONE,No subject provided,707,no
+C22,b5fbfcf40d89,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-09,8447241286,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C22,b9a3b447f4cc,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-06,8447240506,844724,OTHER,Other,407,no
+C22,ba8d90add20e,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241897,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",248,no
+C22,bd3d444c82ee,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-12,8447241819,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",678,no
+C22,bdf106af2be0,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-10,2026-10-07,8447241853,844724,OTHER,Other,901,no
+C22,bdf6688e9c24,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-12,8447241962,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",478,no
+C22,c2968bb715d0,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241836,844724,NONE,No subject provided,630,no
+C22,c63a6c390daf,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447240820,844724,OTHER,Other,904,no
+C22,c8066b4be019,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447240732,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",402,no
+C22,ca791909c750,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-09,8447240721,844724,OTHER,Other,781,no
+C22,ca9c0869fea4,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241869,844724,OTHER,Other,305,no
+C22,cb34e677408b,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241941,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",310,no
+C22,cda48d55d665,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241962,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",856,no
+C22,d384805af964,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241091,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",251,no
+C22,d38a331393d3,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-04,8447241857,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",352,no
+C22,d44deaeacbb8,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241108,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",954,no
+C22,d4d2cdd955aa,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-05,8447241965,844724,OTHER,Other,515,no
+C22,d6d65c24d79e,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-10-07,8447241960,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",213,no
+C22,d9ccf45e9152,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241781,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",910,no
+C22,deecab61b560,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241876,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",623,no
+C22,df1460f227bb,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8447241910,844724,OTHER,Other,704,no
+C22,dfb2eddd5c49,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-07,8447241822,844724,OTHER,Other,813,no
+C22,e2b7e5f5dce1,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241945,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",770,no
+C22,e3ae985699c0,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241819,844724,NONE,No subject provided,714,no
+C22,e60b5fe39344,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-09,8447241808,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",910,no
+C22,ea49745ffc0d,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241944,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",866,no
+C22,ebd6fd0a190e,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,8447241843,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",828,no
+C22,ed3f0e092fc6,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241306,844724,IMPOSTER_GOV,"Pretending to be government, business, family or friends",954,no
+C22,f567fd34357d,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241704,844724,OTHER,Other,805,no
+C22,f56c824c5049,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,8447241948,844724,OTHER,Other,630,no
+C22,f5b830cf7fcf,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-07,8447241967,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",804,no
+C22,f722cf8e9872,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-26,8447241126,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",714,no
+C22,f742922048a8,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241964,844724,OTHER,Other,208,no
+C22,f892dc2705a5,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447241286,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",551,no
+C22,f8ccc87f69c8,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-09,8447240820,844724,DEBT,"Reducing debt (credit cards, mortgage, student loans)",773,no
+C23,178a07e1c731,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-06-20,4125391389,412539,NONE,No subject provided,412,yes
+C23,244085c08efb,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-15,4125398024,412539,OTHER,Other,269,no
+C23,ad708a906907,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-11,4125398081,412539,DEBT,"Reducing debt (credit cards, mortgage, student loans)",602,no
+C23,b846f4fb3177,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-27,4125398726,412539,DEBT,"Reducing debt (credit cards, mortgage, student loans)",714,no
+C23,e7d8f1783f12,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,4125398029,412539,OTHER,Other,412,yes
+C24,338396c4219a,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-20,8722915738,872291,DROPPED,Dropped call or no message,630,no
+C24,816aefdc600e,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-06,8722915724,872291,OTHER,Other,630,no
+C24,8b8768736065,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-26,8722915683,872291,OTHER,Other,630,no
+C24,a014c44a3394,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-07,8722915749,872291,DROPPED,Dropped call or no message,815,no
+C24,ad332b8b9eb2,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-22,8722915718,872291,OTHER,Other,630,no
+C24,ba90540ccc07,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-09,8722915749,872291,OTHER,Other,630,no
+C24,d139889e84bf,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-08,8722915925,872291,DROPPED,Dropped call or no message,312,no
+C24,f250a58a1401,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-02,8722915726,872291,OTHER,Other,630,no
+C24,f9f648e93fce,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-03,8722915765,872291,DROPPED,Dropped call or no message,630,no
+C24,fee9f79301ca,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-14,8722915586,872291,OTHER,Other,630,no
+C25,0b9b50d9ad52,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-17,2026-10-17,6233569836,623356,OTHER,Other,401,no
+C25,2bd78a065ef7,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,6233569324,623356,IMPOSTER_GOV,"Pretending to be government, business, family or friends",916,no
+C25,3e65843c2ceb,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-22,6233569289,623356,HOME,Home improvement & cleaning,480,no
+C25,59844a28de41,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-06,2026-11-06,6233566021,623356,MEDICAL,Medical & prescriptions,623,yes
+C25,5d28f4934f96,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-04,6233569942,623356,OTHER,Other,484,no
+C25,5e3df8302df8,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,6233567552,623356,DEBT,"Reducing debt (credit cards, mortgage, student loans)",623,yes
+C25,7106d1899103,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,6233566582,623356,OTHER,Other,623,yes
+C25,73e084459e28,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-07,6233569882,623356,DROPPED,Dropped call or no message,480,no
+C25,77bdb001873b,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-09,6233560040,623356,OTHER,Other,623,yes
+C25,986e9dd97828,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-20,6233567897,623356,DEBT,"Reducing debt (credit cards, mortgage, student loans)",562,no
+C25,c07ff710c700,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-16,6233565132,623356,OTHER,Other,623,yes
+C26,05c9c03c44bb,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-10-02,5025132430,502513,DEBT,"Reducing debt (credit cards, mortgage, student loans)",808,no
+C26,08854ea1bc27,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-17,2026-09-22,5025132640,502513,OTHER,Other,859,no
+C26,3748576e53a5,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-01,5025132046,502513,OTHER,Other,936,no
+C26,3cc46ef61d2c,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-14,5025132212,502513,OTHER,Other,858,no
+C26,4a54a366365f,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-12,5025132378,502513,OTHER,Other,818,no
+C26,6343e7f11e9b,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-09-01,5025132243,502513,DEBT,"Reducing debt (credit cards, mortgage, student loans)",808,no
+C26,728757257344,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-07,5025132080,502513,IMPOSTER_GOV,"Pretending to be government, business, family or friends",702,no
+C26,7ccd9a22e02d,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-14,5025132388,502513,DEBT,"Reducing debt (credit cards, mortgage, student loans)",954,no
+C26,829ea6f6b748,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-14,5025132114,502513,OTHER,Other,954,no
+C26,8f35c3c61d96,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-23,2026-09-25,5025132633,502513,DEBT,"Reducing debt (credit cards, mortgage, student loans)",808,no
+C26,f86895ae4637,DNC_Complaint_Numbers_2026-10-15.csv.gz,2026-10-14,2026-10-14,5025137058,502513,MEDICAL,Medical & prescriptions,859,no
+C27,06af4e4508b1,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-01,8665500033,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",608,no
+C27,0e3bb0c9ec7b,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-09-30,8665503692,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",954,no
+C27,123de3d19c2f,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-01,8665502722,866550,OTHER,Other,616,no
+C27,17949163fbb6,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-10-31,8665501192,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",262,no
+C27,18043d2df186,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-12,8665503676,866550,OTHER,Other,559,no
+C27,22cc2e49a039,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-09-30,8665501668,866550,OTHER,Other,609,no
+C27,2c14628be3a0,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-02,8665502369,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",707,no
+C27,2dea0d56af9b,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-10-02,8665501669,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",510,no
+C27,2f2cb2085eb8,DNC_Complaint_Numbers_2026-10-19.csv.gz,2026-10-16,2026-10-07,8665501314,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",505,no
+C27,35cfcfa4a647,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-01,8665502854,866550,OTHER,Other,616,no
+C27,3ed58cf0be18,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-31,8665502903,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",732,no
+C27,4afccf27907c,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-05,8665503676,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",707,no
+C27,5d8119775770,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-01,8665502154,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",310,no
+C27,5f8fe652db56,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-01,8665500024,866550,NONE,No subject provided,402,no
+C27,69d4196c851e,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,8665502040,866550,IMPOSTER_GOV,"Pretending to be government, business, family or friends",704,no
+C27,7507ac0a8af8,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-11-01,2026-10-31,8665500038,866550,OTHER,Other,301,no
+C27,79d7e62b3351,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-05,8665502558,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",650,no
+C27,80861d826c0a,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-26,8665503649,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",616,no
+C27,8512ae6a7a24,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-09,8665509901,866550,WARRANTY,Warranties & protection plans,210,no
+C27,af555268cf67,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-10-01,8665501662,866550,NONE,No subject provided,530,no
+C27,b9d23be036f4,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-02,8665500350,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",405,no
+C27,bbda716f256e,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-09-30,8665503680,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",318,no
+C27,ce6d84c68571,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-09,2026-10-02,8665502948,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",626,no
+C27,d6da25fa2298,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-10-02,8665502968,866550,NONE,No subject provided,201,no
+C27,e18c9e0c26aa,DNC_Complaint_Numbers_2026-10-12.csv.gz,2026-10-11,2026-10-01,8665503687,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",386,no
+C27,e82d68552048,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,8665509608,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",305,no
+C27,edbc4a6d2af8,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-01,8665503528,866550,DEBT,"Reducing debt (credit cards, mortgage, student loans)",650,no
+C28,1c1220c3b2ba,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,2622054985,262205,OTHER,Other,409,no
+C28,4a0b8340eb0c,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,2622050799,262205,DROPPED,Dropped call or no message,262,yes
+C28,4cde8da08cf3,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,2622057768,262205,OTHER,Other,920,no
+C28,55916450d4a4,DNC_Complaint_Numbers_2026-11-13.csv.gz,2026-11-12,2026-11-12,2622055012,262205,HOME,Home improvement & cleaning,262,yes
+C28,5bc0e7e7919f,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-07,2622054064,262205,OTHER,Other,262,yes
+C28,717916c2a4f5,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-14,2622056661,262205,OTHER,Other,254,no
+C28,8ddbfcd1310c,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,2622057102,262205,OTHER,Other,410,no
+C28,eb649ca668aa,DNC_Complaint_Numbers_2026-10-29.csv.gz,2026-10-28,2026-10-28,2622055610,262205,OTHER,Other,603,no
+C28,eb67950b1ea0,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-10,2622051952,262205,OTHER,Other,262,yes
+C28,ee340914c773,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-07,2622055589,262205,OTHER,Other,262,yes
+C29,1826c5228b14,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-30,2026-10-30,2343569021,234356,IMPOSTER_GOV,"Pretending to be government, business, family or friends",910,no
+C29,45e62dd06fbd,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-11-10,2343569506,234356,OTHER,Other,972,no
+C29,4a7115f27aaf,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-20,2343569447,234356,OTHER,Other,254,no
+C29,5d972179374e,DNC_Complaint_Numbers_2026-11-06.csv.gz,2026-11-05,2026-11-05,2343567972,234356,OTHER,Other,713,no
+C29,8743985cdcf4,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,2343567033,234356,DEBT,"Reducing debt (credit cards, mortgage, student loans)",631,no
+C29,8cd4bc2b5ca8,DNC_Complaint_Numbers_2026-10-14.csv.gz,2026-10-13,2026-10-13,2343567241,234356,OTHER,Other,937,no
+C29,97c5da591f3f,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-24,2026-10-24,2343567565,234356,OTHER,Other,847,no
+C29,b546c2af9c5c,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-23,2343567896,234356,DEBT,"Reducing debt (credit cards, mortgage, student loans)",719,no
+C29,c02237b7eaa6,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-21,2343569640,234356,OTHER,Other,810,no
+C29,cc26fb4e7431,DNC_Complaint_Numbers_2026-11-05.csv.gz,2026-11-04,2026-11-02,2343569282,234356,OTHER,Other,586,no
+C29,d5977e1517ac,DNC_Complaint_Numbers_2026-10-23.csv.gz,2026-10-22,2026-10-22,2343569041,234356,OTHER,Other,859,no
+C30,1187bdeb54d6,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-21,6604444008,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",805,no
+C30,146fc84ec522,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-03,6604444719,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",901,no
+C30,171c4e445b2f,DNC_Complaint_Numbers_2026-11-04.csv.gz,2026-11-03,2026-11-01,6604447548,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",978,no
+C30,1b669d99e1f8,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-24,6604447964,660444,OTHER,Other,808,no
+C30,2b9602edb563,DNC_Complaint_Numbers_2026-10-16.csv.gz,2026-10-15,2026-10-12,6604444891,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",508,no
+C30,2c3b1c72e3be,DNC_Complaint_Numbers_2026-11-02.csv.gz,2026-10-31,2026-10-31,6604447449,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",626,no
+C30,2da8d8941429,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-07,6604447284,660444,OTHER,Other,740,no
+C30,426c96097346,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-25,2026-10-25,6604447723,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",919,no
+C30,4eed95ad2ed0,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-11-02,6604447670,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",508,no
+C30,576184f2bb4f,DNC_Complaint_Numbers_2026-11-03.csv.gz,2026-11-02,2026-10-25,6604444192,660444,OTHER,Other,917,no
+C30,6a388ca40ca5,DNC_Complaint_Numbers_2026-10-30.csv.gz,2026-10-29,2026-10-29,6604447696,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",407,no
+C30,77d9fb095d35,DNC_Complaint_Numbers_2026-11-10.csv.gz,2026-11-09,2026-11-08,6604445717,660444,NONE,No subject provided,480,no
+C30,7f353c94f456,DNC_Complaint_Numbers_2026-11-11.csv.gz,2026-11-10,2026-10-22,6604444599,660444,OTHER,Other,516,no
+C30,8f76e2267469,DNC_Complaint_Numbers_2026-10-13.csv.gz,2026-10-12,2026-09-21,6604444620,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",786,no
+C30,988093c21904,DNC_Complaint_Numbers_2026-11-12.csv.gz,2026-11-11,2026-11-11,6604445717,660444,OTHER,Other,210,no
+C30,988a9677932c,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-22,6604445549,660444,IMPOSTER_GOV,"Pretending to be government, business, family or friends",865,no
+C30,b514e3a887ac,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-22,6604445549,660444,IMPOSTER_GOV,"Pretending to be government, business, family or friends",865,no
+C30,b9281f1fa99c,DNC_Complaint_Numbers_2026-10-27.csv.gz,2026-10-26,2026-10-26,6604447056,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",660,yes
+C30,be2a9a153fa7,DNC_Complaint_Numbers_2026-10-28.csv.gz,2026-10-27,2026-10-27,6604447534,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",660,yes
+C30,d9a2e6b01138,DNC_Complaint_Numbers_2026-10-20.csv.gz,2026-10-19,2026-10-19,6604444501,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",951,no
+C30,f811251ae32c,DNC_Complaint_Numbers_2026-11-09.csv.gz,2026-11-07,2026-11-07,6604447547,660444,DEBT,"Reducing debt (credit cards, mortgage, student loans)",352,no
+C30,f8dd5c3e97a6,DNC_Complaint_Numbers_2026-10-21.csv.gz,2026-10-20,2026-10-20,6604444238,660444,OTHER,Other,205,no
+C30,faa96304837b,DNC_Complaint_Numbers_2026-10-26.csv.gz,2026-10-25,2026-10-25,6604447719,660444,OTHER,Other,269,no
+C30,fcb6f2c98423,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-21,6604444103,660444,OTHER,Other,205,no
+C30,fcc18c14d5f6,DNC_Complaint_Numbers_2026-10-22.csv.gz,2026-10-21,2026-10-21,6604447084,660444,OTHER,Other,207,no

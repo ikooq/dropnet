@@ -10,8 +10,8 @@ KEY = ROOT / 'docs' / 'independent-review' / 'selection-key.json'
 FIELDS = ('evidence_clear_yes_no_unsure', 'investigate_yes_no_unsure')
 
 
-def summarize(path):
-    cases = {item['case_id']: item['stratum'] for item in json.loads(KEY.read_text(encoding='utf-8'))['selection']}
+def summarize(path, key_path=KEY):
+    cases = {item['case_id']: item['stratum'] for item in json.loads(key_path.read_text(encoding='utf-8'))['selection']}
     counts = {group: {field: Counter() for field in FIELDS} for group in sorted(set(cases.values()))}
     seen = set()
     with path.open(encoding='utf-8-sig', newline='') as f:
@@ -36,6 +36,7 @@ def summarize(path):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        raise SystemExit('Usage: python scripts/summarize_independent_review.py path/to/completed_answers.csv')
-    print(json.dumps(summarize(Path(sys.argv[1])), indent=2))
+    if len(sys.argv) not in (2, 3):
+        raise SystemExit('Usage: python scripts/summarize_independent_review.py answers.csv [selection-key.json]')
+    key_path = Path(sys.argv[2]) if len(sys.argv) == 3 else KEY
+    print(json.dumps(summarize(Path(sys.argv[1]), key_path), indent=2))

@@ -1,7 +1,7 @@
 # Expanded case evidence
 
 These expanded cards were created after the original review. They were not shown to that reviewer;
-the previous review results apply only to the original `cases.md` cards.
+the previous review results apply only to the initial review pack’s `cases.md` cards.
 
 Each report is an unverified FTC complaint. Report IDs are generated from source filename and row,
 not FTC case identifiers. Filing date and reported call date are separate source fields;

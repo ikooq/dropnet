@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / 'data' / 'ftc' / 'raw'
 OUT = ROOT / 'docs' / 'independent-review'
 SEED = 20261117
+EXCLUDED_BLOCKS = set()
 
 
 def generate():
@@ -23,6 +24,8 @@ def generate():
         blocks[report.number[:6]].append(report)
     strata = {'strong': [], 'threshold': [], 'control': []}
     for block, reports in blocks.items():
+        if block in EXCLUDED_BLOCKS:
+            continue
         count = len({r.number for r in reports if not r.neighbor})
         group = 'strong' if count >= 10 else 'threshold' if count >= 5 else 'control' if count >= 1 else None
         if group:

@@ -16,6 +16,12 @@ Dropnet puts 296,273 FTC Do Not Call complaints into a portable graph. An analys
 
 An area-code match is a possible indicator of spoofing, not proof. The graph does not establish who made a call, who controls a range, or that related ranges are one operation. Dropnet does not block calls or determine whether a caller is guilty.
 
+## A two-minute investigation
+
+Check 833-766-1884 in the live demo. Its caller ID appears in 1,202 complaints in the loaded window. The graph connects the number to its six-digit prefix and other reported numbers, consumer states and complaint categories. Select a range and run the what-if counter to see historical matches alongside the potential scope of a rule. A report is a lead, not a verified identification, and the prefix alone does not establish a shared operator.
+
+Relate is central to this workflow: the same portable graph supports relationship traversal, transactional what-if queries and agent access, while the browser demonstration runs an inspectable subset with WebAssembly.
+
 ## What we measured
 
 Rules derived from complaints filed before 2026-11-02 were matched against 103,620 later-filed complaints. A baseline using numbers previously reported at least twice matched 4.3%; adding 2,872 geographic ranges matched 14.3%. These are historical complaint matches, not a measure of all calls or fraud prevented. The range rules plus number rules cover approximately 28.73 million possible numbers; the dataset cannot measure the impact on legitimate traffic.

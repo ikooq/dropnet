@@ -69,8 +69,11 @@ def test_assess_number_spoofed_vs_pool(g):
     assert a["verdict"] == "likely_spoofed" and a["reports"] == 1
     b = campaigns.assess_number(g, "8667710002")
     assert b["verdict"] == "pool" and b["block_numbers"] == 7
+    assert b["repeated_number_signal"] is True
     c = campaigns.assess_number(g, "2178637210")
     assert c["verdict"] == "repeat" and c["reports"] == 6
+    assert c["repeated_number_signal"] is True
+    assert a["repeated_number_signal"] is False
     assert campaigns.assess_number(g, "9999999999")["verdict"] == "unknown"
 
 
@@ -109,6 +112,7 @@ def test_unreported_number_retains_range_context(g):
     assert result["verdict"] == "unknown" and result["reports"] == 0
     assert result["in_pool_range"] and result["block_numbers"] == 7
     assert not campaigns.assess_number(g, "999-999-9999")["in_pool_range"]
+    assert result["repeated_number_signal"] is False
 
 
 def test_invalid_number_is_not_silently_truncated(g):

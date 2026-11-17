@@ -15,6 +15,7 @@ from .parse import SUBJECT_LABEL, TOLL_FREE
 
 POOL_MIN_NUMBERS = 5
 REPEAT_MIN_REPORTS = 100
+REPEATED_NUMBER_MIN_REPORTS = 3
 CAUTION = ("FTC reports are unverified complaints. Caller ID can be spoofed; an area-code match is only a "
            "possible indicator, not proof of spoofing or of the owner's identity or conduct. "
            "A reported range does not establish a common operator. Do not blame a number's owner.")
@@ -116,6 +117,7 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
         count = range_rows[0]["nums"] if range_rows else 0
         return {"number": d, "verdict": "unknown", "advice": ADVICE["unknown"], "reports": 0,
                 "block": block, "block_numbers": count, "in_pool_range": count >= POOL_MIN_NUMBERS,
+                "repeated_number_signal": False,
                 "caution": CAUTION}
     a = r[0]
     pool = rows(conn, """
@@ -126,11 +128,12 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
         verdict = "likely_spoofed"
     elif pool >= POOL_MIN_NUMBERS:
         verdict = "pool"
-    elif a["reports"] >= 3:
+    elif a["reports"] >= REPEATED_NUMBER_MIN_REPORTS:
         verdict = "repeat"
     else:
         verdict = "single"
     return {"number": d, "verdict": verdict, "advice": ADVICE[verdict], "reports": a["reports"], "first_day": a["first"],
             "last_day": a["last"], "states": a["states"], "subjects": a["subjects"],
             "neighbor_share": round(neighbor_share, 3), "block": a["block"], "block_numbers": pool,
-            "toll_free": a["toll_free"], "caution": CAUTION}
+            "toll_free": a["toll_free"], "repeated_number_signal": a["reports"] >= REPEATED_NUMBER_MIN_REPORTS,
+            "caution": CAUTION}

@@ -368,10 +368,11 @@ async function assess(number) {
     return;
   }
   if (request !== latestAssessment) return;
-  const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
+  const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported", unknown: "Not in the reports" }[a.verdict];
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
     ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
-    ${a.block_numbers} reported numbers · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` :
+    ${a.block_numbers} reported numbers meeting pool criteria · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` +
+    (a.repeated_number_signal ? `<p>This number appears in at least 3 complaints. Repeated reports are a lead for review, not proof of wrongdoing or independent callers.</p>` : "") :
     a.in_pool_range ? `<p>No reports for this number in the loaded window; its range contains ${a.block_numbers} reported numbers meeting the pool criteria. This does not establish who called.</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
   document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
 }

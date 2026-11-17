@@ -84,3 +84,9 @@ def test_number_input_validation_and_unreported_range_context(client):
     assert client.get("/api/ftc/number/998667710002").status_code == 400
     result = client.get("/api/ftc/number/8667714444").json()
     assert result["reports"] == 0 and result["in_pool_range"]
+
+
+def test_whatif_rejects_invalid_filing_date(client):
+    response = client.post("/api/ftc/whatif", json={"blocks": ["866771"], "since_day": "2026-02-30"})
+    assert response.status_code == 400
+    assert "YYYY-MM-DD" in response.json()["detail"]

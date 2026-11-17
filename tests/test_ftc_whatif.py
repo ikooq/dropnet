@@ -54,3 +54,12 @@ def test_whatif_all_unknown_rules_reports_zero(g):
     assert r["applied_rules"] == 0
     assert r["unknown_blocks"] == ["999998"]
     assert r["reports_stopped"] == 0 and r["numbers_covered"] == 0
+
+
+def test_whatif_rejects_invalid_filing_date_before_transaction(g):
+    import pytest
+    for value in ["2026-02-30", "20261102", "not-a-date", ""]:
+        with pytest.raises(ValueError, match="YYYY-MM-DD"):
+            whatif.whatif(g, blocks=["866771"], since_day=value)
+    assert g.autocommit is True
+    assert store.rows(g, "MATCH (r:Rule) RETURN count(r) AS n")[0]["n"] == 0

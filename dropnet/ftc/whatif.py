@@ -7,6 +7,7 @@ hypothetical rules (Relate isolates uncommitted state).
 from __future__ import annotations
 
 import re
+from datetime import date
 from pathlib import Path
 
 import relate
@@ -29,6 +30,12 @@ def whatif(conn: relate.Connection, blocks=None, numbers=None, since_day: str | 
     blocks, numbers = _clean(blocks, 6, "block (NPA-NXX)"), _clean(numbers, 10, "number")
     if not blocks and not numbers:
         raise ValueError("give at least one block or number")
+    if since_day is not None:
+        try:
+            if date.fromisoformat(since_day).isoformat() != since_day:
+                raise ValueError
+        except (ValueError, TypeError):
+            raise ValueError("since_day must be a valid date in YYYY-MM-DD format") from None
     conn.autocommit = False
     try:
         rows(conn, "UNWIND $b AS b MATCH (k:Block {npa_nxx: b}) CREATE (:Rule {kind: 'block', value: b})-[:BLOCKS]->(k)",

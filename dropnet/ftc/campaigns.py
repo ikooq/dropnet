@@ -1,10 +1,10 @@
 """Campaigns in real FTC reports, computed with Cypher on the Relate graph.
 
-* pool    — many different numbers from one NPA-NXX block reported for unwanted calls (a rented number range).
-            Built from NON-spoofed reports only: a spoofer dials from random numbers in the victim's own area,
-            and blocking those blocks would hit innocent local subscribers.
-* repeat  — one number reported again and again.
-* spoofing profile — how much of each scam type arrives from a number faked to look local.
+* pool — a concentration of distinct reported numbers in one NPA-NXX block.
+  By default reports with matching caller and consumer area codes are excluded; a match is only an indicator,
+  not proof of spoofing, ownership, allocation or a common operator.
+* repeat — one reported number appearing repeatedly.
+* area-code profile — share of reports with matching caller and consumer area codes.
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Hybrid search over the rented ranges: Relate full-text + vector SEARCH, merged by Reciprocal Rank Fusion.
+"""Hybrid search over ranges with complaint concentrations: Relate full-text + vector SEARCH, merged by Reciprocal Rank Fusion.
 
 Every pool gets a plain-English profile written from its graph neighbourhood (scam types people reported, the
 states they called into, toll-free or local, how many numbers and reports), stored on the campaign node with a

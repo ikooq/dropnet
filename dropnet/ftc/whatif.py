@@ -1,7 +1,7 @@
 """What-if analysis inside a Relate transaction, and one-file case export.
 
 whatif() writes candidate blocking rules as :Rule nodes in an explicit transaction, measures what they would
-have stopped by graph traversal, and rolls back — the store is never changed, and other readers never see the
+would match historical reports by graph traversal, and rolls back — the store is never changed, and other readers never see the
 hypothetical rules (Relate isolates uncommitted state).
 """
 from __future__ import annotations

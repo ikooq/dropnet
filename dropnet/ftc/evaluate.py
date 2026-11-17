@@ -1,7 +1,7 @@
 """Temporal hold-out: rules learned from earlier reports, scored on later reports.
 
 Baseline  = block every number reported >= `min_reports` times before the split (a classic blocklist).
-Dropnet   = the same numbers + every pool block (>= `min_numbers` distinct non-spoofed numbers before the split).
+Dropnet   = the same numbers + every pool block (>= `min_numbers` distinct numbers from reports without an area-code match before the split).
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ BLOCK_SIZE = 10_000
 
 def controls(conn: relate.Connection, split_day: str, min_numbers: int = 5, seeds: int = 5) -> dict:
     """Is a pool more than a random reported block? Same number of blocks, drawn at random from every block with a
-    non-spoofed report before the split; and how many pool rules never catch anything later (dormant)."""
+    report without an area-code match before the split; and how many pool rules never catch anything later (dormant)."""
     import random
     pools = {p["block"] for p in pool_campaigns(conn, min_numbers, exclude_neighbor=True, until_day=split_day)}
     candidates = sorted({r["b"] for r in rows(conn, """
@@ -58,7 +58,7 @@ def holdout(conn: relate.Connection, split_day: str, min_numbers: int = 5, min_r
                 "numbers_blocked": sum(n[:6] not in block_set for n in numbers) + BLOCK_SIZE * len(block_set),
                 "covered": len(hit), "coverage": share(hit),
                 "new_numbers_caught": sum(1 for t in hit if t["n"] not in train_counts),
-                # calls whose (spoofed) caller ID sits in a pool block: the block rule would also hit that number's owner
+                # Legacy key: reports with an area-code match; not verified spoofing or a count of innocent owners.
                 "spoofed_caught": sum(1 for t in hit if t["nb"] and t["n"] not in numbers)}
 
     from .parse import TOLL_FREE

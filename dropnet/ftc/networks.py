@@ -3,7 +3,8 @@
 Path behind every link (multi-hop, read straight off the graph):
 (Pool A)-[:USES_BLOCK]->(Block)<-[:IN_BLOCK]-(Number)<-[:FROM_NUMBER]-(Report)-[:VICTIM_AREA]->(AreaCode)
           <-[:VICTIM_AREA]-(Report)-[:FROM_NUMBER]->(Number)-[:IN_BLOCK]->(Block)<-[:USES_BLOCK]-(Pool B)
-with both reports on the same day and about the same subject. Spoofed reports are left out.
+with reports filed on the same day and in the same subject category. Reports with area-code matches are left out;
+the remaining reports are not confirmed to be unspoofed, and shared patterns do not prove a common operator.
 """
 from __future__ import annotations
 

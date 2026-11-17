@@ -91,7 +91,14 @@ def test_holdout_evaluation(g):
     assert ours["new_numbers_caught"] == 1
     assert ours["spoofed_caught"] == 0  # we never block local spoofed blocks
     # the cost of a block rule is reported, not hidden: every block rule covers 10,000 numbers
-    assert ours["numbers_blocked"] == ours["number_rules"] + 10_000 * ours["block_rules"]
+    assert ours["numbers_blocked"] < ours["number_rules"] + 10_000 * ours["block_rules"]  # overlapping number rules are counted once
     assert base["numbers_blocked"] == base["rules"]
     geo = res["dropnet_geographic"]  # the same rules without toll-free blocks (shared by many businesses)
     assert geo["block_rules"] == 0 and geo["covered"] == 1
+
+
+def test_advice_does_not_infer_owner_or_recommend_range_block():
+    for advice in campaigns.ADVICE.values():
+        assert advice["owner_likely_innocent"] is None
+        assert advice["block"] == "nothing"
+    assert "not proof" in campaigns.CAUTION

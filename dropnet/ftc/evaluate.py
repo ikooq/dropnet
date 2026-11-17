@@ -55,7 +55,7 @@ def holdout(conn: relate.Connection, split_day: str, min_numbers: int = 5, min_r
         hit = [t for t in test if t["n"] in numbers or t["b"] in block_set]
         return {"rules": len(numbers) + len(block_set), "number_rules": len(numbers), "block_rules": len(block_set),
                 # a block rule silences all 10,000 numbers of an NPA-NXX — reported as the price of the rule
-                "numbers_blocked": len(numbers) + BLOCK_SIZE * len(block_set),
+                "numbers_blocked": sum(n[:6] not in block_set for n in numbers) + BLOCK_SIZE * len(block_set),
                 "covered": len(hit), "coverage": share(hit),
                 "new_numbers_caught": sum(1 for t in hit if t["n"] not in train_counts),
                 # calls whose (spoofed) caller ID sits in a pool block: the block rule would also hit that number's owner

@@ -9,7 +9,7 @@ import relate
 from ..store import rows
 
 NOTE = ("Evidence from consumer reports, not proof of wrongdoing. A block rule covers all 10,000 numbers of the range; "
-        "toll-free ranges are shared by many businesses. Review before blocking.")
+        "toll-free ranges are shared by many businesses. spoofed_share is an area-code-match proxy, not verified spoofing. Legitimate-call impact is unknown. Review before blocking.")
 FIELDS = ["block", "toll_free", "reported_numbers", "reports", "states", "first_day", "last_day", "subjects",
           "spoofed_share", "fcc_complaints", "network", "note"]
 

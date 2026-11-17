@@ -23,9 +23,9 @@ def test_no_numbers_no_context(tmp_path):
 
 def test_context_for_spoofed_and_pool(tmp_path):
     ctx = hook.number_guard("Is (303) 555-0001 a scammer? Also check 866-771-0002 and +1 866 771 0003.", make(tmp_path))
-    assert "303-555-0001" in ctx and "likely spoofed" in ctx.lower()
+    assert "303-555-0001" in ctx and "area-code match" in ctx.lower()
     assert "866-771-0002" in ctx and "pool" in ctx.lower()
-    assert "innocent" in ctx  # the caution travels with every answer
+    assert "not proof" in ctx  # the caution travels with every answer
     assert ctx.count("866-771-") == 2
 
 

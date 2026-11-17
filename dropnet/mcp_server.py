@@ -140,7 +140,7 @@ def build_server(backend: Backend):
     @mcp.tool()
     def ftc_summary() -> dict:
         """REAL data: totals of the FTC Do Not Call reports graph (US, public) and, per scam type, the share of
-        calls from a number faked to look local (neighbor spoofing)."""
+        reports with matching caller and consumer area codes. This is not proof of spoofing."""
         return backend.call("ftc_summary", {})
 
     @mcp.tool()
@@ -151,22 +151,20 @@ def build_server(backend: Backend):
     @mcp.tool()
     def assess_number(number: str) -> dict:
         """Evidence about a phone number reported to the FTC: reports, states, scam types, its block's pool, and a
-        verdict (likely_spoofed / pool / repeat / single / unknown). ALWAYS relay the `caution` field: a spoofed
-        number usually belongs to an innocent person."""
+        verdict (likely_spoofed / pool / repeat / single / unknown). ALWAYS relay the `caution` field. Area-code matches are indicators, not proof of spoofing or ownership."""
         return backend.call("assess_number", {"number": number})
 
     @mcp.tool()
     def search_ranges(text: str, state: str | None = None, limit: int = 10) -> dict:
-        """Find rented number ranges by what people say about the calls ("Medicare back brace", "fake IRS agent"):
+        """Find ranges with complaint concentrations by what people say about the calls ("Medicare back brace", "fake IRS agent"):
         hybrid search over each range's profile (Relate full-text + vector SEARCH, rank fusion), optionally only
-        ranges that called into one US state."""
+        ranges reported by consumers in one US state."""
         return backend.call("search_ranges", {"text": text, "state": state, "limit": limit})
 
     @mcp.tool()
     def whatif_block(blocks: list[str] | None = None, numbers: list[str] | None = None,
                      since_day: str | None = None) -> dict:
-        """What would blocking these NPA-NXX blocks / numbers have stopped? Computed inside a Relate transaction
-        that is rolled back — nothing is written."""
+        """Count reports matching hypothetical NPA-NXX blocks or numbers. This does not measure prevented calls or legitimate-call impact. The transaction is rolled back."""
         return backend.call("whatif_block", {"blocks": blocks, "numbers": numbers, "since_day": since_day})
 
     @mcp.tool()

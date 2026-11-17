@@ -1,0 +1,22 @@
+{
+  "split_day": "2026-11-02",
+  "reports": 296273,
+  "test_filed": 103620,
+  "test_event_before_split": 10766,
+  "test_event_on_or_after_split_valid": 92712,
+  "test_invalid_date": 0,
+  "test_event_after_filing": 142,
+  "all_invalid_date": 0,
+  "all_event_after_filing": 373,
+  "missing_consumer_area": 5,
+  "filing_lag_days_p50_p90_p99": [
+    0,
+    6,
+    73
+  ],
+  "event_subset_baseline_coverage": 0.0349,
+  "event_subset_geographic_coverage": 0.1267,
+  "geographic_rules": 2872,
+  "geographic_unique_number_capacity": 28730391,
+  "note": "Training uses complaints filed before the split. Test includes only valid event dates on or after the split and not after filing, among complaints filed in the test window. It does not measure all calls or legitimate-call blocking. Missing consumer area codes are treated as non-matches by the existing pool heuristic."
+}

@@ -79,7 +79,7 @@ def export(conn: relate.Connection, out: Path | str, top: int = 50) -> dict:
                 f"reports from victims in {p['states']} states, {p['first']} → {p['last']}"
                 f"{' (toll-free range — shared by many businesses)' if p['tf'] else ''}.\n\n")
         if siblings:
-            body += "Moves in lockstep with: " + ", ".join(f"[[Pool/{s}]] ({n} shared area-day-scam slots)"
+            body += "Shares filing-day, consumer area and category patterns with: " + ", ".join(f"[[Pool/{s}]] ({n} shared area-day-scam slots)"
                                                           for s, n in siblings if s in ids) + ".\n\n"
         body += f"> {CAUTION}\n"
         _note(out / "Pool" / f"{p['id']}.md", "Pool",
@@ -93,7 +93,7 @@ def export(conn: relate.Connection, out: Path | str, top: int = 50) -> dict:
               f"NPA-NXX {blk[:3]}-{blk[3:]}: 10,000 numbers. Blocking it is a carrier's decision.")
     for n in nets:
         _note(out / "Network" / f"{n['id']}.md", "Network", {"pools": n["pools"], "reports": n["reports"]}, {},
-              "Number ranges that hit the same victims' area codes, on the same days, with the same scam type.")
+              "Ranges with matching consumer area codes, complaint filing days and categories; this does not establish a common operator.")
     for s in subjects:
         _note(out / "Subject" / f"{s}.md", "Subject", {"label": SUBJECT_LABEL.get(s, s)}, {}, SUBJECT_LABEL.get(s, s))
     (out / "README.md").write_text(VAULT_README, encoding="utf-8")

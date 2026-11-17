@@ -15,23 +15,23 @@ from .parse import SUBJECT_LABEL, TOLL_FREE
 
 POOL_MIN_NUMBERS = 5
 REPEAT_MIN_REPORTS = 100
-CAUTION = ("Caller ID is easily faked. A number reported once, from the victim's own area code, is most likely "
-           "spoofed — its real owner may be innocent. Treat this as evidence about a call, not about a person.")
+CAUTION = ("FTC reports are unverified complaints. Caller ID can be spoofed; an area-code match is only a "
+           "possible indicator, not proof of spoofing or of the owner's identity or conduct. "
+           "A reported range does not establish a common operator. Do not blame a number's owner.")
 
-
-# What to do, not only what is known: in a live test an agent that was told "the owner is probably innocent" still
-# blocked the owner's number "to be safe" in 9 of 14 cases. The tool now says it in words.
+# Compatibility: verdict names are retained for existing clients; they describe heuristics, not verified facts.
 ADVICE = {
-    "likely_spoofed": {"block": "nothing", "owner_likely_innocent": True,
-                       "say": "Do not block this number or its range and do not blame its owner: the caller faked it to "
-                              "look local, so a block would cut off an innocent subscriber. Report the call to the FTC."},
-    "pool": {"block": "range", "owner_likely_innocent": False,
-             "say": "Block the range (the first six digits): scammers rotate through it, so a range rule also stops "
-                    "numbers nobody has reported yet. It silences 10,000 numbers, so it is a carrier's decision."},
-    "repeat": {"block": "number", "owner_likely_innocent": False,
-               "say": "Block this number: it was reported again and again from other area codes."},
+    "likely_spoofed": {"block": "nothing", "owner_likely_innocent": None,
+                       "say": "The area codes match in each report. This may indicate spoofing, but does not prove it. "
+                              "Do not infer the owner's identity or conduct; report suspicious calls."},
+    "pool": {"block": "nothing", "owner_likely_innocent": None,
+             "say": "The range has a concentration of reported numbers. Investigate the evidence; a range rule "
+                    "can affect up to 10,000 numbers, and legitimate-call impact is unknown."},
+    "repeat": {"block": "nothing", "owner_likely_innocent": None,
+               "say": "This number appears in several complaints. Caller ID can be spoofed; review the evidence "
+                      "before making a decision."},
     "single": {"block": "nothing", "owner_likely_innocent": None,
-               "say": "Not enough evidence to block or blame: one or two reports and no pool behind it."},
+               "say": "There is limited evidence in the loaded reports. Do not infer who made the call."},
     "unknown": {"block": "nothing", "owner_likely_innocent": None,
                 "say": "No FTC reports for this number in the loaded window; that does not prove it is safe."},
 }

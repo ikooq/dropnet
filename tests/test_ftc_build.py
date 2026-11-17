@@ -33,3 +33,21 @@ def test_build_end_to_end(tmp_path):
     conn = store.open_store(target, read_only=True)
     assert store.rows(conn, "MATCH (c:FtcCampaign {id: 'POOL-866771'}) RETURN c.numbers AS n")[0]["n"] == 6
     conn.close()
+
+
+def test_failed_clone_preserves_previous_snapshot(tmp_path, monkeypatch):
+    import subprocess
+    import pytest
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    with gzip.open(raw / "sample.csv.gz", "wt", encoding="utf-8") as f:
+        f.write(HEADER + "8667710001,2026-11-01,2026-11-01,Denver,Colorado,303,Other,Y\n")
+    out = tmp_path / "ftc.rl"
+    out.write_bytes(b"previous snapshot")
+    monkeypatch.setattr(build, "relate_cli", lambda: "relate")
+    def fail(*args, **kwargs):
+        raise subprocess.CalledProcessError(1, "relate clone")
+    monkeypatch.setattr(build.subprocess, "run", fail)
+    with pytest.raises(subprocess.CalledProcessError):
+        build.build(out=out, raw=raw, eval_path=tmp_path / "eval.json", log=lambda *_: None)
+    assert out.read_bytes() == b"previous snapshot"

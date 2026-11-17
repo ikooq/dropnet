@@ -11,7 +11,7 @@ from . import config, store
 from .ftc.campaigns import CAUTION, assess_number
 
 US_PHONE = re.compile(r"(?<!\d)(?:\+?1[\s.-]?)?\(?([2-9]\d{2})\)?[\s.-]?(\d{3})[\s.-]?(\d{4})(?!\d)")
-LABEL = {"likely_spoofed": "LIKELY SPOOFED — reported once, from the victim's own area code",
+LABEL = {"likely_spoofed": "POSSIBLE LOCAL AREA-CODE MATCH — one or two reports from the same area code",
          "pool": "part of a NUMBER POOL (many reported numbers in the same NPA-NXX block)",
          "repeat": "REPEATEDLY reported", "single": "reported once", "unknown": "not in the FTC reports"}
 
@@ -44,7 +44,7 @@ def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl"
                 lines.append(f"- {pretty}: {LABEL['unknown']}.")
                 continue
             lines.append(f"- {pretty}: {LABEL[a['verdict']]}; {a['reports']} reports in {a['states']} states, "
-                         f"scam types {', '.join(a['subjects'][:3])}; {a['neighbor_share']:.0%} spoofed-local; "
+                         f"scam types {', '.join(a['subjects'][:3])}; {a['neighbor_share']:.0%} area-code match; "
                          f"block {a['block'][:3]}-{a['block'][3:]} has {a['block_numbers']} reported numbers.")
         lines.append(f"Caution for your answer: {CAUTION} Do not call the number's owner a scammer; describe the "
                      f"reports. Use the dropnet MCP tool assess_number for details.")

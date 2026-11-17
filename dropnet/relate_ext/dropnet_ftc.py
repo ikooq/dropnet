@@ -1,7 +1,7 @@
 """dropnet-ftc — a Relate command extension: `relate run dropnet-ftc --path <FTC csv dir> -d graph`.
 
 Reads FTC Do Not Call complaint files (.csv / .csv.gz), writes the call graph into the store Relate owns,
-then finds the rented number ranges (pools) with Cypher — the same method as the full Dropnet build.
+then finds the ranges with complaint concentrations (pools) with Cypher — the same method as the full Dropnet build.
 Standard library only: Relate installs this one file and spawns it; the host owns the store (MCP stdio).
 """
 
@@ -129,8 +129,8 @@ def walk(client, envelope):
     found = client.call("read_cypher", {"statement": "MATCH (c:FtcCampaign) RETURN count(c) AS pools"})
     row = (found.get("rows") or [{}])[0]
     client.call("report_output", {
-        "text": f"{NAME}: {total:,} FTC reports -> {row.get('pools', 0):,} rented number ranges (pools) "
-                f">= {m} numbers, spoofed reports excluded",
+        "text": f"{NAME}: {total:,} FTC reports -> {row.get('pools', 0):,} ranges with complaint concentrations (pools) "
+                f">= {m} numbers, area-code matches excluded",
         "starters": ["MATCH (c:FtcCampaign) RETURN c.id, c.numbers, c.reports ORDER BY c.reports DESC LIMIT 10",
                      "MATCH (c:FtcCampaign)-[:USES_BLOCK]->(b)<-[:IN_BLOCK]-(n:Number) "
                      "RETURN c.id, collect(n.number)[..5] LIMIT 5"]})

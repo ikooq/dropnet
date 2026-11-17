@@ -272,24 +272,23 @@ async function loadReal() {
     $("#real-lede").innerHTML = `Real FTC data is not built yet — run <code>python -m dropnet ftc-build</code>.`; return false;
   }
   $("#real-lede").innerHTML = `<b>${s.reports.toLocaleString()}</b> real complaints about unwanted calls, filed with the US
-    Federal Trade Commission between ${esc(s.first_day)} and ${esc(s.last_day)}, live in one Relate file. Most of the numbers
-    behind them were reported only once — so a blocklist of numbers is always one step behind.`;
+    Federal Trade Commission between ${esc(s.first_day)} and ${esc(s.last_day)}, live in one Relate file. Most reported numbers appeared only once; ranges offer another way to explore patterns.`;
   $("#real-kpis").innerHTML = [[s.reports.toLocaleString(), "reports"], [s.numbers.toLocaleString(), "reported numbers"],
-    [pct(s.single_report_numbers_share), "numbers reported only once"], [pct(s.neighbor_share), "spoofed to look local"],
+    [pct(s.single_report_numbers_share), "numbers reported only once"], [pct(s.neighbor_share), "area codes match"],
     [(s.campaigns.pool || 0).toLocaleString(), "number pools found"]].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
   const ev = s.eval;
   if (ev) {
     ftcSplit = ev.split_day;
     const max = Math.max(ev.dropnet.coverage, ev.blocklist_all_seen.coverage);
     $("#eval-caption").innerHTML = `Rules learned from reports before ${esc(ev.split_day)} (${ev.train_reports.toLocaleString()}),
-      scored on the ${ev.test_reports.toLocaleString()} reports that came after. Share of later reports each rule set would have caught:`;
+      scored on the ${ev.test_reports.toLocaleString()} reports that came after. Share of later-filed reports matching each rule set (not necessarily calls after the split):`;
     $("#eval-bars").innerHTML = hbar(`Block every number ever reported (${ev.blocklist_all_seen.rules.toLocaleString()} rules)`, ev.blocklist_all_seen.coverage, max)
       + hbar(`Blocklist: numbers with ≥2 reports (${ev.baseline.rules.toLocaleString()})`, ev.baseline.coverage, max)
       + (ev.dropnet_geographic ? hbar(`<b>Dropnet</b>, geographic pool blocks only (+${ev.dropnet_geographic.block_rules.toLocaleString()})`, ev.dropnet_geographic.coverage, max, true) : "")
       + hbar(`<b>Dropnet</b>, all pool blocks incl. toll-free (+${ev.dropnet.block_rules.toLocaleString()})`, ev.dropnet.coverage, max, true)
-      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} catches came from numbers nobody had reported before. The price: a
-        block rule silences all 10,000 numbers of its range (${(ev.dropnet.numbers_blocked / 1e6).toFixed(1)} M numbers vs
-        ${ev.baseline.numbers_blocked.toLocaleString()} for the blocklist), and toll-free ranges are shared by many businesses — blocking is a carrier's call.</p>`;
+      + `<p class="muted">${ev.dropnet.new_numbers_caught.toLocaleString()} matching reports involved numbers absent from training. The price: a
+        block rule can affect up to 10,000 possible numbers in its range (${(ev.dropnet.numbers_blocked / 1e6).toFixed(1)} M numbers vs
+        ${ev.baseline.numbers_blocked.toLocaleString()} for the blocklist), and toll-free ranges are shared by many businesses — legitimate-call impact is unknown.</p>`;
   }
   const prof = s.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share);
   $("#spoof-bars").innerHTML = prof.map((p) => hbar(esc(p.label), p.neighbor_share, 1)).join("");
@@ -297,9 +296,8 @@ async function loadReal() {
   if (nets.length) {
     const n = nets[0];
     $("#net-panel").style.display = "";
-    $("#net-panel").innerHTML = `<h2>One operation, ${n.pools} number ranges</h2>
-      <p class="muted">These ranges hit the same victims' area codes, on the same days, with the same scam type — at least
-      10 times per pair. Read straight off the graph: Pool → Block → Number → Report → AreaCode ← Report ← … ← Pool.</p>
+    $("#net-panel").innerHTML = `<h2>${n.pools} ranges with related complaint patterns</h2>
+      <p class="muted">Reports share consumer area codes, filing days and categories at least 10 times per pair. This does not prove a common operator. Read straight off the graph: Pool → Block → Number → Report → AreaCode ← Report ← … ← Pool.</p>
       <p><b>${n.reports.toLocaleString()}</b> reports · <b>${(n.numbers || 0).toLocaleString()}</b> reported numbers</p>
       <div class="whatif-pick">${n.members.map((m) => `<label data-id="${esc(m.id)}" style="cursor:pointer">${esc(m.id.replace("POOL-", ""))} · ${m.reports.toLocaleString()}</label>`).join("")}</div>`;
     $("#net-panel").querySelectorAll("label[data-id]").forEach((l) => l.addEventListener("click", () => openFtc(l.dataset.id)));
@@ -341,7 +339,7 @@ async function openFtc(id) {
   $("#ftc-legend").innerHTML = [["Block (NPA-NXX)", C.Block], ["Reported number", C.Number], ["Victim state", C.State], ["Scam type", C.Subject]]
     .map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join("") + "<span>node size = reports</span>";
   const picks = ftcCampaigns.slice(0, 12);
-  $("#ftc-whatif").innerHTML = `<b>What if we had blocked these pools on day one?</b>
+  $("#ftc-whatif").innerHTML = `<b>How many later-filed reports match these ranges?</b>
     <div class="whatif-pick">${picks.map((c) => `<label><input type="checkbox" value="${esc(c.id.replace("POOL-", ""))}" ${c.id === id ? "checked" : ""}> ${esc(c.id.replace("POOL-", ""))}</label>`).join("")}</div>
     <button class="primary" id="whatif-go">Run what-if</button> <span class="muted">Runs inside a Relate transaction, then rolls back — nothing is written.</span>
     <div id="whatif-out"></div>`;
@@ -350,18 +348,18 @@ async function openFtc(id) {
     try {
       const r = await post("api/ftc/whatif", { blocks, since_day: ftcSplit });
       $("#whatif-out").innerHTML = `<p>Reports filed from ${esc(ftcSplit || "the first day")}: <b>${r.reports_stopped.toLocaleString()}</b> from
-        <b>${r.numbers_covered.toLocaleString()}</b> numbers would have been stopped by ${r.rules} block rule${r.rules > 1 ? "s" : ""}
+        <b>${r.numbers_covered.toLocaleString()}</b> numbers matched ${r.rules} block rule${r.rules > 1 ? "s" : ""}
         (each block covers 10,000 numbers); ${r.campaigns_touched.length} campaigns touched.
-        ${r.spoofed_reports_in_scope ? `<br><span class="muted">${r.spoofed_reports_in_scope.toLocaleString()} of them were spoofed-local calls — a block would also hit those numbers' real owners.</span>` : ""}</p>`;
+        ${r.spoofed_reports_in_scope ? `<br><span class="muted">${r.spoofed_reports_in_scope.toLocaleString()} matching reports had matching area codes; this does not prove spoofing.</span>` : ""}</p>`;
     } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   });
 }
 async function assess(number) {
   $("#num-in").value = fmtNum(number);
   const a = await api(`api/ftc/number/${encodeURIComponent(number)}`);
-  const label = { likely_spoofed: "Likely spoofed", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
+  const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
-    ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} spoofed-local · block ${esc(a.block)} has
+    ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
     ${a.block_numbers} reported numbers · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
   document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
 }

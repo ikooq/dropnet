@@ -29,8 +29,7 @@ function hbar(label, value, max, ours) {
 function renderStatic() {
   const s = data.summary, ev = data.eval;
   $("#lede").innerHTML = `People reported <b>${fmt(s.reports)}</b> unwanted calls to the FTC between ${day(s.first_day)} and
-    ${day(s.last_day, true)}. <b>${pct(s.single_report_numbers_share)}</b> of the numbers were reported only once: scammers don't
-    reuse a number, they rotate through ranges they rent. So Dropnet looks at the range.`;
+    ${day(s.last_day, true)}. <b>${pct(s.single_report_numbers_share)}</b> of the numbers were reported only once. Dropnet groups complaints by number range to help analysts investigate patterns.`;
   if (ev) {
     const max = Math.max(ev.dropnet.coverage, ev.blocklist_all_seen.coverage);
     $("#eval-caption").innerHTML = `Rules learned from the ${fmt(ev.train_reports)} reports before ${day(ev.split_day)}, then
@@ -40,20 +39,13 @@ function renderStatic() {
       + (ev.dropnet_geographic ? hbar(`Dropnet: also block ${fmt(ev.dropnet_geographic.block_rules)} local ranges`, ev.dropnet_geographic.coverage, max, true) : "")
       + hbar(`Dropnet: plus toll-free ranges`, ev.dropnet.coverage, max, true);
     const rb = ev.robustness;
-    $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} of the calls caught came from numbers nobody had
-      reported yet.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet caught at
-      least ${rb.rolling_summary.min_lift.toFixed(1)} times as many calls every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""} The price: a range rule silences all
-      10,000 numbers in it, so this is a ranking for a carrier to decide on, not an automatic block.`;
+    $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} later reports matched numbers not previously reported.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet matched at
+      least ${rb.rolling_summary.min_lift.toFixed(1)} times as many reports every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""} The price: a range rule can affect up to
+      10,000 numbers; legitimate-call impact is unknown.`;
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
     .map((p) => hbar(esc(LABEL[p.subject] || p.label), p.neighbor_share, 1)).join("");
-  const la = ev && ev.live_agent;
-  if (la) {
-    const off = la.without_dropnet, on = la.with_dropnet;
-    $("#agent-note").innerHTML = `We asked a real AI agent what to do about ${on.answered} reported numbers. Without Dropnet it
-      blocked the innocent owner's number for <b>${off.spoofed_owner_blamed} of ${off.spoofed_total}</b> faked calls. With
-      Dropnet's tool: <b>${on.spoofed_owner_blamed} of ${on.spoofed_total}</b>, and the right action for ${on.block_correct} of ${on.answered}.`;
-  }
+  $("#agent-note").textContent = "A historical agent experiment measured agreement with Dropnet's own labels and advice, not independently verified spoofing or correct blocking decisions.";
   $("#source").textContent = data.caution;
 }
 
@@ -93,24 +85,24 @@ function renderNetworkAndWhatIf() {
   if (n) {
     const el = $("#net-panel");
     el.hidden = false;
-    el.innerHTML = `<h2>One operation behind ${n.pools} ranges</h2>
-      <p class="quiet">These ranges called the same area codes on the same days with the same scam: ${fmt(n.reports)} reports
-      in all, linked by paths in the graph. Open one to see its numbers.</p>
+    el.innerHTML = `<h2>${n.pools} ranges with related complaint patterns</h2>
+      <p class="quiet">Reports for these ranges share consumer area codes, filing days and complaint categories: ${fmt(n.reports)} reports
+      in all. The links do not prove a common operator. Open one to see its numbers.</p>
       <ul class="chips">${n.members.map((m) => `<li><button data-id="${esc(m.id)}"><b>${esc(rangeOf(m.id.replace("POOL-", "")))}</b> ${fmt(m.reports)} reports</button></li>`).join("")}</ul>`;
     el.querySelectorAll("button[data-id]").forEach((b) => b.addEventListener("click", () => { openPool(b.dataset.id); $(".pools").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); }));
   }
   const top = q("MATCH (c:Pool) RETURN c.id AS id, c.reports AS r ORDER BY r DESC LIMIT 12");
   $("#whatif").innerHTML = `<h2>What if a carrier had blocked these ranges?</h2>
-    <p class="quiet">Pick ranges and count the reported calls they would have stopped. The count runs as Cypher on this page.</p>
+    <p class="quiet">Pick ranges and count reports whose caller IDs match them. These are filing dates, not necessarily call dates. The count runs as Cypher on this page.</p>
     <ul class="chips">${top.map((c, i) => `<li><label><input type="checkbox" value="${esc(c.id)}" ${i < 3 ? "checked" : ""}> <b>${esc(rangeOf(c.id.replace("POOL-", "")))}</b></label></li>`).join("")}</ul>
-    <button class="go small" id="wi-go">Count the calls stopped</button><div id="wi-out"></div>`;
+    <button class="go small" id="wi-go">Count matching reports</button><div id="wi-out"></div>`;
   $("#wi-go").addEventListener("click", () => {
     const ids = [...document.querySelectorAll("#whatif input:checked")].map((x) => x.value);
     const r = q(`MATCH (c:Pool) WHERE c.id IN $ids
                  RETURN count(c) AS rules, sum(c.reports) AS reports, sum(c.numbers) AS numbers`, { ids })[0];
-    $("#wi-out").innerHTML = r.rules ? `<p><b>${fmt(r.reports)}</b> reported calls from <b>${fmt(r.numbers)}</b> different numbers
-      would have been stopped by ${r.rules} rule${r.rules === 1 ? "" : "s"}. The price: ${fmt(r.rules * 10000)} numbers silenced,
-      some of them belonging to legitimate callers. That decision belongs to the carrier.</p>`
+    $("#wi-out").innerHTML = r.rules ? `<p><b>${fmt(r.reports)}</b> eligible reports from <b>${fmt(r.numbers)}</b> different numbers
+      matched ${r.rules} rule${r.rules === 1 ? "" : "s"}. A rule could affect up to ${fmt(r.rules * 10000)} numbers,
+      some belonging to legitimate callers. Pool totals exclude area-code matches; this is not an estimate of all affected traffic.</p>`
       : `<p class="quiet">Pick at least one range.</p>`;
   });
 }
@@ -225,18 +217,18 @@ function caption(L, block) {
   $("#grid-cap").innerHTML = reported
     ? `<b>${esc(rangeOf(block))}</b>: ${reported === 1 ? "1 of its 10,000 numbers was" : `${fmt(reported)} of its 10,000 numbers were`}
        reported, ${reports === 1 ? "once" : `${fmt(reports)} times in all`}.
-       ${b ? "Dropnet marks it as a rented range." : spoof === reported ? "Every report had a faked local caller ID, so Dropnet does not mark it." : "Too few numbers for Dropnet to mark it as a rented range."}`
+       ${b ? "This range meets the complaint concentration threshold." : spoof === reported ? "Each reported number has an area-code match; this is not proof of spoofing." : "Too few numbers meet the threshold for a concentration."}`
     : `<b>${esc(rangeOf(block))}</b>: none of its 10,000 numbers were reported.`;
 }
 
 const VERDICT = {
-  s: ["likely_spoofed", "Probably a faked caller ID", "Every report came from the victim's own area code, which is how spoofers make a call look local. The person who owns this number is probably innocent. Don't call it back to complain."],
-  p: ["pool", "Part of a rented scam range", "This number sits in a range scammers rotate through. Blocking the range stops numbers that haven't been reported yet."],
+  s: ["likely_spoofed", "Area-code match in reports", "The caller and consumer area codes match in each report. This may indicate spoofing, but it does not prove it or identify the caller."],
+  p: ["pool", "In a range with concentrated complaints", "Several numbers in this range appear in complaints. This does not establish who made the calls or a common operator."],
   r: ["pool", "Reported again and again", "People in other area codes reported this one number many times."],
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
 async function check(raw, example = false) {
-  const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "").slice(-10);
+  const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
   if (n.length !== 10) { $("#num-out").innerHTML = `<p>Enter a 10-digit US number, like 866-771-6581.</p>`; return; }
   if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
   let L;
@@ -250,14 +242,14 @@ async function check(raw, example = false) {
     const [cls, title, why] = VERDICT[hit.code] || VERDICT["1"];
     html = `<p class="verdict ${cls}">${title}</p><p>Reported ${fmt(hit.reports)} time${hit.reports > 1 ? "s" : ""} to the FTC between ${esc(L.span)}. ${why}</p>`;
   } else if (block) {
-    html = `<p class="verdict pool">Never reported, but it sits in a rented scam range</p><p>${fmt(block.numbers)} numbers from
-      ${esc(rangeOf(n.slice(0, 6)))} were reported ${fmt(block.reports)} times.${data.eval ? ` In our test, ${fmt(data.eval.dropnet.new_numbers_caught)} later calls came from numbers like this one.` : ""}</p>`;
+    html = `<p class="verdict pool">Not reported in this window, but its range has concentrated complaints</p><p>${fmt(block.numbers)} numbers from
+      ${esc(rangeOf(n.slice(0, 6)))} were reported ${fmt(block.reports)} times.${data.eval ? ` In our test, ${fmt(data.eval.dropnet.new_numbers_caught)} later complaints involved numbers absent from the training reports.` : ""}</p>`;
   } else {
     html = `<p class="verdict">No reports for this number or its range</p><p class="quiet">Between ${esc(L.span)}. That doesn't prove the call was safe.</p>`;
   }
   $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`
-    + (hit && hit.code === "s" ? "" : `<div class="caution">${esc(data.caution)}</div>`);
+    + `<div class="caution">${esc(data.caution)}</div>`;
 }
 $("#num-form").addEventListener("submit", (e) => { e.preventDefault(); check($("#num-in").value); });
 
@@ -269,7 +261,7 @@ $("#grid").addEventListener("mousemove", (e) => {
   const i = y * 100 + x, rec = grid.cells.get(i), num = `${grid.block.slice(0, 3)}-${grid.block.slice(3)}-${String(i).padStart(4, "0")}`;
   tip.hidden = false;
   tip.style.left = `${e.clientX - r.left}px`; tip.style.top = `${e.clientY - r.top}px`;
-  tip.textContent = rec ? `${num}: ${fmt(rec.reports)} report${rec.reports > 1 ? "s" : ""}${rec.code === "s" ? ", faked caller ID" : ""}` : `${num}: not reported`;
+  tip.textContent = rec ? `${num}: ${fmt(rec.reports)} report${rec.reports > 1 ? "s" : ""}${rec.code === "s" ? ", area-code match" : ""}` : `${num}: not reported`;
 });
 $("#grid").addEventListener("mouseleave", () => { tip.hidden = true; });
 $("#grid").addEventListener("click", (e) => {

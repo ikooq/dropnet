@@ -1,12 +1,4 @@
-"""How would an agent answer "is this number a scammer?" without and with the Dropnet graph?
-
-Naive agent (no graph): any reported number is a scammer; a number reported only once is not worth a look.
-Dropnet agent: the verdict of `assess_number` (likely_spoofed / pool / repeat / single).
-
-Two mistakes of the naive agent are counted on a random sample of reported numbers:
-* blaming the owner of a likely-spoofed number (reported once, from the victim's own area code), and
-* dismissing a once-reported number that belongs to an active pool.
-"""
+"""Count heuristic categories in a sample; this is not an evaluation against independent truth."""
 from __future__ import annotations
 
 import random
@@ -27,7 +19,7 @@ def run(conn: relate.Connection, n: int = 1000, seed: int = 0) -> dict:
         a = assess_number(conn, num)
         verdicts[a["verdict"]] += 1
         if a["verdict"] == "likely_spoofed":
-            blames += 1  # naive: "reported -> scammer" -> accuses an innocent owner
+            blames += 1  # naive accusation on an area-code match: ownership is unknown
         if a["reports"] == 1 and a["verdict"] == "pool":
             dismisses += 1  # naive: "only one report" -> ignores a pool member
     k = len(sample)

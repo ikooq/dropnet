@@ -47,7 +47,7 @@ def test_ftc_campaigns_graph_assess(client):
     assert g["nodes"] and g["edges"]
     assert client.get("/api/ftc/campaigns/POOL-000000/graph").status_code == 404
     a = client.get("/api/ftc/number/(303) 555-0001").json()
-    assert a["verdict"] == "likely_spoofed" and "innocent" in a["caution"]
+    assert a["verdict"] == "likely_spoofed" and "not proof" in a["caution"]
 
 
 def test_ftc_whatif_and_export(client):

@@ -51,16 +51,36 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
     finally:
         conn.close()
     out = Path(out)
-    store.reset_store(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     cli = relate_cli()
     if cli:  # a compact Parquet bundle: ~40 MB instead of ~150 MB, fits a git repo
-        subprocess.run([cli, "clone", str(work), str(out), "--to-snapshot-format", "parquet"], check=True,
-                       env={**os.environ, "RELATE_TELEMETRY": "off"}, capture_output=True)
+        # Clone alongside the destination; preserve the old snapshot if cloning fails.
+        with tempfile.TemporaryDirectory(prefix="dropnet-snapshot-", dir=out.parent) as staging:
+            candidate = Path(staging) / out.name
+            subprocess.run([cli, "clone", str(work), str(candidate), "--to-snapshot-format", "parquet"], check=True,
+                           env={**os.environ, "RELATE_TELEMETRY": "off"}, capture_output=True)
+            check = store.open_store(candidate, read_only=True)
+            try:
+                store.rows(check, "MATCH (r:Report) RETURN count(r) AS n")
+            finally:
+                check.close()
+            os.replace(candidate, out)
     else:
         out = out.with_suffix("")  # directory mode: same graph, no compaction without the Relate CLI
         log(f"Relate CLI not found: keeping the graph as a directory store at {out} (larger, ~100 MB).")
-        shutil.rmtree(out, ignore_errors=True)
-        shutil.copytree(work, out)
+        # Do not destroy an existing directory store if copying fails.
+        with tempfile.TemporaryDirectory(prefix="dropnet-directory-", dir=out.parent) as staging:
+            candidate = Path(staging) / "graph"
+            backup = Path(staging) / "previous"
+            shutil.copytree(work, candidate)
+            if out.exists():
+                os.replace(out, backup)
+            try:
+                os.replace(candidate, out)
+            except Exception:
+                if backup.exists():
+                    os.replace(backup, out)
+                raise
     shutil.rmtree(work.parent, ignore_errors=True)
     result.update({"stats": stats, "campaigns": n, "seconds": round(time.perf_counter() - t0, 1),
                    "store_mb": round(out.stat().st_size / 1e6, 1) if out.is_file() else None,

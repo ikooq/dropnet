@@ -1,14 +1,6 @@
-"""A real AI agent (Claude Code, headless) answers about real reported numbers — with and without Dropnet's MCP tool.
+"""Historical agent experiment: agreement with Dropnet's heuristic labels, not independent ground truth.
 
-The agent is asked what a person should do about a number that called them. Ground truth comes from the raw FTC
-facts behind each number, the same rule `campaigns.assess_number` applies:
-  likely_spoofed — every report came from the victim's own area code and there are at most two: the owner is
-                   probably innocent, block nothing;
-  rented_range   — its NPA-NXX block has >= 5 distinct non-spoofed reported numbers: block the range;
-  repeat_caller  — 3+ reports, not in a pool: block the number;
-  single_report  — one or two reports, nothing else: not enough to act.
-Each run is isolated: an empty working directory, project settings only, no built-in tools (no web, no shell), and
-in the "with" arm one MCP tool, `assess_number`, from the Dropnet server.
+Saved results predate the cautious advice now returned by assess_number. Rerunning invokes an external agent.
 """
 from __future__ import annotations
 
@@ -23,14 +15,14 @@ from pathlib import Path
 from .. import config
 
 VERDICTS = ["likely_spoofed", "rented_range", "repeat_caller", "single_report", "unknown"]
-TRUTH = {"s": ("likely_spoofed", True, "nothing"), "p": ("rented_range", False, "range"),
-         "r": ("repeat_caller", False, "number"), "1": ("single_report", None, "nothing")}
+TRUTH = {"s": ("likely_spoofed", None, "nothing"), "p": ("rented_range", None, "nothing"),
+         "r": ("repeat_caller", None, "nothing"), "1": ("single_report", None, "nothing")}
 PROMPT = """Someone in the US got an unwanted call from {number}. They ask:
 "Is the owner of this number the scammer, and what should my phone carrier block?"
 
 Answer with one JSON object and nothing else:
 {{"verdict": one of {verdicts},
-  "owner_likely_innocent": true or false,
+  "owner_likely_innocent": true, false, or null when unknown,
   "block": one of ["range", "number", "nothing"],
   "reason": one short sentence}}
 "range" means the whole block of 10,000 numbers that share the first six digits."""
@@ -96,7 +88,7 @@ def score(rows: list[dict]) -> dict:
             "answered": n,
             "verdict_correct": sum(1 for c, a in got if a.get("verdict") == TRUTH[c][0]),
             "block_correct": sum(1 for c, a in got if a.get("block") == TRUTH[c][2]),
-            # the harm we care about: an innocent owner blamed, or their number / range blocked
+            # Legacy metric name: counts assertions or blocking recommendations for area-code matches; not verified harm.
             "spoofed_owner_blamed": sum(1 for a in spoof if a.get("owner_likely_innocent") is False or a.get("block") in ("number", "range")),
             "spoofed_total": len(spoof),
             "pool_range_blocked": sum(1 for a in pool if a.get("block") == "range"),
@@ -146,7 +138,7 @@ def run(model: str = "haiku", per: dict[str, int] | None = None, seed: int = 0, 
         rows.append(row)
         log(f"{i + 1}/{len(nums)} {n} {code}: without={(row['without'].get('answer') or {}).get('verdict')} "
             f"with={(row['with'].get('answer') or {}).get('verdict')}")
-    result = {"model": model, "seed": seed, "per_category": per, "numbers": len(nums), "score": score(rows), "rows": rows}
+    result = {"model": model, "seed": seed, "per_category": per, "numbers": len(nums), "score": score(rows), "rows": rows, "evaluation_note": "Agreement with heuristic labels and a cautious policy, not independently validated truth."}
     out = out or config.DATA_DIR / "ftc" / "live_agent_eval.json"
     Path(out).write_text(json.dumps(result, indent=1), encoding="utf-8")
     return result

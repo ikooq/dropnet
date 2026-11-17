@@ -56,7 +56,7 @@ def test_relate_run_finds_pools(tmp_path):
     r = subprocess.run([cli, "run", "dropnet-ftc", "--path", str(fixture(tmp_path, filler=1500)), "-d", str(db)],
                        capture_output=True, text=True, env=env, timeout=120)
     assert r.returncode == 0, r.stderr
-    assert "1,525 FTC reports -> 1 rented number ranges" in r.stdout
+    assert "1,525 FTC reports -> 1 ranges with complaint concentrations" in r.stdout
     conn = store.open_store(db, read_only=True)
     pools = store.rows(conn, "MATCH (c:FtcCampaign) RETURN c.id AS id, c.numbers AS n")
     conn.close()

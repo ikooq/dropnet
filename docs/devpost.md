@@ -1,92 +1,45 @@
-# Devpost submission draft — Dropnet
+# Dropnet — Devpost submission draft
 
-**Tagline (≤ 200 chars):** 296,273 real phone-scam reports in one Relate file. Dropnet finds the number pools behind
-them — 3× what a blocklist catches — and never blames people whose numbers were spoofed.
+**Tagline:** Connect individual unwanted-call complaints to range-level patterns, with evidence and uncertainty, in a portable Relate graph.
 
-## Inspiration
-Every day about 13,000 people report unwanted calls to the US Federal Trade Commission. Each report names one number,
-so the standard defence is a blocklist of numbers. We loaded 35 days of those reports and found why it fails: 92 % of
-the 248,930 reported numbers appear exactly once. Scammers rotate numbers faster than a list can grow. And 37 % of the
-calls came from a number faked to carry the victim's own area code — numbers that belong to innocent neighbours.
+**Demo:** https://ikooq.github.io/dropnet/
 
-## What it does
-Dropnet turns the reports into a graph — report → number → NPA-NXX block → area code, plus scam type, victim state and
-spoofing — and looks for *pools*: rented number ranges where many different reported numbers share a block, the same
-scam types and victims in dozens of states. A pool is invisible in any single report and obvious in the graph.
+**Code:** https://github.com/ikooq/dropnet
 
-- **Real results, measured honestly.** Rules learned from reports before 2 Nov, scored on the 103,620 reports that came
-  after: a blocklist of every number with ≥ 2 reports (11,968 rules) would have caught 4.3 %; blocking every number
-  ever reported (163,606 rules) 6.2 %; those numbers plus 2,872 geographic pool ranges 14.3 % (22.0 % with toll-free
-  ranges). 17,532 catches came from numbers nobody had reported before. We show the price too: a range rule silences
-  10,000 numbers, so Dropnet ranks ranges for a carrier's decision rather than blocking anything.
-- **Confirmed by a second agency.** 49 of the 50 largest pools (98 %) also show up in the FCC's separate consumer
-  complaints for the same weeks — versus 9.2 % of random reported blocks.
-- **Pools are signal, not noise.** Control: the same number of *random* reported blocks catches 4.4 % of later reports;
-  the pool blocks catch 20.3 % — a 4.7× lift. 83 % of pool rules caught at least one later report.
-- **Not one lucky split.** 27 rolling train/test splits: Dropnet beats the blocklist in 27 of 27 (lift ≥ 2.6×, median
-  3.1×). 95 % bootstrap intervals over test days do not overlap (3.9–5.0 % vs 13.2–16.0 %). The threshold sweep has no
-  cliff. And an ablation says plainly what does the work: ranges instead of numbers, and dropping spoofed reports
-  first — ranking ranges by raw volume catches the same but puts 1.9× more innocent spoofed numbers in blocked ranges.
-- **Useful today, to anyone.** "Did this number call you?" on the public page checks all 248,930 reported numbers and
-  6,091 rented ranges in the browser, with a shareable link, and tells you when the owner is probably innocent.
-  Carriers get a ranked CSV of ranges with evidence and the price of each rule.
-- **Dropnet inside Relate's own CLI.** A Relate command extension: `relate run dropnet-ftc --path <FTC files> -d graph`
-  turns raw files into the graph and its pools (296,273 reports → 6,091 pools in 33 s, the same as the full build).
-  The same file is also served over Bolt (official neo4j driver) and the HTTP Query API v2, both tested.
-- **Tested on a real AI agent.** Claude Code (headless, Haiku) was asked what to do about 40 real reported numbers,
-  isolated runs, no web. Without Dropnet: 0 of 40 right verdicts, and it blocked the innocent owner's number for all
-  14 spoofed calls. With Dropnet's `assess_number` MCP tool: 39 of 40 verdicts, 40 of 40 right actions, 0 of 14
-  innocent owners hit, and the range blocked for 14 of 14 pool numbers. The test also caught our own mistake: with
-  facts alone the agent still blocked 9 of 14 innocent numbers "to be safe", so the tool now says its advice in words.
-- **Search by what people say.** Each of the 6,091 ranges has a plain-English profile from its graph and a local
-  embedding. Hybrid search (Relate vector + full-text `SEARCH`, rank fusion, then a graph filter by state) finds the
-  right ranges for "someone pretending to be the IRS" or "my car warranty is about to expire": 0.78 precision at 10 on
-  14 everyday descriptions, against 0.29 for full-text alone. It is an MCP tool, `search_ranges`, for agents.
-- **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported
-  number as a scammer would blame 395 (39.5 %) likely-spoofed numbers whose owners are probably innocent, and dismiss
-  246 (24.6 %) once-reported numbers that belong to an active pool. With Dropnet's hook / MCP tool it gets the right
-  verdict for each, with the caution.
-- **One operation, fifteen ranges.** Linking pools by multi-hop paths (same victim area code, same day, same scam)
-  finds one network of 15 number ranges behind 11,071 reports.
-- **Spoofing-aware by design.** Pools are built only from non-spoofed reports, so Dropnet never proposes blocking the
-  local ranges spoofers hide in. `assess_number` labels a one-off local number "likely spoofed" and says so.
-- **What-if in a transaction.** Pick pools, ask what blocking them on day one would have stopped: Dropnet writes the
-  rules into the graph inside a Relate transaction, counts by traversal (0.07 s on the full graph), and rolls back.
-- **A case in one file.** Any campaign exports to its own single-file Relate store — hand it over, archive it, delete it.
-- **No-install demo.** The docs/ page runs Relate compiled to WebAssembly and loads the 200 biggest pools (7,872 nodes,
-  34,070 relationships) in about a second; Cypher queries run locally in ~4 ms.
-- **Agents that are careful.** MCP tools plus a Claude Code hook: whenever a prompt mentions a phone number, the agent
-  gets the graph's evidence *and* the caution that caller ID is easily spoofed — before it answers.
-- **Second module: free text, any language.** Victims' stories (demo: Russian) become phones, cards, IBANs, phishing
-  domains, aliases and money trails; every link in a case file carries a path and the victim's own words.
+## The problem
 
-## How we built it
-Python + `relate-db` (embedded). FTC daily CSVs → parse → batched `UNWIND`/`MERGE` into a directory store with range
-indexes (296k reports in ~2 min) → campaign detection as Cypher aggregations → `relate clone --to-snapshot-format
-parquet` compacts it to a single file committed to the repo (40 MB for the graph, 78 MB with the range embeddings). FastAPI + cytoscape.js UI, MCP server (official
-SDK), a Claude Code hook, a Relate command extension, and a static page with `@relate/relate-wasm`. 206 tests.
+An analyst may see one complaint about one caller ID and miss a concentration of complaints involving other numbers in the same range. At the same time, caller IDs can be spoofed, so a report does not identify the person who placed a call.
 
-## AI-assisted development
-Built with substantial help from Claude Code (Anthropic), as the rules allow. I chose the problem (phone fraud on real
-FTC data), the approach (number ranges, excluding spoofed reports), and the priorities, and I directed and reviewed
-each step. Claude Code wrote most of the code, tests and documentation under that direction, ran the evaluations,
-and built the demo page and the video. The video's voice-over is synthetic (Kokoro, a local text-to-speech model).
-Every number in this write-up comes from the code and public data in the repository, and can be reproduced with
-`python -m dropnet ftc-eval` and `python -m dropnet ftc-robustness`.
+## What Dropnet does
 
-## Challenges
-- The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB (the 6,091 range embeddings later added 38 MB).
-- A multi-hop pattern started from an `UNWIND`-bound key took 21 s on the 249k-number graph; starting from an indexed
-  anchor took 0.03 s. In WASM, per-row lookups cost ~0.5 ms, so the demo addresses nodes by list index — 13 s → 1 s.
-- Being fair to spoofing victims shaped the method: no block rules from spoofed reports, cautions everywhere.
-- A Relate extension that wrote 5,000 rows per statement ended silently with exit code 0; the handshake's
-  `caps.maxRowsPerStatement` (1,000) was the limit. On Windows the extension ships as one `.cmd` that is also Python.
+Dropnet puts 296,273 FTC Do Not Call complaints into a portable graph. An analyst can look up a number, explore its range and related reports, and model how a proposed range rule would match historical complaints. A browser demo runs a sample graph in Relate WASM; the full local application opens the saved database. The same context is accessible to agents through MCP.
 
-## What we learned
-Blocking is a graph problem, not a list problem — and the graph also tells you whom *not* to blame.
+An area-code match is a possible indicator of spoofing, not proof. The graph does not establish who made a call, who controls a range, or that related ranges are one operation. Dropnet does not block calls or determine whether a caller is guilty.
 
-## What's next
-Longer windows, STIR/SHAKEN attestation data where available, and the free-text module on real complaint corpora.
+## What we measured
 
-## Built with
-relate, cypher, python, fastapi, webassembly, mcp, claude-code, cytoscape.js, ftc-open-data
+Rules derived from complaints filed before 2026-11-02 were matched against 103,620 later-filed complaints. A baseline using numbers previously reported at least twice matched 4.3%; adding 2,872 geographic ranges matched 14.3%. These are historical complaint matches, not a measure of all calls or fraud prevented. The range rules plus number rules cover approximately 28.73 million possible numbers; the dataset cannot measure the impact on legitimate traffic.
+
+Filing date is not call date: 10,766 later-filed complaints concerned earlier calls and 142 have an event date after filing. Among 92,712 later-filed complaints with valid call dates on or after the split, the baseline matched 3.49% and geographic ranges 12.67%. This retrospective subset is not representative of all calls. Run `python -m dropnet.ftc.time_audit` to reproduce it.
+
+A historical agent experiment compares the agent's answers to labels and advice produced by Dropnet's own rules. It measures agreement with those rules, not independently verified spoofing or the correctness of blocking decisions. Saved historical runs predate our revised cautious advice.
+
+## How Relate helps
+
+- `Report → Number → Block` joins individual complaints to the range-level pattern; subject, state and consumer area links give context.
+- Relate's embedded Python engine, persistent single-file store and Cypher support the local investigation.
+- The browser demo uses Relate WASM; the full dataset remains in `data/ftc.rl`.
+- What-if creates hypothetical rule nodes inside a transaction and rolls back. Case export creates a portable Relate file.
+- Full-text and optional vector search, MCP tools and a Claude Code hook make graph context available to agents.
+
+## Try it
+
+Open the demo above and check `833-766-1884`; explore the range, graph and what-if. For the full graph, clone the repository, create a Python environment, run `pip install -e .` and `python -m dropnet serve`. See the README for all commands and limitations.
+
+## Sources and tools
+
+FTC Do Not Call complaints; FCC consumer complaints for a separate comparison; synthetic Russian-language complaints are confined to a separate demonstration. Built with Python, Relate, FastAPI, JavaScript and WebAssembly. Claude Code and other AI coding tools assisted development and documentation; the team reviewed the output and is responsible for it. Relate 1.0.1 is used as an embedded database, through Cypher, WASM, MCP, and other interfaces documented in the repository.
+
+## Limitations
+
+Complaints and caller IDs are unverified; area-code matches are only indicators. Some consumer area codes are missing and treated as non-matches by the current pool heuristic. Co-occurrence links use complaint filing day, not necessarily call day. The sample window is short and there is no denominator of legitimate calls. The local demo server is intended for a trusted environment and is not suitable for sensitive real complaints.

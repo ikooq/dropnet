@@ -71,16 +71,16 @@ def _print_eval(r: dict) -> None:
     b, d, allseen = r["baseline"], r["dropnet"], r["blocklist_all_seen"]
     print(f"\nReal FTC reports: train before {r['split_day']} ({r['train_reports']:,}) · test after "
           f"({r['test_reports']:,})")
-    print(f"| rules | count | later reports caught |\n|---|---:|---:|")
+    print(f"| rules | count | later-filed reports matched |\n|---|---:|---:|")
     print(f"| every number ever reported | {allseen['rules']:,} | {allseen['coverage']:.1%} |")
     print(f"| blocklist: numbers with ≥2 reports | {b['rules']:,} | {b['coverage']:.1%} |")
     g = r.get("dropnet_geographic")
     if g:
         print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {g['coverage']:.1%} |")
     print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {d['coverage']:.1%} |")
-    print(f"\n{d['new_numbers_caught']:,} catches came from numbers never reported before. Price: block rules silence "
+    print(f"\n{d['new_numbers_caught']:,} matching reports involved numbers not previously reported. Potential scope: rules cover up to "
           f"{d.get('numbers_blocked', 0) / 1e6:.1f} M numbers (blocklist: {b.get('numbers_blocked', b['rules']):,}); "
-          f"risk: {d['spoofed_caught']:,} caught calls carried a spoofed caller ID inside a pool range.")
+          f"risk: {d['spoofed_caught']:,} matching reports had matching caller and consumer area codes; this is not proof of spoofing.")
 
 
 def cmd_ftc_eval(a: argparse.Namespace) -> int:
@@ -117,10 +117,9 @@ def cmd_agent_eval(a: argparse.Namespace) -> int:
     finally:
         conn.close()
     k = r["sampled"]
-    print(f"{k:,} random reported numbers. Without the graph, an agent that treats every reported number as a scammer "
-          f"would blame {r['naive_blames_likely_spoofed']:,} ({r['naive_blames_share']:.1%}) likely-spoofed numbers whose "
-          f"owners are probably innocent, and would dismiss {r['naive_dismisses_pool_members']:,} "
-          f"({r['naive_dismiss_share']:.1%}) once-reported numbers that belong to an active pool. Verdicts: {r['verdicts']}")
+    print(f"{k:,} sampled reported numbers: {r['naive_blames_likely_spoofed']:,} meet the area-code-match "
+          f"heuristic; {r['naive_dismisses_pool_members']:,} are single-report numbers in a pool. "
+          f"These categories are heuristics, not verified spoofing or ownership. Verdicts: {r['verdicts']}")
     return 0
 
 

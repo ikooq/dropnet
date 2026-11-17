@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dropnet</title>
-  <meta name="description" content="Check a phone number against every scam call reported to the FTC. Dropnet finds the rented number ranges behind the calls, in a Relate graph running in your browser.">
+  <link rel="icon" href="data:,">
+  <meta name="description" content="Check a phone number against FTC unwanted-call complaints. Dropnet explores concentrations of reported numbers, in a Relate graph running in your browser.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
@@ -27,13 +28,12 @@
         <input id="num-in" placeholder="866-771-6581" inputmode="tel" maxlength="16">
         <button class="go" id="num-go" type="submit">Check</button>
       </form>
-      <div id="num-out" aria-live="polite"><p class="quiet" id="num-hint">Checks every number reported to the FTC and every
-        rented number range. It runs in your browser; the number never leaves it.</p></div>
+      <div id="num-out" aria-live="polite"><p class="quiet" id="num-hint">Checks reported numbers and ranges in the loaded FTC dataset. It runs in your browser; the number never leaves it.</p></div>
     </div>
     <figure class="range">
       <canvas id="grid" width="500" height="500" aria-label="The 10,000 numbers of this range"></canvas>
       <figcaption id="grid-cap"></figcaption>
-      <div class="key"><span><i class="k-rep"></i>reported</span><span><i class="k-spoof"></i>faked caller ID, owner probably innocent</span><span><i class="k-none"></i>not reported</span></div>
+      <div class="key"><span><i class="k-rep"></i>reported</span><span><i class="k-spoof"></i>area-code match (possible spoofing)</span><span><i class="k-none"></i>not reported</span></div>
       <div class="tip" id="grid-tip" hidden></div>
     </figure>
   </section>
@@ -44,15 +44,14 @@
 
   <section class="evidence">
     <div>
-      <h2>A blocklist of numbers stays one step behind</h2>
+      <h2>Historical rule comparison</h2>
       <p class="quiet" id="eval-caption"></p>
       <div id="eval-bars"></div>
       <p class="quiet" id="eval-note"></p>
     </div>
     <div>
-      <h2>Faked to look local</h2>
-      <p class="quiet">Share of reports where the caller ID carried the victim's own area code. Those numbers belong to
-        innocent people, so Dropnet never proposes blocking them.</p>
+      <h2>Matching area codes</h2>
+      <p class="quiet">Share of reports where the reported caller and consumer area codes match. This is a possible indicator, not proof of spoofing. Missing consumer codes are counted as non-matches.</p>
       <div id="spoof-bars"></div>
       <p class="quiet" id="agent-note"></p>
     </div>
@@ -63,7 +62,7 @@
 
   <section class="pools">
     <h2>The 200 biggest ranges, as a graph</h2>
-    <p class="quiet">Each range with its reported numbers, the states they called into and the scam types people reported.</p>
+    <p class="quiet">Pool totals exclude area-code matches for the threshold; the graph can include all reports. Consumer states and complaint categories do not establish where a caller was located.</p>
     <div class="camp-layout">
       <ol class="camp-list" id="list"></ol>
       <div class="camp-main">

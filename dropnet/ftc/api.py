@@ -77,7 +77,7 @@ def campaign_graph(conn: relate.Connection, campaign_id: str, max_numbers: int =
 
 
 def networks(conn: relate.Connection) -> list[dict]:
-    """Pool networks: ranges that hit the same victim area codes, on the same days, with the same scam."""
+    """Pool networks: shared consumer area codes, filing days and complaint categories; not proof of a common operator."""
     out = []
     for n in rows(conn, "MATCH (n:PoolNetwork) RETURN n.id AS id, n.pools AS pools, n.reports AS reports, "
                         "n.numbers AS numbers ORDER BY reports DESC"):

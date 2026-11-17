@@ -63,7 +63,7 @@ scam types and victims in dozens of states. A pool is invisible in any single re
 ## How we built it
 Python + `relate-db` (embedded). FTC daily CSVs → parse → batched `UNWIND`/`MERGE` into a directory store with range
 indexes (296k reports in ~2 min) → campaign detection as Cypher aggregations → `relate clone --to-snapshot-format
-parquet` compacts it to a 40 MB single file committed to the repo. FastAPI + cytoscape.js UI, MCP server (official
+parquet` compacts it to a single file committed to the repo (40 MB for the graph, 78 MB with the range embeddings). FastAPI + cytoscape.js UI, MCP server (official
 SDK), a Claude Code hook, a Relate command extension, and a static page with `@relate/relate-wasm`. 206 tests.
 
 ## AI-assisted development
@@ -75,7 +75,7 @@ Every number in this write-up comes from the code and public data in the reposit
 `python -m dropnet ftc-eval` and `python -m dropnet ftc-robustness`.
 
 ## Challenges
-- The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB.
+- The graph had to fit in git: slimmed node properties and Parquet compaction took it from 150 MB to 40 MB (the 6,091 range embeddings later added 38 MB).
 - A multi-hop pattern started from an `UNWIND`-bound key took 21 s on the 249k-number graph; starting from an indexed
   anchor took 0.03 s. In WASM, per-row lookups cost ~0.5 ms, so the demo addresses nodes by list index — 13 s → 1 s.
 - Being fair to spoofing victims shaped the method: no block rules from spoofed reports, cautions everywhere.

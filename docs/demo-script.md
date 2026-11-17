@@ -39,7 +39,7 @@ was faked.** Every figure below comes from `data/ftc/eval.json` or the live page
 | 49 of the 50 biggest ranges | `fcc_crosscheck`: 49 / 50 |
 | 15 ranges, 11,000 reports | network NET-217863: 15 pools, 11,071 reports |
 | 4,300 calls, 30,000 numbers | what-if on 866-771, 217-863, 877-578: 4,339 reports, 3 × 10,000 numbers |
-| 40 MB, 33 s, 6,000 ranges | `data/ftc.rl` 39.9 MB; `relate run dropnet-ftc`: 6,091 pools in 33 s |
+| 40 MB, 33 s, 6,000 ranges | `data/ftc.rl` 39.9 MB at recording (78 MB with embeddings since); `relate run dropnet-ftc`: 6,091 pools in 33 s |
 
 ## Как записать (по-русски)
 

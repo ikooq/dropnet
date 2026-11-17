@@ -137,11 +137,11 @@ Investigate locally, embedded; publish only what was confirmed.
 
 ## How it uses Relate
 
-- **Mode: single file.** `data/ftc.rl` (40 MB, committed) holds the whole graph: 296,273 reports, 248,930 numbers,
+- **Mode: single file.** `data/ftc.rl` (78 MB with the range embeddings, committed) holds the whole graph: 296,273 reports, 248,930 numbers,
   96,126 blocks, 1,531,971 relationships, 6,146 campaigns (6,091 pools, 55 repeat numbers). A second file, `data/dropnet.rl`, holds the free-text module.
 - **Why this mode:** the investigation is one portable artifact — judges and colleagues open exactly the graph we built,
   and a single campaign can be handed over as its *own* `.rl` file (`Download case`). Built in a directory store,
-  then compacted with `relate clone --to-snapshot-format parquet` (150 MB → 40 MB) so it fits a git repo.
+  then compacted with `relate clone --to-snapshot-format parquet` (150 MB → 40 MB; the embeddings for hybrid search add 38 MB) so it fits a git repo.
 - **What the graph models:** reports, numbers, NPA-NXX blocks, area codes, states, scam types, pool/repeat campaigns —
   plus, in the second module, free-text complaints, cards, IBANs, phishing domains, aliases and money transfers.
 

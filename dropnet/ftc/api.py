@@ -106,7 +106,7 @@ def search_pools(conn: relate.Connection, text: str, limit: int = 20) -> dict:
     return {"subjects": subjects, "pools": pools}
 
 
-FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block"]
+FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block", "search_ranges"]
 
 
 def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
@@ -117,6 +117,9 @@ def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
         return campaign_list(conn, int(args.get("limit", 20)), args.get("kind"))
     if name == "assess_number":
         return campaigns.assess_number(conn, args["number"])
+    if name == "search_ranges":
+        from . import semantic
+        return semantic.search(conn, args["text"], limit=int(args.get("limit") or 10), state=args.get("state"))
     if name == "whatif_block":
         return whatif.whatif(conn, blocks=args.get("blocks"), numbers=args.get("numbers"),
                              since_day=args.get("since_day"))

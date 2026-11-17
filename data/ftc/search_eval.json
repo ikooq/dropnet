@@ -1,0 +1,75 @@
+{
+ "fulltext": {
+  "precision_at_10": 0.286,
+  "per_query": [
+   1.0,
+   1.0,
+   0.1,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.7,
+   0.1,
+   0.5,
+   0.5,
+   0.0,
+   0.1,
+   0.0
+  ]
+ },
+ "vector": {
+  "precision_at_10": 0.779,
+  "per_query": [
+   1.0,
+   1.0,
+   0.4,
+   1.0,
+   1.0,
+   0.6,
+   1.0,
+   0.9,
+   0.5,
+   1.0,
+   0.1,
+   0.9,
+   0.5,
+   1.0
+  ]
+ },
+ "hybrid": {
+  "precision_at_10": 0.779,
+  "per_query": [
+   1.0,
+   1.0,
+   0.3,
+   1.0,
+   1.0,
+   0.6,
+   1.0,
+   0.9,
+   0.4,
+   0.9,
+   0.4,
+   0.9,
+   0.5,
+   1.0
+  ]
+ },
+ "queries": [
+  "lower my credit card interest rate",
+  "student loan forgiveness program",
+  "Medicare back brace for free",
+  "cheap prescription drugs pharmacy",
+  "someone pretending to be the IRS",
+  "your Social Security number is suspended",
+  "your car warranty is about to expire",
+  "lower my electricity bill with solar panels",
+  "you won a free cruise",
+  "you have won a sweepstakes prize",
+  "Microsoft says my computer has a virus",
+  "roof repair and new windows",
+  "earn money working from home",
+  "the line goes silent and hangs up"
+ ]
+}

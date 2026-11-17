@@ -183,8 +183,13 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
                         headers={"content-disposition": f'attachment; filename="{tmp.name}"'})
 
     @app.get("/api/ftc/search")
-    def ftc_search(q: str = ""):
-        return run_ftc(ftc_api.search_pools, q[:200])
+    def ftc_search(q: str = "", mode: str = "hybrid", state: str | None = None, limit: int = 10):
+        from ..ftc import semantic
+        if mode == "subjects":  # the original scam-type lookup through the Subject full-text index
+            return run_ftc(ftc_api.search_pools, q[:200])
+        if mode not in ("hybrid", "fulltext", "vector"):
+            raise HTTPException(400, "mode must be hybrid, fulltext, vector or subjects")
+        return run_ftc(lambda c: semantic.search(c, q[:200], limit=max(1, min(int(limit), 50)), mode=mode, state=state))
 
     @app.get("/api/ftc/networks")
     def ftc_networks():

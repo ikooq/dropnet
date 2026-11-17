@@ -44,6 +44,8 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
         log(f"wrote {n:,} campaigns")
         from . import networks
         log(f"pool networks: {networks.link_pools(conn)}")
+        from . import semantic
+        semantic.write_profiles(conn, log=log)  # text profiles + vectors (when fastembed is installed) for hybrid search
         result = evaluate.holdout(conn, split_day([r.created_day for r in reports]))
         result["profile"] = campaigns.spoofing_profile(conn)
     finally:

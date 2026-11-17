@@ -154,6 +154,7 @@ Investigate locally, embedded; publish only what was confirmed.
 | `relate clone --to-snapshot-format parquet` compaction | `dropnet/ftc/build.py` |
 | **WebAssembly build** in the browser demo (in-memory, ~1 s load) | `docs/app.js` |
 | **full-text index** + `db.index.fulltext.queryNodes` ("mortgage" → scam type → its pools; `GET /api/ftc/search?q=`) | `dropnet/ftc/api.py` |
+| **hybrid search on the real ranges**: `SEARCH … IN (VECTOR INDEX …)` + `SEARCH … IN (FULLTEXT INDEX …)`, weighted Reciprocal Rank Fusion, then a graph filter (ranges that called a state); local bge-small embeddings, no API key | `dropnet/ftc/semantic.py` |
 | vector index + `db.index.vector.queryNodes`, `shortestPath`, variable-length money trails | free-text module |
 | **MCP**: our server + Relate's native `relate serve --mcp stdio --read-only` | `.mcp.json` |
 | **command extension** — `relate run dropnet-ftc --path data/ftc/raw -d graph`: FTC files → graph → pools inside Relate's own CLI (296,273 reports → 6,091 pools in 33 s, the same count as the full build) | `dropnet/relate_ext/` |
@@ -206,6 +207,26 @@ Without the graph the agent cannot know, and its default is to block the number 
 off an innocent subscriber every time. The first version of the tool returned only facts; told "the owner is probably
 innocent", the agent still blocked the number "to be safe" in 9 of 14 cases. The tool now also returns its `advice`
 in words, and the harm went to zero.
+
+### Finding ranges by what people say
+
+People describe a call ("my car warranty is about to expire"), not an FTC category. Every one of the 6,091 ranges
+has a plain-English profile written from its graph neighbourhood (scam types, states called, toll-free or local,
+volume) and a 384-number embedding (BAAI/bge-small-en-v1.5, local ONNX via `fastembed`; `pip install -e .[semantic]`).
+`search_ranges` (MCP) and `GET /api/ftc/search?q=…&state=Florida` run Relate's vector and full-text `SEARCH`, fuse the
+two rankings, and keep only ranges that called the given state.
+
+On 14 everyday descriptions (`dropnet/ftc/semantic.py`, `EVAL_QUERIES`; result in `data/ftc/search_eval.json`), the
+share of the top 10 ranges whose main scam type matches:
+
+| full-text only | vector only | hybrid |
+|---:|---:|---:|
+| 0.29 | 0.78 | **0.78** |
+
+Full-text alone misses whenever the words differ ("someone pretending to be the IRS" → 0 of 10). Equal-weight fusion
+fell to 0.69, because common words matched everywhere; with full-text weighted 0.5 the hybrid keeps the vector's
+quality and still finds exact tokens such as a range number or a state. The weight was chosen on these same 14
+queries, so treat 0.78 as an upper estimate. Without `fastembed` the search falls back to full-text and says so.
 
 ### With an AI agent
 

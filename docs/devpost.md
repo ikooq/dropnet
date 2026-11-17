@@ -38,6 +38,10 @@ scam types and victims in dozens of states. A pool is invisible in any single re
   14 spoofed calls. With Dropnet's `assess_number` MCP tool: 39 of 40 verdicts, 40 of 40 right actions, 0 of 14
   innocent owners hit, and the range blocked for 14 of 14 pool numbers. The test also caught our own mistake: with
   facts alone the agent still blocked 9 of 14 innocent numbers "to be safe", so the tool now says its advice in words.
+- **Search by what people say.** Each of the 6,091 ranges has a plain-English profile from its graph and a local
+  embedding. Hybrid search (Relate vector + full-text `SEARCH`, rank fusion, then a graph filter by state) finds the
+  right ranges for "someone pretending to be the IRS" or "my car warranty is about to expire": 0.78 precision at 10 on
+  14 everyday descriptions, against 0.29 for full-text alone. It is an MCP tool, `search_ranges`, for agents.
 - **Measured for agents.** On 1,000 random reported numbers, an agent without the graph that treats every reported
   number as a scammer would blame 395 (39.5 %) likely-spoofed numbers whose owners are probably innocent, and dismiss
   246 (24.6 %) once-reported numbers that belong to an active pool. With Dropnet's hook / MCP tool it gets the right

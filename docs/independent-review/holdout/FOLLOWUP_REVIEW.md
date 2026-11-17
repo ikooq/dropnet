@@ -1,6 +1,6 @@
 # Follow-up review of 30 new-block cases
 
-The response file contains 30 completed cases under one identifier. The user states that an expert independently completed the review and agreed to publication of anonymized results. Their professional field and access to the group key or prior responses are not yet confirmed. The response file itself describes an AI-assisted review with no verified professional investigative credentials, which differs from the user's description; the reason for this discrepancy remains unresolved. The word "expert" here reflects the user's account, not independently verified qualifications. No personal identity or raw answers are published in this report.
+The response file contains 30 completed cases under one identifier. The user reports that the reviewer made the judgments personally, with AI used to shorten the text, and agreed to publication of anonymized results. The reported area of expertise is consumer-complaint data and pattern analysis, but professional qualifications have not been verified. According to the user, the reviewer was not given and did not use the group selection key, but previous ratings were available in the conversation; the review therefore cannot be considered fully blinded or independent of prior responses. No personal identity or raw answers are published in this report.
 
 | Sample stratum | Evidence clear: yes / no / unsure | Investigate: yes / no / unsure |
 |---|---|---|

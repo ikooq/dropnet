@@ -95,8 +95,10 @@ def spoofing_profile(conn: relate.Connection) -> list[dict]:
 
 def assess_number(conn: relate.Connection, number: str) -> dict:
     """Evidence about one reported number — and how careful to be with it."""
-    import re
-    d = re.sub(r"\D", "", number)[-10:]
+    from .parse import _number
+    d = _number(number)
+    if not d:
+        raise ValueError("Enter a valid 10-digit North American number (optionally prefixed by 1).")
     r = rows(conn, """
         MATCH (n:Number {number: $n})-[:IN_BLOCK]->(b:Block)
         OPTIONAL MATCH (n)<-[:FROM_NUMBER]-(rep:Report)
@@ -106,7 +108,15 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
                b.npa_nxx AS block, count(DISTINCT st) AS states, collect(DISTINCT s.code) AS subjects,
                sum(CASE WHEN rep.neighbor THEN 1 ELSE 0 END) AS neighbor""", {"n": d})
     if not r or r[0]["reports"] is None:
-        return {"number": d, "verdict": "unknown", "advice": ADVICE["unknown"], "reports": 0, "caution": CAUTION}
+        # The number may be absent while its prefix has a concentration of other reports.
+        block = d[:6]
+        range_rows = rows(conn, """
+            MATCH (:Block {npa_nxx: $b})<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(rep:Report)
+            WHERE rep.neighbor = false RETURN count(DISTINCT n) AS nums""", {"b": block})
+        count = range_rows[0]["nums"] if range_rows else 0
+        return {"number": d, "verdict": "unknown", "advice": ADVICE["unknown"], "reports": 0,
+                "block": block, "block_numbers": count, "in_pool_range": count >= POOL_MIN_NUMBERS,
+                "caution": CAUTION}
     a = r[0]
     pool = rows(conn, """
         MATCH (b:Block {npa_nxx: $b})<-[:IN_BLOCK]-(n:Number)<-[:FROM_NUMBER]-(rep:Report)

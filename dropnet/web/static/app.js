@@ -360,7 +360,8 @@ async function assess(number) {
   const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported once", unknown: "Not in the reports" }[a.verdict];
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
     ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
-    ${a.block_numbers} reported numbers · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
+    ${a.block_numbers} reported numbers · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` :
+    a.in_pool_range ? `<p>No reports for this number in the loaded window; its range contains ${a.block_numbers} reported numbers meeting the pool criteria. This does not establish who called.</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
   document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 $("#num-go").addEventListener("click", () => assess($("#num-in").value));

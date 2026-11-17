@@ -201,7 +201,10 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
 
     @app.get("/api/ftc/number/{number}")
     def ftc_number(number: str):
-        return run_ftc(ftc_campaigns.assess_number, number)
+        try:
+            return run_ftc(ftc_campaigns.assess_number, number)
+        except ValueError as e:
+            raise HTTPException(400, str(e))
 
     @app.post("/api/ftc/whatif")
     def ftc_whatif_route(body: WhatIfIn):

@@ -78,3 +78,9 @@ def test_ftc_absent_is_graceful(stores, tmp_path):
     with TestClient(app) as c:
         assert c.get("/api/ftc/summary").status_code == 404
         assert c.get("/api/health").json()["ok"] is True
+
+
+def test_number_input_validation_and_unreported_range_context(client):
+    assert client.get("/api/ftc/number/998667710002").status_code == 400
+    result = client.get("/api/ftc/number/8667714444").json()
+    assert result["reports"] == 0 and result["in_pool_range"]

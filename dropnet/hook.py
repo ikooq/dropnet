@@ -36,12 +36,14 @@ def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl"
     try:
         lines = ["Dropnet evidence (real FTC Do Not Call reports, embedded Relate graph):"]
         found = [(n, assess_number(conn, n)) for n in nums]
-        if all(a["verdict"] == "unknown" for _, a in found):
+        if all(a["verdict"] == "unknown" and not a.get("in_pool_range") for _, a in found):
             return None  # e.g. an order number: say nothing rather than add noise
         for n, a in found:
             pretty = f"{n[:3]}-{n[3:6]}-{n[6:]}"
             if a["verdict"] == "unknown":
-                lines.append(f"- {pretty}: {LABEL['unknown']}.")
+                context = (f" Its range contains {a['block_numbers']} reported numbers meeting the pool criteria."
+                           if a.get("in_pool_range") else "")
+                lines.append(f"- {pretty}: {LABEL['unknown']}.{context}")
                 continue
             lines.append(f"- {pretty}: {LABEL[a['verdict']]}; {a['reports']} reports in {a['states']} states, "
                          f"scam types {', '.join(a['subjects'][:3])}; {a['neighbor_share']:.0%} area-code match; "

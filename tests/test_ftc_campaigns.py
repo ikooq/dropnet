@@ -102,3 +102,17 @@ def test_advice_does_not_infer_owner_or_recommend_range_block():
         assert advice["owner_likely_innocent"] is None
         assert advice["block"] == "nothing"
     assert "not proof" in campaigns.CAUTION
+
+
+def test_unreported_number_retains_range_context(g):
+    result = campaigns.assess_number(g, "866-771-4444")
+    assert result["verdict"] == "unknown" and result["reports"] == 0
+    assert result["in_pool_range"] and result["block_numbers"] == 7
+    assert not campaigns.assess_number(g, "999-999-9999")["in_pool_range"]
+
+
+def test_invalid_number_is_not_silently_truncated(g):
+    with pytest.raises(ValueError):
+        campaigns.assess_number(g, "998667710002")
+    with pytest.raises(ValueError):
+        campaigns.assess_number(g, "12345")

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from . import config, store
 from .ftc import api, campaigns
+from .ftc.date_quality import chronology
 from .store import rows
 
 SITE_DATA = config.ROOT / "docs" / "data" / "graph.json"
@@ -48,6 +49,36 @@ def export_lookup(ftc_store: Path | str = config.DATA_DIR / "ftc.rl", out: Path 
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return {"pool_blocks": len(pools), "numbers": len(nums), "verdicts": counts, "bytes": out.stat().st_size}
+
+
+
+def export_date_quality(ftc_store: Path | str = config.DATA_DIR / "ftc.rl",
+                        out: Path | str = config.ROOT / "docs" / "data" / "date-quality.json") -> dict:
+    """Sparse issue index for the exact saved graph, with dates preserved."""
+    conn = store.open_store(ftc_store, read_only=True)
+    try:
+        records = rows(conn, """MATCH (r:Report)-[:FROM_NUMBER]->(n:Number)
+                       RETURN n.number AS n, r.id AS id, r.day AS filing, r.violation_day AS call""")
+    finally:
+        conn.close()
+    issues = {}
+    for r in records:
+        state = chronology(r["filing"], r["call"])
+        if state == "valid":
+            continue
+        entry = issues.setdefault(r["n"], {"call_after_filing": 0, "missing": 0, "invalid": 0, "examples": []})
+        entry[state] += 1
+        if state == "call_after_filing":
+            entry["examples"].append({"report_id": r["id"], "filing_date": r["filing"], "reported_call_date": r["call"]})
+    for entry in issues.values():
+        entry["examples"] = sorted(entry["examples"], key=lambda x: x["report_id"] or "")[:5]
+    days = [r["filing"] for r in records if r["filing"]]
+    result = {"reports": len(records), "first_day": min(days) if days else None,
+              "last_day": max(days) if days else None, "issues": dict(sorted(issues.items()))}
+    out = Path(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(result, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    return {"reports": len(records), "numbers_with_date_issues": len(issues)}
 
 
 def export(ftc_store: Path | str = config.DATA_DIR / "ftc.rl", out: Path | str = SITE_DATA,

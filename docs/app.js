@@ -191,6 +191,18 @@ function loadLookup() {
   });
 }
 
+let dateQualityPromise = null;
+function loadDateQuality() {
+  return dateQualityPromise ??= fetch("data/date-quality.json").then((r) => {
+    if (!r.ok) throw new Error(`Date quality request failed: ${r.status}`);
+    return r.json();
+  }).then((d) => {
+    if (!d.issues || d.reports !== data.summary.reports || d.first_day !== data.summary.first_day || d.last_day !== data.summary.last_day)
+      throw new Error("Date quality data does not match the graph snapshot");
+    return d.issues;
+  }).catch((e) => { dateQualityPromise = null; throw e; });
+}
+
 const grid = { block: null, cells: null, focus: -1, animation: 0 };
 function drawGrid(L, block, focus, animate) {
   const cv = $("#grid"), ctx = cv.getContext("2d"), N = 100, s = cv.width / N;
@@ -260,6 +272,11 @@ async function check(raw, example = false) {
   }
   if (request !== latestLookup) return;
   const hit = L.nums.get(n), block = L.blocks.get(n.slice(0, 6));
+  let dateIssues = null;
+  if (!example && hit) {
+    try { dateIssues = await loadDateQuality(); } catch { /* unavailable is not equivalent to no issues */ }
+    if (request !== latestLookup) return;
+  }
   drawGrid(L, n.slice(0, 6), example ? -1 : +n.slice(6), true);
   caption(L, n.slice(0, 6));
   if (example) return;
@@ -273,6 +290,15 @@ async function check(raw, example = false) {
   } else {
     const otherReported = (L.byBlock.get(n.slice(0, 6)) || []).length;
     html = `<p class="verdict">No reports for this number in the loaded window</p><p class="quiet">Between ${esc(L.span)}. ${otherReported ? `${fmt(otherReported)} other number${otherReported === 1 ? "" : "s"} in this range ${otherReported === 1 ? "was" : "were"} reported, but the range does not meet the pool threshold. ` : "No numbers in this range were reported in the loaded window. "}That doesn't prove the call was safe.</p>`;
+  }
+  if (hit) {
+    if (!dateIssues) html += `<div class="caution">Date-quality check is unavailable. Do not assume the reported dates are consistent.</div>`;
+    else {
+      const issue = dateIssues[n];
+      if (issue?.call_after_filing) html += `<div class="caution">Date warning: ${fmt(issue.call_after_filing)} complaint(s) have a reported call date later than filing. Source values are unchanged; cause unknown.<ul>${issue.examples.map((x) => `<li>Report ${esc(x.report_id)}: filed ${esc(x.filing_date)}, reported call ${esc(x.reported_call_date)}</li>`).join("")}</ul>Showing up to five examples.</div>`;
+      if (issue && (issue.missing || issue.invalid)) html += `<div class="caution">Date check unavailable for ${fmt(issue.missing)} missing and ${fmt(issue.invalid)} invalid date pair(s).</div>`;
+      if (!issue) html += `<p class="quiet">No date inconsistencies or missing dates were found for this number in the loaded snapshot.</p>`;
+    }
   }
   $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`

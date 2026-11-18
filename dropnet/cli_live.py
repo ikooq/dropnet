@@ -105,6 +105,7 @@ def cmd_site(a: argparse.Namespace) -> int:
     d = site.export(top=a.top)
     print(f"Wrote {site.SITE_DATA} ({len(d['pools'])} pools). Serve docs/ (GitHub Pages: branch, /docs).")
     print(f"Wrote {site.LOOKUP}: {site.export_lookup()}")
+    print(f"Wrote date-quality index: {site.export_date_quality()}")
     return 0
 
 

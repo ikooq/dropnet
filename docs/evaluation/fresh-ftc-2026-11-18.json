@@ -1,0 +1,50 @@
+{
+  "all_ranges": 3681,
+  "baseline_numbers": 11968,
+  "date_audit": {
+    "call_after_filing": 84,
+    "call_before_new_window": 7631,
+    "valid_in_new_window": 21834
+  },
+  "event_date_subset": {
+    "hits": {
+      "all_pools": 3963,
+      "baseline": 723,
+      "geographic": 2578
+    },
+    "reports": 21834,
+    "shares": {
+      "all_pools": 0.181506,
+      "baseline": 0.033113,
+      "geographic": 0.118073
+    }
+  },
+  "geographic_number_capacity": 28730391,
+  "geographic_ranges": 2872,
+  "new_filed": {
+    "hits": {
+      "all_pools": 5910,
+      "baseline": 1054,
+      "geographic": 3896
+    },
+    "reports": 29549,
+    "shares": {
+      "all_pools": 0.200007,
+      "baseline": 0.03567,
+      "geographic": 0.131849
+    }
+  },
+  "new_filing_dates": {
+    "2026-11-13": 11610,
+    "2026-11-14": 4892,
+    "2026-11-15": 2523,
+    "2026-11-16": 10524
+  },
+  "new_filing_start": "2026-11-13",
+  "new_source_files": {
+    "DNC_Complaint_Numbers_2026-11-16.csv.gz": "7bbbc22bb54ea759338a6f5dc6b6d6af1d61f9fabb6feb331896d46e4a251d7e",
+    "DNC_Complaint_Numbers_2026-11-17.csv.gz": "9283263b596493270063335abf2a27e1282696caa9eb1c6df4e4961f0d2f0b99"
+  },
+  "train_reports": 192653,
+  "training_cutoff_exclusive": "2026-11-02"
+}

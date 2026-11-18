@@ -60,3 +60,5 @@ The local app and browser lookup flag reported call dates later than filing date
 ## Fresh-period check
 
 On 29,549 complaints filed November 13–16 after the original snapshot, the same pre-November 2 rules matched 3.57% for the repeated-number baseline and 13.18% with geographic ranges. The event-date subset (21,834 reports) produced 3.31% and 11.81%. These are complaint matches, not fraud accuracy or prevented calls; legitimate-call impact remains unknown. The separate reproducible evaluation does not change the demo dataset.
+
+A further 30-range review was performed by a reviewer with reported experience in complaint analysis who, according to the supplied account, did not see the group labels or previous answers. They recommended follow-up for 17 cases and were unsure about 6. This is one label-blinded review, not verified fraud ground truth or proof of improved investigative efficiency.

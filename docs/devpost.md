@@ -55,4 +55,8 @@ Complaints and caller IDs are unverified; area-code matches are only indicators.
 
 Two exploratory 30-case reviews examined whether complaint summaries warranted follow-up. The follow-up used different number ranges from the same historical snapshot; prior answers were available and the review was not fully blinded. These judgments do not establish fraud or measure detection accuracy. Methods and limitations are documented in the repository.
 
-In the full local app, number lookup flags reported call dates later than filing dates and preserves the original source values. The browser demo is a sample and does not expose this full-data check.
+The local app and browser lookup flag reported call dates later than filing dates and preserve the original source values. The browser graph remains a sample; its lookup and date-quality index cover the original snapshot.
+
+## Fresh-period check
+
+On 29,549 complaints filed November 13–16 after the original snapshot, the same pre-November 2 rules matched 3.57% for the repeated-number baseline and 13.18% with geographic ranges. The event-date subset (21,834 reports) produced 3.31% and 11.81%. These are complaint matches, not fraud accuracy or prevented calls; legitimate-call impact remains unknown. The separate reproducible evaluation does not change the demo dataset.

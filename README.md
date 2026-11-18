@@ -99,4 +99,4 @@ Built for the Relate by Neo4j Hackathon 2026. MIT license. FTC and FCC public da
 
 Independent human review: see [the prepared review protocol and blinded cases](docs/independent-review/README.md). One human review of the original cards and its limitations are documented in the review pack.
 
-In the full local app, number lookup flags reported call dates later than filing dates and counts missing or invalid dates without changing the source values. The GitHub Pages demo uses a sample and does not provide this full-data date check.
+Both the local app and the browser lookup flag reported call dates later than filing dates and report missing or invalid dates without changing source values. The browser lookup uses a date-quality index for the original full snapshot; its visual graph remains a sample. The [separate fresh-period evaluation](docs/evaluation/fresh-ftc-2026-11-18.md) does not change the demo snapshot.

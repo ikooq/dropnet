@@ -1,6 +1,8 @@
 # Human review of the initial 30 cases
 
-One reviewer completed all 30 original `cases.md` cards. The user reports that the reviewer did not see the earlier AI answers; the reviewer described basic experience in data analysis and information assessment and consented to publication of their answers. Specialized telecom or investigative expertise was not claimed. The submitted file retains the identifier `AI-R01` and the phrase `AI-assisted`; their origin and whether the reviewer saw the selection key are unconfirmed. All 30 decisions and confidence scores match an earlier AI answer file; reasons are worded differently. These facts limit what can be concluded about review independence. No personal identity is published here.
+> **Not counted as evidence.** All 30 answers, including confidence scores, are identical to an earlier AI answer file, so this round cannot be treated as an independent human review. It is kept only as a record. The label-blinded review is in [`../validation-study/EXPERT_REVIEW.md`](../validation-study/EXPERT_REVIEW.md).
+
+One reviewer completed all 30 original `cases.md` cards. I was told the reviewer did not see the earlier AI answers; the reviewer described basic experience in data analysis and information assessment and consented to publication of their answers. Specialized telecom or investigative expertise was not claimed. The submitted file retains the identifier `AI-R01` and the phrase `AI-assisted`; their origin and whether the reviewer saw the selection key are unconfirmed. All 30 decisions and confidence scores match an earlier AI answer file; reasons are worded differently. These facts limit what can be concluded about review independence. No personal identity is published here.
 
 | Sample stratum | Clarity yes / no / unsure | Investigate yes / no / unsure |
 |---|---|---|

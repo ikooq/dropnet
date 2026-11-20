@@ -1,6 +1,8 @@
 # Follow-up review of 30 new-block cases
 
-The response file contains 30 completed cases under one identifier. The user reports that the reviewer made the judgments personally, with AI used to shorten the text, and agreed to publication of anonymized results. The reported area of expertise is consumer-complaint data and pattern analysis, but professional qualifications have not been verified. According to the user, the reviewer was not given and did not use the group selection key, but previous ratings were available in the conversation; the review therefore cannot be considered fully blinded or independent of prior responses. No personal identity or raw answers are published in this report.
+> **Not counted as evidence.** Earlier ratings were visible to the reviewer, so this round is not blinded. It is kept as a record and for its notes on date inconsistencies, which led to the date-quality flags.
+
+The response file contains 30 completed cases under one identifier. The reviewer told me they made the judgments personally, with AI used to shorten the text, and agreed to publication of anonymized results. The reported area of expertise is consumer-complaint data and pattern analysis, but professional qualifications have not been verified. The reviewer was not given and did not use the group selection key, but previous ratings were available in the conversation; the review therefore cannot be considered fully blinded or independent of prior responses. No personal identity or raw answers are published in this report.
 
 | Sample stratum | Evidence clear: yes / no / unsure | Investigate: yes / no / unsure |
 |---|---|---|

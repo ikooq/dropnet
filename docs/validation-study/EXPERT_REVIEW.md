@@ -1,6 +1,6 @@
 # Label-blinded review of 30 new ranges
 
-One reviewer rated 30 cases. According to the user, their background is data analysis, risk assessment and suspicious telephone activity; they did not participate in DropNet development, did not see the selection key or prior answers, did not use AI for evaluation, and consented to anonymous publication of the results and experience description. These are user-reported conditions; professional credentials and identity have not been independently verified. The response filename alone is not evidence of AI use. Cards showed factual counts, so labels were blinded but evidence was not masked.
+One reviewer rated 30 cases. The reviewer reports a background in data analysis, risk assessment and suspicious telephone activity; they did not participate in DropNet development, did not see the selection key or prior answers, did not use AI for evaluation, and consented to anonymous publication of the results and experience description. These conditions are as the reviewer reported them to me; professional credentials and identity have not been independently verified. The response filename alone is not evidence of AI use. Cards showed factual counts, so labels were blinded but evidence was not masked.
 
 | Stratum | Clear yes/no/unsure | Investigate yes/no/unsure |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Independent review protocol
 
-**Status: one human review of the original cards is summarized in `HUMAN_REVIEW.md`; expert review has not been established.** This pack tests whether the supplied evidence is clear and whether a reviewer considers a range worth investigating. It does not validate fraud, caller identity, common control, blocking decisions, real-world benefit, or model accuracy.
+**Status: the two rounds in this folder are kept as a record and are not counted as independent evidence (see the notes at the top of each report). The label-blinded review is in `../validation-study/EXPERT_REVIEW.md`.** This pack tests whether the supplied evidence is clear and whether a reviewer considers a range worth investigating. It does not validate fraud, caller identity, common control, blocking decisions, real-world benefit, or model accuracy.
 
 ## For the coordinator
 

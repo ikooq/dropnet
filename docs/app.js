@@ -40,7 +40,8 @@ function renderStatic() {
       + hbar(`Dropnet: plus toll-free ranges`, ev.dropnet.coverage, max, true);
     const rb = ev.robustness;
     $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} later reports matched numbers not previously reported.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet matched at
-      least ${rb.rolling_summary.min_lift.toFixed(1)} times as many reports every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""} The price: a range rule can affect up to
+      least ${rb.rolling_summary.min_lift.toFixed(1)} times as many reports every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""}${ev.early_warning ? ` Replayed day by day, ${fmt(ev.early_warning.numbers_first_seen_after_flag)} numbers
+      first appeared in a range that was already flagged, a median of ${ev.early_warning.days_first_complaint_to_flag.median} days after its first complaint.` : ""} The price: a range rule can affect up to
       10,000 numbers; legitimate-call impact is unknown.`;
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)

@@ -799,5 +799,20 @@
       "pool_total": 14,
       "said_unknown": 0
     }
+  },
+  "early_warning": {
+    "complaints": 239932,
+    "caught_by_number_rule": 0.0257,
+    "caught_by_range_rule": 0.1187,
+    "caught_by_either": 0.1338,
+    "ranges_flagged": 4713,
+    "days_first_complaint_to_flag": {
+      "median": 14,
+      "p25": 8,
+      "p75": 21
+    },
+    "flagged_ranges_share_of_their_complaints_after_flag": 0.4848,
+    "numbers_first_seen_after_flag": 23726,
+    "note": "Streaming replay over filing days; a rule only counts from the day after it would have fired. Complaint matches, not calls blocked or fraud proven."
   }
 }

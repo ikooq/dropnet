@@ -4,7 +4,7 @@
 Relate graph and finds the number ranges behind them — the pattern a blocklist of single numbers never sees — while
 refusing to blame the people whose numbers get faked.
 
-**[Try it in your browser](https://ikooq.github.io/dropnet/)** · [Demo script](docs/demo-script.md) · [Submission](docs/devpost.md)
+**[Try it in your browser](https://ikooq.github.io/dropnet/)** · [Every result and how to reproduce it](docs/EVIDENCE.md) · [Submission](docs/devpost.md)
 
 ![Dropnet on 296,273 real FTC reports](docs/img/real-overview.png)
 
@@ -30,6 +30,10 @@ Rules learned from the 192,653 complaints filed before 2026-11-02, matched again
 | **Fresh data:** 29,549 complaints filed Nov 13–16, after the snapshot ended | 3.6% | **13.2%** | 20.0% |
 | Fresh data, calls made in the new period (21,834) | 3.3% | **11.8%** | 18.2% |
 
+- **Early warning:** replaying all 239,932 geographic complaints day by day, using only what was known the day
+  before, a blocklist of numbers already knew 2.6% of them; the range rule 11.9%. 4,713 ranges were flagged, a median
+  of 14 days after their first complaint in the window, and 23,726 numbers first appeared in a range that was already
+  flagged (`python -m dropnet ftc-early-warning`).
 - **Stable:** 27 different start days, ranges ahead every time (at least 2.6×; `python -m dropnet ftc-robustness`).
 - **Confirmed elsewhere:** 49 of the 50 largest ranges also appear in the FCC's separate complaints, against 9% of
   random reported ranges.

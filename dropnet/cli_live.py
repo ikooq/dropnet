@@ -189,7 +189,26 @@ def cmd_live_agent(a) -> int:
     return 0
 
 
+def cmd_early_warning(a) -> int:
+    import json
+    from . import store
+    from .ftc import build, early_warning, robustness
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        reports = robustness.load(conn)
+    finally:
+        conn.close()
+    res = early_warning.replay(reports)
+    ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
+    ev["early_warning"] = res
+    build.EVAL_JSON.write_text(json.dumps(ev, indent=2), encoding="utf-8")
+    print(json.dumps(res, indent=2))
+    return 0
+
+
 def register(sub) -> None:
+    ew = sub.add_parser("ftc-early-warning", help="replay complaints day by day: how early do range rules fire?")
+    ew.set_defaults(fn=cmd_early_warning)
     la = sub.add_parser("ftc-live-agent-eval", help="a real Claude Code agent, with and without Dropnet's MCP tool")
     la.add_argument("--model", default="haiku")
     la.add_argument("--seed", type=int, default=0)

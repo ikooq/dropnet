@@ -30,6 +30,7 @@ All on public FTC data; each result is reproducible from the repository.
 | **Fresh data:** the same rules on 29,549 complaints filed Nov 13–16, after our snapshot ended | 3.6% | **13.2%** |
 | **Fresh data, calls made in the new period** (21,834) | 3.3% | **11.8%** |
 
+- **Early warning, replayed day by day:** going through all 239,932 geographic complaints in filing order, with only the previous days' knowledge, a blocklist of numbers already knew 2.6% of them; the range rule knew 11.9%. 4,713 ranges were flagged a median of 14 days after their first complaint in the window, and 23,726 numbers first appeared in a range Dropnet had already flagged: the range was known before the number was.
 - **Not one lucky split:** repeated from 27 different start days, ranges matched more complaints every time (at least 2.6×).
 - **A second agency agrees:** 49 of our 50 largest ranges also appear in the FCC's separate complaint data for the same weeks, against 9% of randomly drawn reported ranges.
 - **Search:** on 14 everyday descriptions, the right complaint category in 78% of the top 10 results, against 29% for full-text alone.

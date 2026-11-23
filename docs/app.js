@@ -13,6 +13,7 @@ const rangeOf = (b) => `${b.slice(0, 3)}-${b.slice(3, 6)}-xxxx`;
 const LABEL = { DEBT: "Debt relief", IMPOSTER_GOV: "Impersonation", MEDICAL: "Medical", OTHER: "Other", DROPPED: "Dropped call",
   NONE: "No subject", WARRANTY: "Warranty", HOME: "Home improvement", TRAVEL: "Travel", PRIZES: "Prizes", ENERGY: "Energy",
   TECH: "Tech support", WORK: "Work from home" };
+const DATA_V = 15;  // bump with the data files so browsers and the Pages cache fetch fresh copies
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
 
@@ -96,13 +97,13 @@ addEventListener("resize", () => { clearTimeout(earlyResize); earlyResize = setT
 
 // the pre-registered forward test: frozen lists, fixed test set and pass marks; result shown once it exists
 let predRanges;
-const loadPredRanges = () => predRanges ??= fetch("prediction/ranges.txt").then((r) => {
+const loadPredRanges = () => predRanges ??= fetch("prediction/ranges.txt?v=" + DATA_V).then((r) => {
   if (!r.ok) throw new Error(r.status);
   return r.text();
 }).then((t) => new Set(t.split(/\r?\n/).map((l) => l.split("\t")[0]).filter(Boolean)));
 async function renderPrereg() {
   const get = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-  const m = await get("prediction/manifest.json");
+  const m = await get("prediction/manifest.json?v=" + DATA_V);
   if (!m) return;
   const res = Date.now() >= Date.parse("2026-12-08T00:00:00Z") ? await get("prediction/result-2026-12-08.json") : null;
   const fr = m.frozen, tr = m.training, toll = fr.ranges - fr.geographic_ranges;
@@ -253,7 +254,7 @@ function openPool(id) {
 // docs/data/lookup.txt: every reported number + every pool block (~1 MB gzipped), fetched once.
 let lookupPromise = null;
 function loadLookup() {
-  return lookupPromise ??= fetch("data/lookup.txt").then((r) => {
+  return lookupPromise ??= fetch("data/lookup.txt?v=" + DATA_V).then((r) => {
     if (!r.ok) throw new Error(`Lookup request failed: ${r.status}`);
     return r.text();
   }).then((text) => {
@@ -280,7 +281,7 @@ function loadLookup() {
 
 let dateQualityPromise = null;
 function loadDateQuality() {
-  return dateQualityPromise ??= fetch("data/date-quality.json").then((r) => {
+  return dateQualityPromise ??= fetch("data/date-quality.json?v=" + DATA_V).then((r) => {
     if (!r.ok) throw new Error(`Date quality request failed: ${r.status}`);
     return r.json();
   }).then((d) => {
@@ -440,7 +441,7 @@ function run() {
 $("#q-go").addEventListener("click", run);
 
 (async function boot() {
-  data = await (await fetch("data/graph.json")).json();
+  data = await (await fetch("data/graph.json?v=" + DATA_V)).json();
   renderStatic();
   renderEarly();
   renderPrereg();

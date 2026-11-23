@@ -199,6 +199,7 @@ def cmd_early_warning(a) -> int:
     finally:
         conn.close()
     res = early_warning.replay(reports)
+    res["example"] = early_warning.example(reports)
     ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
     ev["early_warning"] = res
     build.EVAL_JSON.write_text(json.dumps(ev, indent=2), encoding="utf-8")

@@ -25,3 +25,14 @@ def test_toll_free_is_left_out_of_the_geographic_replay():
     reps = [(f"8667710{k:03d}", "866771", "2026-11-01", False) for k in range(6)]
     assert early_warning.replay(reps)["complaints"] == 0
     assert early_warning.replay(reps, geographic_only=False)["complaints"] == 6
+
+
+def test_example_picks_range_with_most_numbers_after_flag():
+    reps = [(f"303555{k:04d}", "303555", "2026-11-01", False) for k in range(5)]          # flagged Nov 1
+    reps += [(f"303555{k:04d}", "303555", "2026-11-03", False) for k in range(5, 12)]     # 7 new after
+    reps += [(f"720555{k:04d}", "720555", "2026-11-01", False) for k in range(6)]         # flagged, nothing after
+    reps += [(f"800555{k:04d}", "800555", "2026-11-01", False) for k in range(20)]        # toll-free, ignored
+    ex = early_warning.example(reps)
+    assert ex["block"] == "303555" and ex["flag_day"] == "2026-11-01"
+    assert ex["numbers_after_flag"] == 7 and ex["complaints_after_flag"] == 7
+    assert [d["new_numbers"] for d in ex["days"]] == [5, 7]

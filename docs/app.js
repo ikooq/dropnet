@@ -50,6 +50,92 @@ function renderStatic() {
   $("#source").textContent = data.caution;
 }
 
+// one flagged range on a timeline: numbers appearing for the first time, before and after Dropnet flagged the range
+const addDays = (d, k) => new Date(Date.parse(d + "T00:00:00Z") + k * 864e5).toISOString().slice(0, 10);
+const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+function renderEarly() {
+  const ew = data.eval?.early_warning, ex = ew?.example;
+  if (!ex) return;
+  const before = ex.numbers - ex.numbers_after_flag;
+  $("#early-story").innerHTML = `On <b>${day(ex.first_day)}</b> one number from ${esc(rangeOf(ex.block))} was reported.
+    By <b>${day(ex.flag_day)}</b>, ${fmt(before)} different numbers from it had been reported by consumers outside the caller's
+    area code, enough for Dropnet to flag the range. Over the next ${daysBetween(ex.flag_day, ex.last_day)} days,
+    <b>${fmt(ex.numbers_after_flag)} more numbers</b> from the same range appeared in complaints for the first time.
+    No list of numbers could have contained them, because nobody had reported them yet. The range was already flagged.`;
+  $("#early-note").textContent = `This is the clearest case, picked as ${ex.selection}. Across all ${fmt(ew.ranges_flagged)} ranges
+    flagged in the replay, ${fmt(ew.numbers_first_seen_after_flag)} numbers first appeared after their range was flagged, which took a median
+    of ${ew.days_first_complaint_to_flag.median} days from the first complaint. Each day is judged with the previous days' complaints only.`;
+  $("#early-cap").textContent = `New numbers from ${rangeOf(ex.block)} per filing day, ${day(ex.window[0])} to ${day(ex.window[1], true)}.
+    Grey: before the range was flagged. Red: after.`;
+  $("#early").hidden = false;
+  const svgW = $("#early-svg").getBoundingClientRect().width || 640;
+  const n = daysBetween(ex.window[0], ex.window[1]) + 1, W = Math.round(Math.min(640, Math.max(300, svgW))), H = W < 480 ? 240 : 300, top = 34, base = H - 28, left = 8, right = 8;
+  const byDay = new Map(ex.days.map((d) => [d.day, d.new_numbers]));
+  const max = Math.max(...ex.days.map((d) => d.new_numbers)), bw = (W - left - right) / n, y = (v) => base - ((base - top) * v) / max;
+  const x = (d) => left + daysBetween(ex.window[0], d) * bw;
+  let bars = "";
+  for (let i = 0; i < n; i++) {
+    const d = addDays(ex.window[0], i), v = byDay.get(d) || 0;
+    if (!v) continue;
+    bars += `<rect class="${d > ex.flag_day ? "after" : "before"}" x="${(x(d) + 1).toFixed(1)}" y="${y(v).toFixed(1)}"
+      width="${Math.max(1, bw - 2).toFixed(1)}" height="${(base - y(v)).toFixed(1)}"><title>${day(d)}: ${v} new number${v > 1 ? "s" : ""}</title></rect>`;
+  }
+  const fx = x(ex.flag_day) + bw, sx = x(ex.first_day) + bw / 2;
+  const ticks = [ex.window[0], ex.window[1]].map((d, i) => `<text class="tick" x="${i ? W - right : left}" y="${H - 8}"
+    text-anchor="${i ? "end" : "start"}">${day(d)}</text>`).join("");
+  $("#early-svg").setAttribute("viewBox", `0 0 ${W} ${H}`);
+  $("#early-svg").innerHTML = `<line class="axis" x1="${left}" x2="${W - right}" y1="${base}" y2="${base}"/>${bars}
+    <line class="flag" x1="${fx}" x2="${fx}" y1="${top - 22}" y2="${base}"/>
+    <text class="flag-label" x="${fx + 6}" y="${top - 10}">Flagged ${day(ex.flag_day)}</text>
+    <circle class="first" cx="${sx}" cy="${base + 7}" r="3.5"/><text class="tick" x="${sx}" y="${H - 8}" text-anchor="middle">${x(ex.first_day) - left > 60 ? "first report" : ""}</text>
+    <text class="tick" x="${W - right}" y="${top - 10}" text-anchor="end">${max} a day at most</text>${ticks}`;
+  $("#early-show").onclick = () => { check(ex.block + "0000", true); $(".hero").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); };
+}
+let earlyResize;
+addEventListener("resize", () => { clearTimeout(earlyResize); earlyResize = setTimeout(() => data && renderEarly(), 200); });
+
+// the pre-registered forward test: frozen lists, fixed test set and pass marks; result shown once it exists
+let predRanges;
+const loadPredRanges = () => predRanges ??= fetch("prediction/ranges.txt").then((r) => {
+  if (!r.ok) throw new Error(r.status);
+  return r.text();
+}).then((t) => new Set(t.split(/\r?\n/).map((l) => l.split("\t")[0]).filter(Boolean)));
+async function renderPrereg() {
+  const get = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const m = await get("prediction/manifest.json");
+  if (!m) return;
+  const res = Date.now() >= Date.parse("2026-12-08T00:00:00Z") ? await get("prediction/result-2026-12-08.json") : null;
+  const fr = m.frozen, tr = m.training, toll = fr.ranges - fr.geographic_ranges;
+  $("#prereg-lede").textContent = `On ${day(m.frozen_on, true)}, Dropnet's rule was run on every FTC file published so far and its
+    output was frozen in a public commit, with the test set and the pass marks written down before the complaints it will be
+    judged on existed. Nothing is re-learned: the lists are scored exactly as they are.`;
+  $("#prereg-facts").innerHTML = [
+    ["Frozen", day(m.frozen_on, true)],
+    ["Learned from", `${fmt(tr.reports)} complaints in ${tr.files} daily files, ${day(tr.first_file)} to ${day(tr.last_file)}`],
+    ["Frozen lists", `${fmt(fr.geographic_ranges)} geographic ranges, ${fmt(toll)} toll-free ranges, ${fmt(fr.numbers)} repeat numbers`],
+    ["Test set", `complaints filed after ${day(tr.last_filing_day)}, in files published after ${day(tr.last_file)}`],
+    ["Scored", res ? `Dec 8, 2026, on ${fmt(res.filed_after_freeze.complaints)} complaints` : "Dec 8, 2026"],
+  ].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+  const f = res?.filed_after_freeze, c = res?.called_after_freeze;
+  const seen = f && f.never_seen_numbers.complaints ? f.never_seen_numbers.in_a_frozen_geographic_range / f.never_seen_numbers.complaints : null;
+  const tests = [
+    ["Numbers + geographic ranges match at least 2× the complaints that numbers alone match", f && f.lift_geographic,
+      f && `${pct(f.shares.numbers_only)} → ${pct(f.shares.numbers_and_geographic_ranges)}, ${f.lift_geographic}×`, (v) => v >= 2],
+    ["The same holds for calls made after the freeze", c && c.lift_geographic,
+      c && `${pct(c.shares.numbers_only)} → ${pct(c.shares.numbers_and_geographic_ranges)}, ${c.lift_geographic}×`, (v) => v >= 2],
+    ["At least 10% of complaints about never-seen numbers fall in a frozen geographic range", seen,
+      seen !== null && pct(seen), (v) => v >= 0.1],
+  ];
+  $("#prereg-tests").innerHTML = tests.map(([t, v, shown, pass]) => {
+    const st = v === null || v === undefined ? ["pending", "Scored Dec 8"] : pass(v) ? ["pass", `Passed: ${shown}`] : ["fail", `Failed: ${shown}`];
+    return `<li><span>${esc(t)}</span><b class="status ${st[0]}">${esc(st[1])}</b></li>`;
+  }).join("");
+  $("#prereg-proof").innerHTML = `SHA-256 of the frozen range list: <code>${fr.ranges_sha256.slice(0, 16)}…</code>
+    <a href="https://github.com/ikooq/dropnet/tree/main/docs/prediction" target="_blank" rel="noopener">Lists, hashes and protocol</a>.
+    The result is published whatever it is.`;
+  $("#prereg").hidden = false;
+}
+
 function loadGraph() {
   const t0 = performance.now();
   // Matching a node by property per row costs ~0.5 ms in WASM (11 s for 26k edges). Instead every node gets an
@@ -301,6 +387,12 @@ async function check(raw, example = false) {
       if (!issue) html += `<p class="quiet">No date inconsistencies or missing dates were found for this number in the loaded snapshot.</p>`;
     }
   }
+  try {
+    const frozen = await loadPredRanges();
+    if (request !== latestLookup) return;
+    if (frozen.has(n.slice(0, 6))) html += `<p class="quiet">This range is on the list Dropnet froze on Nov 23 for its
+      <a href="#prereg">pre-registered test</a>.</p>`;
+  } catch { /* the frozen list is optional here */ }
   $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`
     + `<div class="caution">${esc(data.caution)}</div>`;
@@ -350,6 +442,8 @@ $("#q-go").addEventListener("click", run);
 (async function boot() {
   data = await (await fetch("data/graph.json")).json();
   renderStatic();
+  renderEarly();
+  renderPrereg();
   const shared = new URLSearchParams(location.search).get("n");
   check(shared || "8667716581", !shared);  // the hero works before the graph engine has loaded
   await init();

@@ -813,6 +813,153 @@
     },
     "flagged_ranges_share_of_their_complaints_after_flag": 0.4848,
     "numbers_first_seen_after_flag": 23726,
-    "note": "Streaming replay over filing days; a rule only counts from the day after it would have fired. Complaint matches, not calls blocked or fraud proven."
+    "note": "Streaming replay over filing days; a rule only counts from the day after it would have fired. Complaint matches, not calls blocked or fraud proven.",
+    "example": {
+      "block": "365826",
+      "first_day": "2026-10-14",
+      "flag_day": "2026-10-19",
+      "last_day": "2026-11-12",
+      "window": [
+        "2026-10-09",
+        "2026-11-12"
+      ],
+      "numbers": 340,
+      "numbers_after_flag": 323,
+      "complaints": 393,
+      "complaints_after_flag": 375,
+      "days": [
+        {
+          "day": "2026-10-14",
+          "new_numbers": 1,
+          "complaints": 1
+        },
+        {
+          "day": "2026-10-19",
+          "new_numbers": 16,
+          "complaints": 17
+        },
+        {
+          "day": "2026-10-20",
+          "new_numbers": 16,
+          "complaints": 17
+        },
+        {
+          "day": "2026-10-21",
+          "new_numbers": 17,
+          "complaints": 18
+        },
+        {
+          "day": "2026-10-22",
+          "new_numbers": 13,
+          "complaints": 13
+        },
+        {
+          "day": "2026-10-23",
+          "new_numbers": 15,
+          "complaints": 15
+        },
+        {
+          "day": "2026-10-24",
+          "new_numbers": 4,
+          "complaints": 4
+        },
+        {
+          "day": "2026-10-25",
+          "new_numbers": 4,
+          "complaints": 4
+        },
+        {
+          "day": "2026-10-26",
+          "new_numbers": 32,
+          "complaints": 34
+        },
+        {
+          "day": "2026-10-27",
+          "new_numbers": 55,
+          "complaints": 72
+        },
+        {
+          "day": "2026-10-28",
+          "new_numbers": 48,
+          "complaints": 54
+        },
+        {
+          "day": "2026-10-29",
+          "new_numbers": 33,
+          "complaints": 36
+        },
+        {
+          "day": "2026-10-30",
+          "new_numbers": 36,
+          "complaints": 42
+        },
+        {
+          "day": "2026-10-31",
+          "new_numbers": 13,
+          "complaints": 16
+        },
+        {
+          "day": "2026-11-01",
+          "new_numbers": 3,
+          "complaints": 4
+        },
+        {
+          "day": "2026-11-02",
+          "new_numbers": 11,
+          "complaints": 16
+        },
+        {
+          "day": "2026-11-03",
+          "new_numbers": 3,
+          "complaints": 4
+        },
+        {
+          "day": "2026-11-04",
+          "new_numbers": 0,
+          "complaints": 1
+        },
+        {
+          "day": "2026-11-05",
+          "new_numbers": 2,
+          "complaints": 3
+        },
+        {
+          "day": "2026-11-06",
+          "new_numbers": 5,
+          "complaints": 7
+        },
+        {
+          "day": "2026-11-07",
+          "new_numbers": 2,
+          "complaints": 3
+        },
+        {
+          "day": "2026-11-08",
+          "new_numbers": 3,
+          "complaints": 3
+        },
+        {
+          "day": "2026-11-09",
+          "new_numbers": 1,
+          "complaints": 1
+        },
+        {
+          "day": "2026-11-10",
+          "new_numbers": 2,
+          "complaints": 3
+        },
+        {
+          "day": "2026-11-11",
+          "new_numbers": 1,
+          "complaints": 1
+        },
+        {
+          "day": "2026-11-12",
+          "new_numbers": 4,
+          "complaints": 4
+        }
+      ],
+      "selection": "the geographic range with the most numbers first seen after the day it was flagged"
+    }
   }
 }

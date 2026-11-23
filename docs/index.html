@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
 </head>
 <body>
@@ -57,6 +57,29 @@
     </div>
   </section>
 
+  <section class="early" id="early" hidden>
+    <div class="early-text">
+      <h2 id="early-title">The range was known before its numbers were</h2>
+      <p id="early-story"></p>
+      <p class="quiet" id="early-note"></p>
+      <button class="go small" id="early-show" type="button">Show this range in the grid</button>
+    </div>
+    <figure class="early-chart">
+      <svg id="early-svg" role="img" aria-labelledby="early-title early-cap"></svg>
+      <figcaption class="quiet" id="early-cap"></figcaption>
+    </figure>
+  </section>
+
+  <section class="prereg" id="prereg" hidden>
+    <h2>A prediction made before the data existed</h2>
+    <p class="quiet" id="prereg-lede"></p>
+    <div class="prereg-grid">
+      <dl class="prereg-facts" id="prereg-facts"></dl>
+      <ol class="prereg-tests" id="prereg-tests"></ol>
+    </div>
+    <p class="quiet" id="prereg-proof"></p>
+  </section>
+
   <section id="net-panel" hidden></section>
   <section id="whatif"></section>
 
@@ -83,6 +106,6 @@
   </section>
 </main>
 <footer><p id="source"></p><p>Built on Relate by Neo4j, WebAssembly build. Data: FTC Do Not Call complaints, US public data.</p></footer>
-<script type="module" src="app.js?v=14"></script>
+<script type="module" src="app.js?v=15"></script>
 </body>
 </html>

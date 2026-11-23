@@ -19,6 +19,52 @@ from datetime import date
 from .parse import TOLL_FREE
 
 
+def example(reports, min_numbers: int = 5) -> dict | None:
+    """The geographic range with the most numbers first seen after it was flagged, as a day-by-day timeline.
+
+    Chosen as the clearest case, not a typical one; the selection rule is returned with it.
+    """
+    by_block = defaultdict(list)
+    for n, b, d, nb in reports:
+        if b[:3] not in TOLL_FREE:
+            by_block[b].append((d, n, nb))
+    best = None
+    for b, rows in by_block.items():
+        rows.sort()
+        distinct, flag, first_seen = set(), None, {}
+        for day in sorted({d for d, _, _ in rows}):
+            todays = [(n, nb) for d, n, nb in rows if d == day]
+            for n, _ in todays:
+                first_seen.setdefault(n, day)
+            if flag is None:
+                distinct |= {n for n, nb in todays if not nb}
+                if len(distinct) >= min_numbers:
+                    flag = day
+        if flag is None:
+            continue
+        after = sum(d > flag for d in first_seen.values())
+        if best is None or after > best[0]:
+            best = (after, b, flag, rows, first_seen)
+    if best is None:
+        return None
+    after, b, flag, rows, first_seen = best
+    complaints = defaultdict(int)
+    for d, _, _ in rows:
+        complaints[d] += 1
+    days = sorted({d for d, _, _ in rows})
+    new = defaultdict(int)
+    for d in first_seen.values():
+        new[d] += 1
+    return {
+        "block": b, "first_day": rows[0][0], "flag_day": flag, "last_day": rows[-1][0],
+        "window": [min(r[2] for r in reports), max(r[2] for r in reports)],
+        "numbers": len(first_seen), "numbers_after_flag": after,
+        "complaints": len(rows), "complaints_after_flag": sum(d > flag for d, _, _ in rows),
+        "days": [{"day": d, "new_numbers": new.get(d, 0), "complaints": complaints[d]} for d in days],
+        "selection": "the geographic range with the most numbers first seen after the day it was flagged",
+    }
+
+
 def replay(reports, min_numbers: int = 5, min_reports: int = 2, geographic_only: bool = True) -> dict:
     """reports: iterable of (number, block, day 'YYYY-MM-DD', area_code_match bool)."""
     by_day = defaultdict(list)

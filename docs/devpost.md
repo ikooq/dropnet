@@ -61,4 +61,4 @@ relate, cypher, python, fastapi, webassembly, mcp, claude-code, cytoscape.js, fa
 
 ## AI-assisted development
 
-Built with substantial help from Claude Code (Anthropic), as the rules allow. I chose the problem, the approach and the priorities, directed and reviewed each step, and am responsible for the result. Claude Code wrote much of the code, tests and documentation, ran the evaluations, and built the demo page and video. The video's voice-over is synthetic (Kokoro, a local text-to-speech model).
+Built with substantial help from Claude Code (Anthropic), as the rules allow. I chose the problem, the approach and the priorities, directed and reviewed each step, and am responsible for the result. Claude Code wrote much of the code, tests and documentation, ran the evaluations, and built the demo page and video. The video's voice-over is synthetic, generated with ElevenLabs (elevenlabs.io).

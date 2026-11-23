@@ -31,6 +31,7 @@ All on public FTC data; each result is reproducible from the repository.
 | **Fresh data, calls made in the new period** (21,834) | 3.3% | **11.8%** |
 
 - **Early warning, replayed day by day:** going through all 239,932 geographic complaints in filing order, with only the previous days' knowledge, a blocklist of numbers already knew 2.6% of them; the range rule knew 11.9%. 4,713 ranges were flagged a median of 14 days after their first complaint in the window, and 23,726 numbers first appeared in a range Dropnet had already flagged: the range was known before the number was.
+- **A prediction made before the data existed:** on Nov 23 we froze the rule's output on every FTC file published so far (5,765 geographic ranges, 23,740 repeat numbers), with SHA-256 hashes, the test set and the pass marks, in a public commit. On Dec 8 it is scored, unchanged, on complaints filed after Nov 18 ([protocol](https://github.com/ikooq/dropnet/tree/main/docs/prediction)).
 - **Not one lucky split:** repeated from 27 different start days, ranges matched more complaints every time (at least 2.6×).
 - **A second agency agrees:** 49 of our 50 largest ranges also appear in the FCC's separate complaint data for the same weeks, against 9% of randomly drawn reported ranges.
 - **Search:** on 14 everyday descriptions, the right complaint category in 78% of the top 10 results, against 29% for full-text alone.

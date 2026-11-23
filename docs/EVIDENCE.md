@@ -9,6 +9,7 @@ repository root after `pip install -e .`.
 | Same, on call dates after the split: 3.5% → 12.7% | `data/ftc/time_audit.json` | `python -m dropnet.ftc.time_audit` |
 | Fresh data after the snapshot: 3.6% → 13.2% (3.3% → 11.8% by call date) | `docs/evaluation/fresh-ftc-2026-11-18.json`, [report](evaluation/fresh-ftc-2026-11-18.md) | `python scripts/evaluate_fresh_ftc.py --train-dir data/ftc/raw --test-dir data/ftc/fresh-2026-11-18` |
 | Early warning: 2.6% vs 11.9% replayed day by day; 4,713 ranges, median 14 days; 23,726 numbers seen first in a flagged range | `data/ftc/eval.json` (`early_warning`) | `python -m dropnet ftc-early-warning` |
+| Pre-registered forward test: lists frozen 2026-11-23, checked on files published after 2026-11-19 | `docs/prediction/` (`manifest.json`, hashes) | `python scripts/preregister.py check --prediction docs/prediction --test-dir data/ftc/after-freeze` |
 | 27 of 27 start days, lift ≥ 2.6×; bootstrap intervals; threshold sweep; ablations | `data/ftc/eval.json` (`robustness`) | `python -m dropnet ftc-robustness` |
 | Random-range control: 20.3% vs 4.4% | `data/ftc/eval.json` (`controls`) | `evaluate.controls(conn, "2026-11-02")` in `dropnet/ftc/evaluate.py` |
 | FCC cross-check: 49 of 50 largest ranges vs 9% random | `data/ftc/eval.json` (`fcc_crosscheck`), `data/fcc/` | `crosscheck.crosscheck(...)` in `dropnet/ftc/crosscheck.py` |

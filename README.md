@@ -34,6 +34,9 @@ Rules learned from the 192,653 complaints filed before 2026-11-02, matched again
   before, a blocklist of numbers already knew 2.6% of them; the range rule 11.9%. 4,713 ranges were flagged, a median
   of 14 days after their first complaint in the window, and 23,726 numbers first appeared in a range that was already
   flagged (`python -m dropnet ftc-early-warning`).
+- **Pre-registered:** on 2026-11-23 the rule's output on every file published so far — 5,765 geographic ranges and
+  23,740 repeat numbers — was frozen with hashes in [docs/prediction/](docs/prediction/README.md), together with the
+  test set and the pass marks, before the complaints it will be judged on existed. The check runs on 2026-12-08.
 - **Stable:** 27 different start days, ranges ahead every time (at least 2.6×; `python -m dropnet ftc-robustness`).
 - **Confirmed elsewhere:** 49 of the 50 largest ranges also appear in the FCC's separate complaints, against 9% of
   random reported ranges.

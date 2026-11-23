@@ -1,0 +1,55 @@
+{
+  "frozen_on": "2026-11-23",
+  "rule": {
+    "min_distinct_numbers_per_range": 5,
+    "baseline_min_reports_per_number": 2,
+    "ranges_built_from": "reports whose caller area code differs from the consumer's"
+  },
+  "training": {
+    "files": 29,
+    "first_file": "2026-10-12",
+    "last_file": "2026-11-19",
+    "reports": 350525,
+    "last_filing_day": "2026-11-18",
+    "distinct_numbers": 292956
+  },
+  "frozen": {
+    "numbers": 23740,
+    "ranges": 7461,
+    "geographic_ranges": 5765,
+    "numbers_sha256": "5c867bf01a414d5909d6147b6be8a854a5a8a10858d69a88ba92c30988ffa843",
+    "ranges_sha256": "ab4c8a45ddffeca580c4eeadd6d524281629a5cb4fa5535946ec7201ea6b3fec",
+    "seen_numbers_sha256": "d73a66d64dc8ab8cca7b1df1c817904da284e24a937c9d260e9bb5793c4e1d20"
+  },
+  "training_files_sha256": {
+    "DNC_Complaint_Numbers_2026-10-12.csv.gz": "1e8eeeafd13254c460fab616dc3fdbb127d917424528e0978699361719453fac",
+    "DNC_Complaint_Numbers_2026-10-13.csv.gz": "709b8b7b66a0e0123813bf634dcc0ef8bdf1e40485fbc4fa418f85dafcf9b18f",
+    "DNC_Complaint_Numbers_2026-10-14.csv.gz": "ced4080621b9c499d91f25c7eb9c15e6cbffa7cab65a5d3e5994f0790e20586a",
+    "DNC_Complaint_Numbers_2026-10-15.csv.gz": "c9aa0f9b9ddeb96490937f1178f004b5af34e5f3986aa9fca8d42e6f1ed1934f",
+    "DNC_Complaint_Numbers_2026-10-16.csv.gz": "0b9e1474a7e3e95331b9ff8bd2f70da1d08cc78ec848ecd854ab641e6b093f20",
+    "DNC_Complaint_Numbers_2026-10-19.csv.gz": "db9c4315d2344dcd1d41aaf0d02e18bb4954544f9412562d46da9c8c3c71b975",
+    "DNC_Complaint_Numbers_2026-10-20.csv.gz": "3706078542334eb855532d5e13e1ed904dc3a072aee413a046139a79be82958b",
+    "DNC_Complaint_Numbers_2026-10-21.csv.gz": "7e81763ef72caaf3156cb8d09d8e2700d25cb1338104aa8c06baf78ba7c0bcd2",
+    "DNC_Complaint_Numbers_2026-10-22.csv.gz": "a82e1f274fa2924134d65e212a7ce7cc31d24b2897f659834f3737dc23da707c",
+    "DNC_Complaint_Numbers_2026-10-23.csv.gz": "678683747fed8b29ad2e1ae41302051064e205bdd2083009d5be477e40e7b597",
+    "DNC_Complaint_Numbers_2026-10-26.csv.gz": "f83e77c5abc5dc61df39635225fb98c5857b2ed35320e1fab4e31de3fe69a6aa",
+    "DNC_Complaint_Numbers_2026-10-27.csv.gz": "7f37f7187f79222044391a7c8ba10d21a0ac8f8312fdfced29cb578d87bb655d",
+    "DNC_Complaint_Numbers_2026-10-28.csv.gz": "95aafbab2fb66cd3ae92fe6a77911736156056428d8a394748b794999f8c4d1e",
+    "DNC_Complaint_Numbers_2026-10-29.csv.gz": "48f5ea6c86bd3273e06cf74d2811662e0aa8c909824fa456f0ded632d1ee6cc5",
+    "DNC_Complaint_Numbers_2026-10-30.csv.gz": "f6f85b9d20081b2380b078e8391b62ff76d22b3fae720a3fccf6bb09a89ee92c",
+    "DNC_Complaint_Numbers_2026-11-02.csv.gz": "3d74c3aaa2115954d6975d632c8dcbef43d9f2f3dbea91fae9767c58c8d6922a",
+    "DNC_Complaint_Numbers_2026-11-03.csv.gz": "b4f3a3a3fa7f1295bc9d9c0c2fc5f78a7db3a1ffddac2992a87ab4dcfc502d2d",
+    "DNC_Complaint_Numbers_2026-11-04.csv.gz": "471fd2d4e2e8c512589b27d3d4af1741a58b0cc290417044ba186537f1c6dac8",
+    "DNC_Complaint_Numbers_2026-11-05.csv.gz": "f2ad50a0b7fcc54842add0af197bcac13d319a51e7aa99b5297a88030230724b",
+    "DNC_Complaint_Numbers_2026-11-06.csv.gz": "5ba2d0b95884bd018422091978610efb73b7ff52e30dd7823d8553bbbb6b8cdd",
+    "DNC_Complaint_Numbers_2026-11-09.csv.gz": "b7d97857b029e043a6d2373b67c4f819d3721432fc6bed1469d0edc14db98fa3",
+    "DNC_Complaint_Numbers_2026-11-10.csv.gz": "5c9ca3f2b7559c544fa578a9da7be3bc74d96644a13c686cacde0f27f531bb8d",
+    "DNC_Complaint_Numbers_2026-11-11.csv.gz": "cde745e38a69d4b9db2d93f2dcdeb6c0d9e5f6d41d09dc7b12d22f60773ec16b",
+    "DNC_Complaint_Numbers_2026-11-12.csv.gz": "3dbc09c99a32bd3ffb37be2866e02099edd0d1e97d2a6b7cabdab13b25a7c31a",
+    "DNC_Complaint_Numbers_2026-11-13.csv.gz": "f2e0146157a4cd4bfa146fdab1a4efe0b85a140b5002b664da2b48c4c6f14d58",
+    "DNC_Complaint_Numbers_2026-11-16.csv.gz": "7bbbc22bb54ea759338a6f5dc6b6d6af1d61f9fabb6feb331896d46e4a251d7e",
+    "DNC_Complaint_Numbers_2026-11-17.csv.gz": "9283263b596493270063335abf2a27e1282696caa9eb1c6df4e4961f0d2f0b99",
+    "DNC_Complaint_Numbers_2026-11-18.csv.gz": "a036d1f20e79a5ea359cd27aee5f261446c0dc8c74ffe74228b01c32043a0373",
+    "DNC_Complaint_Numbers_2026-11-19.csv.gz": "128dd8f387c9302292ab3fc51d30bebc3bf467bec0b7345fcf272cf8d04ee99c"
+  }
+}

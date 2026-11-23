@@ -1,0 +1,2 @@
+docs/prediction/*.txt -text
+docs/prediction/*.json -text

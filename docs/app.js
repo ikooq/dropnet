@@ -105,7 +105,7 @@ async function renderPrereg() {
   const get = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const m = await get("prediction/manifest.json?v=" + DATA_V);
   if (!m) return;
-  const res = Date.now() >= Date.parse("2026-12-08T00:00:00Z") ? await get("prediction/result-2026-12-08.json") : null;
+  const res = Date.now() >= Date.parse("2026-12-08T00:00:00Z") ? await get("prediction/result-2026-12-08.json?v=" + DATA_V) : null;
   const fr = m.frozen, tr = m.training, toll = fr.ranges - fr.geographic_ranges;
   $("#prereg-lede").textContent = `On ${day(m.frozen_on, true)}, Dropnet's rule was run on every FTC file published so far and its
     output was frozen in a public commit, with the test set and the pass marks written down before the complaints it will be

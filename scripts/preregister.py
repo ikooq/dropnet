@@ -125,6 +125,10 @@ if __name__ == "__main__":
     sub = ap.add_subparsers(dest="cmd", required=True)
     f = sub.add_parser("freeze"); f.add_argument("dirs", nargs="+", type=Path); f.add_argument("--out", type=Path, required=True)
     c = sub.add_parser("check"); c.add_argument("--prediction", type=Path, required=True); c.add_argument("--test-dir", type=Path, required=True)
+    c.add_argument("--out", type=Path, help="also write the result here (UTF-8, LF), the file the site reads")
     a = ap.parse_args()
     result = freeze(a.dirs, a.out) if a.cmd == "freeze" else check(a.prediction, a.test_dir)
-    print(json.dumps({k: v for k, v in result.items() if not k.endswith("sha256")}, indent=2))
+    text = json.dumps({k: v for k, v in result.items() if not k.endswith("sha256")}, indent=2)
+    if a.cmd == "check" and a.out:
+        a.out.write_bytes((text + "\n").encode("utf-8"))
+    print(text)

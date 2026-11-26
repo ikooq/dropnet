@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 dependencies = [
-  "relate-db==1.0.1",
+  "relate-db==1.2.0",
   "fastapi>=0.110",
   "uvicorn>=0.29",
   "mcp>=2.3,<3",

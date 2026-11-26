@@ -39,7 +39,10 @@ def test_ablation_without_vectors_loses_script_campaign(tmp_path):
 
 def test_console_script_and_mcp_json():
     import json as _json
-    import tomllib
+    try:
+        import tomllib
+    except ModuleNotFoundError:  # Python 3.10: same API from the tomli backport
+        import tomli as tomllib
     from pathlib import Path
     root = Path(__file__).resolve().parent.parent
     scripts = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]

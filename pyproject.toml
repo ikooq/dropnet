@@ -23,7 +23,7 @@ dropnet = "dropnet.__main__:main"
 agent = ["pydantic-ai"]
 ml = ["sentence-transformers"]
 semantic = ["fastembed>=0.4"]  # local bge-small embeddings for hybrid range search (optional; full-text works without)
-dev = ["pytest>=8", "httpx>=0.27", "neo4j>=5"]
+dev = ["pytest>=8", "httpx>=0.27", "neo4j>=5", "tomli>=2; python_version < '3.11'"]
 
 [tool.setuptools.packages.find]
 include = ["dropnet*"]

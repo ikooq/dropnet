@@ -65,4 +65,10 @@ relate, cypher, python, fastapi, webassembly, mcp, claude-code, cytoscape.js, fa
 
 ## AI-assisted development
 
-Built with substantial help from Claude Code (Anthropic), as the rules allow. I chose the problem, the approach and the priorities, directed and reviewed each step, and am responsible for the result. Claude Code wrote much of the code, tests and documentation, ran the evaluations, and built the demo page and video. The video's voice-over is synthetic, generated with ElevenLabs (elevenlabs.io).
+Built with substantial help from AI coding agents (Claude Code by Anthropic, and a second coding agent for parts of the interface and review), as the rules allow.
+
+- **My own work:** the idea and the choice of data (FTC and FCC complaints, NANPA numbering records); the direction of every step: I set the tasks, read and accepted or rejected the agents' changes, and checked the results; part of the code, written by hand; and the blinded expert review of 30 ranges, which I organised with an outside reviewer.
+- **AI-assisted:** much of the code, the tests and the documentation, running the evaluations, and the demo page.
+- **Video:** [CHECK BEFORE SUBMITTING: keep this line only if it is true] I recorded the screen and the voice-over myself, following [docs/demo-script.md](demo-script.md). There is no AI-generated voice or footage in it.
+
+I am responsible for the result, including its originality and license compliance.

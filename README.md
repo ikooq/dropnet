@@ -54,6 +54,10 @@ runs the tests.
 - **WebAssembly:** the browser demo runs Relate on a smaller graph.
 - **MCP:** `.mcp.json` starts Dropnet's own read-only tools (`assess_number`, `carriers`, `read_cypher`, …) and
   `relate serve --mcp` on the same file, so an agent sees the evidence and its caution before it answers.
+  It needs the `dropnet` command on PATH: start `claude` from the activated virtual environment. In the Claude desktop
+  app, which does not see the venv, add a local entry once:
+  `claude mcp add --scope local dropnet -- <repo>/.venv/Scripts/python.exe -m dropnet mcp`
+  (`.venv/bin/python` on macOS/Linux).
 - Also: full-text and optional vector `SEARCH`, Bolt and the HTTP Query API, and a `relate run dropnet-ftc` extension.
   Details in [EVIDENCE.md](docs/EVIDENCE.md).
 

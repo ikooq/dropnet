@@ -20,6 +20,8 @@ numbers can be ported. Dropnet never blocks anything.
 
 [Open the browser demo](https://ikooq.github.io/dropnet/#early) · [Every result, its method and its limits](docs/EVIDENCE.md)
 
+![Checking 771-999-0716 in the browser demo: its range has 53 reported numbers](docs/img/demo-check.png)
+
 ## Run locally
 
 Python 3.10 or later. No API key, no database server: the graph is the checked-in file `data/ftc.rl`.

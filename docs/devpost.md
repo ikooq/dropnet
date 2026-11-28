@@ -6,6 +6,10 @@
 
 **Code:** https://github.com/ikooq/dropnet
 
+## Screenshots (upload to the Devpost gallery)
+
+`docs/img/demo-check.png` (number check), `docs/img/demo-early.png` (the 365-826 timeline), `docs/img/holders.png` (who holds flagged ranges), `docs/img/app-graph.png` (a range linked through its holder), `docs/img/architecture.svg` (data flow).
+
 ## Inspiration
 
 Thousands of Americans report unwanted calls to the FTC every day, and each report names one caller ID, so the usual answer is a blocklist of numbers. But 92% of the 248,930 reported numbers in our window were reported exactly once: callers move on before a list catches up. What repeats is the **range** a number comes from, its first six digits, and that only shows when the reports are connected.

@@ -1,5 +1,7 @@
 # Evidence index
 
+![Data flow: FTC, NANPA and FCC data into one Relate file, used by the app, the browser demo and agents](img/architecture.svg)
+
 Every number in the README and the submission, where it is stored, and how to reproduce it. Run the commands from the
 repository root after `pip install -e .`.
 
@@ -55,6 +57,8 @@ holder has across the whole numbering plan shows which holders are over-represen
 | CELLCO PARTNERSHIP DBA VERIZON WIRELESS | 17,691 | 178 | 1.0 |
 | NEW CINGULAR WIRELESS PCS, LLC | 18,816 | 159 | 0.8 |
 
+![The holder table in the browser demo](img/holders.png)
+
 The large carriers hold many flagged ranges because they hold many ranges. A few smaller holders hold far
 more flagged ranges than their size predicts.
 
@@ -88,6 +92,8 @@ The full database, `data/ftc.rl`, contains the FTC snapshot and the matching US 
 
 - `Block → HELD_BY → Carrier` gives the six-digit code holder by OCN. `Block → IN_RATE_CENTER → RateCenter` gives the rate center.
 - `Number → IN_SUBBLOCK → SubBlock → ASSIGNED_TO → Carrier` gives the assignee of a thousand-number block where the source provides one. A block can be assigned to a different carrier than the code holder.
+![Range 725-696 in the local app: its holder (green) links it to other flagged ranges with the same OCN (blue)](img/app-graph.png)
+
 - The local UI can rank OCNs by distinct flagged ranges and traverse from one range through its holder to related ranges. Shared assignment describes numbering administration. Portability and caller-ID spoofing limit attribution, and a rate center describes the numbering resource rather than the caller's location.
 
 ## Reproducibility and disclosure

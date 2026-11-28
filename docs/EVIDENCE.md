@@ -15,6 +15,8 @@ repository root after `pip install -e .`.
 | Random-range control: 20.3% vs 4.4% | `data/ftc/eval.json` (`controls`) | `evaluate.controls(conn, "2026-11-02")` in `dropnet/ftc/evaluate.py` |
 | FCC cross-check: 49 of 50 largest ranges vs 9% random | `data/ftc/eval.json` (`fcc_crosscheck`), `data/fcc/` | `crosscheck.crosscheck(...)` in `dropnet/ftc/crosscheck.py` |
 | Hybrid search: 0.78 vs 0.29 precision at 10 on 14 descriptions | `data/ftc/search_eval.json` | `dropnet/ftc/semantic.py` (`evaluate`), needs `pip install -e .[semantic]` |
+| Range holders: flagged ranges per 100 ranges held, e.g. 21.2 for one carrier vs 1.0 for Verizon Wireless | `data/ftc/eval.json` (`carriers`) | `python -m dropnet ftc-numbering --eval-only` |
+| Holder as an early signal: unflagged ranges of the 10 leading holders flagged later 7.5% vs 2.1% (3.7×; 3.2×–4.1× over 4 start days) | `data/ftc/eval.json` (`carrier_prior`, `carrier_prior_splits`) | `python -m dropnet ftc-numbering --eval-only` |
 | Real agent, 40 numbers, with and without the MCP tool | `data/ftc/live_agent_eval.json` | `python -m dropnet ftc-live-agent-eval` (calls the `claude` CLI) |
 | Blinded review of 30 ranges by one reviewer | [validation-study/EXPERT_REVIEW.md](validation-study/EXPERT_REVIEW.md) | protocol in [validation-study/PROTOCOL.md](validation-study/PROTOCOL.md) |
 | Relate extension: 296,273 reports → 6,091 ranges in 33 s | — | `python -m dropnet relate-ext`, then `relate run dropnet-ftc --path data/ftc/raw -d graph` |
@@ -36,6 +38,49 @@ Both range methods start with the same repeat-number rules and add exactly 2,872
 | Repeat numbers + naive geographic prefixes | 15,043 | 14.52% | 28,730,239 | 523.6 |
 
 The prefix budgets are equal. The exact address-space capacities differ by 152 numbers because a repeat number already inside a selected prefix is counted once. The denominator is possible numbers covered by rules. Multiple complaints about one number can each count as a match. These figures measure complaint coverage, with no estimate of legitimate-call traffic or of verified fraud. The naive rule matched slightly more complaints on this hold-out. The comparison supports investigating prefixes and leaves the value of the area-code filter for analyst triage open.
+
+## Who holds flagged ranges
+
+The graph joins each US range to the carrier NANPA lists as its holder (`Block → HELD_BY → Carrier → PART_OF → CarrierGroup`,
+NANPA files dated 2026-11-27). Counting flagged ranges per holder is one Cypher traversal; dividing by the ranges each
+holder has across the whole numbering plan shows which holders are over-represented:
+
+| Holder | Ranges held (all of NANP) | Flagged ranges | Flagged per 100 held |
+|---|---:|---:|---:|
+| FRACTEL, LLC | 2,858 | 606 | 21.2 |
+| IP HORIZON LLC | 630 | 131 | 20.8 |
+| ONVOY, LLC | 12,913 | 915 | 7.1 |
+| BANDWIDTH.COM CLEC, LLC | 4,820 | 305 | 6.3 |
+| T-MOBILE USA, INC. | 7,584 | 108 | 1.4 |
+| CELLCO PARTNERSHIP DBA VERIZON WIRELESS | 17,691 | 178 | 1.0 |
+| NEW CINGULAR WIRELESS PCS, LLC | 18,816 | 159 | 0.8 |
+
+The large carriers hold many flagged ranges because they hold many ranges. A few smaller holders hold far
+more flagged ranges than their size predicts.
+
+**Holder as an early signal.** From complaints before 2026-11-02 only, each holder gets a rate: flagged ranges per
+range held (holders with at least 100 ranges). The 10 highest are the leaders. Then, among the 61,384 geographic
+ranges that had a complaint before the split but were not flagged, 9,002 belong to a leader. Once later
+complaints are added, 7.5% of those become flagged against 2.1% of the other
+52,382 (3.7×). 686 of the 1,841 newly flagged ranges belong to a leader.
+The same test from other start days and with 25 leaders:
+
+| First test day | Leaders | Leaders' open ranges flagged later | Others | Lift |
+|---|---:|---:|---:|---:|
+| 2026-10-20 | 10 | 22.3% | 7.0% | 3.2× |
+| 2026-10-20 | 25 | 19.5% | 6.2% | 3.2× |
+| 2026-10-26 | 10 | 13.7% | 4.0% | 3.4× |
+| 2026-10-26 | 25 | 12.0% | 3.5% | 3.5× |
+| 2026-11-02 | 10 | 7.5% | 2.1% | 3.7× |
+| 2026-11-02 | 25 | 6.6% | 1.7% | 3.8× |
+| 2026-11-06 | 10 | 4.3% | 1.1% | 3.8× |
+| 2026-11-06 | 25 | 3.9% | 0.9% | 4.1× |
+
+Limits: the holders come from today's NANPA files, not from the complaint dates (assignments do not depend on
+complaints, but some can have changed). A holder issued a number; numbers can be ported, and caller ID can be faked, so
+a holder is not the caller and this is no finding of wrongdoing. Some holders provide numbers to many unrelated
+customers. Toll-free and Canadian ranges have no holder in these files. NANPA lists one name with a typo variant
+(`ONVOY, LLCV`) that is counted as a separate holder.
 
 ## Numbering data and queries
 

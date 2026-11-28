@@ -48,10 +48,13 @@ def test_console_script_and_mcp_json():
     scripts = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
     assert scripts["dropnet"] == "dropnet.__main__:main"
     servers = _json.loads((root / ".mcp.json").read_text(encoding="utf-8"))["mcpServers"]
-    assert servers == {"relate-native": {
-        "command": "relate",
-        "args": ["serve", "--database", "data/ftc.rl", "--mcp", "stdio", "--read-only"],
-    }}
+    assert servers == {
+        "dropnet": {"command": "dropnet", "args": ["mcp"]},  # FTC-only tools, see dropnet/mcp_server.py
+        "relate-native": {
+            "command": "relate",
+            "args": ["serve", "--database", "data/ftc.rl", "--mcp", "stdio", "--read-only"],
+        },
+    }
 
 
 def test_cli_eval_prints_table(tmp_path):

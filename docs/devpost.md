@@ -1,6 +1,6 @@
 # Dropnet — Devpost submission draft
 
-**Tagline:** Dropnet connects unwanted-call complaints by phone-number range so an analyst can follow the evidence in Relate.
+**Tagline:** Scam reports arrive one at a time; the scams don't. Dropnet connects 296,273 FTC complaints to the number ranges behind them and to the carriers that hold those ranges, in one Relate graph.
 
 **Demo:** https://ikooq.github.io/dropnet/
 
@@ -12,11 +12,11 @@ Thousands of Americans report unwanted calls to the FTC every day, and each repo
 
 ## What it does
 
-Dropnet loads 296,273 real FTC Do Not Call complaints into one Relate graph: `Report → Number → Block (six-digit range) → Area code`, plus complaint category and consumer state.
+Dropnet loads 296,273 real FTC Do Not Call complaints into one Relate graph: `Report → Number → Block (six-digit range) → Area code`, plus complaint category and consumer state, and joins every US range to NANPA's numbering records: `Block → HELD_BY → Carrier`, `Block → IN_RATE_CENTER → RateCenter`, `Number → IN_SUBBLOCK → SubBlock → ASSIGNED_TO → Carrier`.
 
 - **Check a number.** The page looks up any reported number in the browser and shows its range as a grid of 10,000 numbers, with the reported ones lit.
 - **Watch a range get flagged.** A timeline shows one range flagged on Oct 19, then 323 numbers nobody had reported yet appearing in it.
-- **Explore numbering assignments.** The full graph connects U.S. ranges to their NANPA code holders and rate centers. It distinguishes the assignee of a specific thousands-block from the holder of the six-digit code. The local Cypher examples rank OCNs by flagged ranges and find ranges that share an OCN.
+- **See who holds the flagged ranges.** The app ranks carriers by flagged ranges per 100 ranges they hold, opens one carrier's ranges, rate centers and complaint categories, and follows a range through its holder to other flagged ranges. It also tells the holder of a six-digit range apart from the carrier a 1,000-number block inside it was assigned to.
 - **Test a rule first.** The what-if writes candidate range rules in a Relate transaction, counts the complaints they match, then rolls back.
 - **Give agents the same context.** An MCP server and a Claude Code hook return a number's evidence with a caution about faked caller IDs before an agent answers.
 
@@ -29,13 +29,15 @@ Dropnet loads 296,273 real FTC Do Not Call complaints into one Relate graph: `Re
 | **Fresh data:** 29,549 complaints filed Nov 13–16, after our snapshot ended | 3.6% | **13.2%** |
 | **Fresh data, calls in the new period** (21,834) | 3.3% | **11.8%** |
 
-At the same budget of 2,872 geographic prefixes, a naive ranking by distinct caller IDs matched 14.52% compared with Dropnet's 14.31%. That is 523.6 vs. 516.0 matches per million possible numbers. The [equal-budget comparison](EVIDENCE.md#equal-budget-comparison) explains the denominator and its limits.
+**What the gain comes from.** At the same budget of 2,872 geographic ranges, simply ranking ranges by how many distinct numbers were reported matched 14.52%, against Dropnet's 14.31% (523.6 vs. 516.0 matches per million possible numbers). The gain comes from watching ranges instead of numbers, not from our filter; we keep the filter because it leaves out reports whose caller ID copies the consumer's own area code, which protects people whose numbers are faked. [Equal-budget comparison](EVIDENCE.md#equal-budget-comparison)
+
+**Who holds the ranges.** One graph traversal per question: two smaller carriers hold about 21 flagged ranges per 100 ranges they hold, the largest wireless carriers about 1. Using only complaints before Nov 2, unflagged ranges held by the 10 leading holders became flagged later 7.5% of the time, against 2.0% for all others (3.7×; 3.2×–4.1× from four start days). A holder issued numbers; it is not the caller. [Method and limits](EVIDENCE.md#who-holds-flagged-ranges)
 
 - **Early warning:** replaying 239,932 complaints day by day with only the previous days' knowledge, a number blocklist knew 2.6% of them, the range rule 11.9%. 23,726 numbers first appeared in a range Dropnet had already flagged.
 - **Frozen-list evaluation:** on Nov 23 we froze the rule's output (5,765 geographic ranges, 23,740 repeat numbers) with SHA-256 hashes, the test set and the pass marks. The unchanged lists are scored on Dec 8 using complaints filed after Nov 18, a window that begins before the public commit. [Protocol](prediction/README.md)
 - **Not one lucky split:** ranges led from all 27 start days we tried, by at least 2.6×.
 - **A second agency agrees:** 49 of our 50 largest ranges also appear in the FCC's complaint data, against 9% of random ranges.
-- **Search:** the right complaint category in 78% of the top 10 results, against 29% for full-text alone.
+- **Search (optional local embeddings, `pip install -e .[semantic]`):** the right complaint category in 78% of the top 10 results, against 29% for full-text alone.
 - **A real agent:** without Dropnet, Claude Code (Haiku) answered "unknown" for 37 of 40 numbers and advised blocking all 14 whose caller ID matched the consumer's area code. With Dropnet's MCP tool, its answers followed the evidence in 39 of 40. This measures agreement with our rules, not ground truth.
 - **A blinded human look:** one reviewer who reports a background in suspicious-call analysis and did not help build Dropnet rated 10 of 10 strong ranges and 1 of 10 controls worth investigating.
 
@@ -44,7 +46,7 @@ The price: the geographic rules cover about 28.7 million possible numbers. Dropn
 ## How we built it on Relate
 
 - **One file is the product.** `data/ftc.rl` holds 296,273 reports, 248,930 numbers, 96,126 ranges, and the NANPA numbering assignments. It is compacted with `relate clone --to-snapshot-format parquet`.
-- **Cypher does the detection:** ranges, a network of 15 ranges that hit the same area codes on the same days, and the what-if in a rolled-back transaction.
+- **Cypher does the detection:** ranges, carriers ranked by the flagged ranges they hold, ranges linked through a shared holder, a network of 15 ranges that hit the same area codes on the same days, and the what-if in a rolled-back transaction.
 - **Every surface Relate offers:** the embedded Python engine, WebAssembly in the browser, Bolt, the HTTP Query API, MCP, full-text and vector indexes with `SEARCH`, and our own command extension, `relate run dropnet-ftc`, which turns raw FTC files into the same 6,091 ranges in 33 seconds.
 
 ## Challenges
@@ -55,11 +57,11 @@ The price: the geographic rules cover about 28.7 million possible numbers. Dropn
 
 ## Limitations
 
-Complaints and caller IDs are unverified, and an area-code match only suggests spoofing. A range is a screening signal, not proof of fraud or of a common operator. The data hold no legitimate calls, so a range rule's cost to legitimate callers can't be measured. The windows are short, and the human review is one person on 30 cases.
+Complaints and caller IDs are unverified, and an area-code match only suggests spoofing. A range is a screening signal, not proof of fraud or of a common operator. Range holders come from NANPA's current files, numbers can be ported, and toll-free and Canadian ranges have no holder in them. The data hold no legitimate calls, so a range rule's cost to legitimate callers can't be measured. The windows are short, and the human review is one person on 30 cases.
 
 ## Built with
 
-relate, cypher, python, fastapi, webassembly, mcp, claude-code, cytoscape.js, fastembed, ftc-open-data
+relate, cypher, python, fastapi, webassembly, mcp, claude-code, cytoscape.js, fastembed, ftc-open-data, nanpa-numbering-data
 
 ## AI-assisted development
 

@@ -8,7 +8,7 @@
 
 ## Screenshots (upload to the Devpost gallery)
 
-`docs/img/demo-check.png` (number check), `docs/img/demo-early.png` (the 365-826 timeline), `docs/img/holders.png` (who holds flagged ranges), `docs/img/app-graph.png` (a range linked through its holder), `docs/img/architecture.svg` (data flow).
+`docs/img/demo-check.png` (number check), `docs/img/demo-early.png` (the 365-826 timeline), `docs/img/holders.png` (who holds flagged ranges), `docs/img/app-lookup.png` (a number's prefix holder and block assignee), `docs/img/app-graph.png` (its range linked to other flagged ranges through the holder), `docs/img/architecture.svg` (data flow).
 
 ## Inspiration
 

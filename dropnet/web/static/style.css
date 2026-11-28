@@ -49,9 +49,10 @@ textarea, select, input { font: inherit; color: var(--ink); background: var(--bg
 textarea { width: 100%; resize: vertical; }
 .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .spacer { flex: 1; }
-button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px;
+button, .case-download { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px;
   padding: 8px 12px; cursor: pointer; }
-button:hover { border-color: var(--muted); }
+.case-download { text-decoration: none; }
+button:hover, .case-download:hover { border-color: var(--muted); }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
 button:disabled { opacity: .6; cursor: progress; }
 .samples { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }

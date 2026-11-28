@@ -195,7 +195,7 @@ async function openFtc(id) {
   $("#ftc-head").innerHTML = `<h2 tabindex="-1">${esc(fmtRange(blk))}-xxxx</h2>
     <span class="badge">${k.numbers} numbers</span><span class="badge">${k.reports.toLocaleString()} reports</span>
     <span class="badge">${k.states} states</span><span class="badge">${esc(k.first_day || "")} → ${esc(k.last_day || "")}</span>
-    <span class="spacer"></span><a href="api/ftc/campaigns/${esc(id)}/export"><button>Download case (.rl)</button></a>`;
+    <span class="spacer"></span><a class="case-download" href="api/ftc/campaigns/${esc(id)}/export">Download case (.rl)</a>`;
   const C = { Block: css("--c-cashout"), Number: css("--c-card"), State: css("--c-phone"), Subject: css("--c-persona"),
     Carrier: "#11726a", RateCenter: "#836736", RelatedBlock: "#42679c" };
   // Readability: only the busiest numbers carry a label; state / scam-type labels are short and sit on a backdrop.

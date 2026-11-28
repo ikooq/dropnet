@@ -17,6 +17,11 @@ const DATA_V = 17;  // bump with the data files so browsers and the Pages cache 
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
 
+function scrollToSection(id) {
+  const section = document.getElementById(id);
+  if (location.hash === `#${id}` && section && !section.hidden) section.scrollIntoView();
+}
+
 function q(cypher, params) {
   const r = JSON.parse(db.execute(cypher, params ? JSON.stringify(params) : null));
   if (r.error) throw new Error(r.error);
@@ -139,6 +144,7 @@ async function renderPrereg() {
     <a href="https://github.com/ikooq/dropnet/tree/main/docs/prediction" target="_blank" rel="noopener">Lists, hashes and protocol</a>.
     The result is published whatever it is.`;
   $("#prereg").hidden = false;
+  scrollToSection("prereg");
 }
 
 function loadGraph() {
@@ -490,9 +496,11 @@ async function renderCarriers() {
   data = await (await fetch("data/graph.json?v=" + DATA_V)).json();
   renderStatic();
   renderEarly();
+  scrollToSection("early");
   renderPrereg();
   const shared = sharedNumber() || legacyNumber;
-  check(shared || "8667716581", !shared);  // the hero works before the graph engine has loaded
+  if (shared) check(shared);
+  else if (!["#early", "#prereg"].includes(location.hash)) check("8667716581", true);
   await init();
   db = new RelateDb();
   loadGraph();

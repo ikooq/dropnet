@@ -1,4 +1,7 @@
 """The app serves only the FTC graph: no synthetic store, no synthetic endpoints."""
+import re
+from html.parser import HTMLParser
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -39,6 +42,37 @@ def test_index_served(client):
     assert r.status_code == 200 and "Dropnet" in r.text
     assert "FTC complaint data" in r.text
     assert 'data-tab="ingest"' not in r.text and 'data-tab="inbox"' not in r.text
+
+
+def test_initial_assets_load_before_graph_boot_script(client):
+    class InitialAssets(HTMLParser):
+        in_head = False
+
+        def handle_starttag(self, tag, attributes):
+            attrs = dict(attributes)
+            if tag == "head":
+                self.in_head = True
+            elif tag == "link" and not attrs.get("href", "").startswith("data:"):
+                assets.append((tag, self.in_head, attrs))
+            elif tag == "script" or "src" in attrs or "srcset" in attrs:
+                assets.append((tag, self.in_head, attrs))
+
+        def handle_endtag(self, tag):
+            if tag == "head":
+                self.in_head = False
+
+    assets = []
+    InitialAssets().feed(client.get("/").text)
+    # app.js starts the first graph requests as soon as it runs. Its prerequisites
+    # must be parser-blocking and the CSS must have no late asset dependencies.
+    assert assets == [
+        ("link", True, {"rel": "stylesheet", "href": "style.css"}),
+        ("script", True, {"src": "cytoscape-3.30.2.min.js"}),
+        ("script", False, {"src": "app.js"}),
+    ]
+    for asset in ("style.css", "cytoscape-3.30.2.min.js", "app.js"):
+        assert client.get(f"/{asset}").status_code == 200
+    assert not re.search(r"@import\b|url\s*\(", client.get("/style.css").text, re.I)
 
 
 @pytest.mark.parametrize("method, path", [

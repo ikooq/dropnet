@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 from fastapi.testclient import TestClient
@@ -38,6 +39,24 @@ def test_ftc_summary(client):
     assert all("neighbor_share" in p and "label" in p for p in s["profile"])  # derived fields survive JSON
     st = client.get("/api/ftc/states").json()
     assert all("neighbor_share" in x for x in st)
+
+
+def test_ftc_cypher_queries_the_ftc_store(client):
+    response = client.post("/api/ftc/cypher", json={"statement": "MATCH (r:Report) RETURN count(r) AS reports"})
+    assert response.status_code == 200
+    assert response.json()["rows"] == [{"reports": 35}]
+    assert client.get("/api/ftc/schema").status_code == 200
+
+
+def test_ftc_snapshot_refreshes_an_older_live_copy(stores, tmp_path):
+    old = tmp_path / "ftc-live.rl"
+    with store.open_store(old) as conn:
+        store.rows(conn, "CREATE (:Report {id: 'old'})")
+    os.utime(old, (1_000_000_000, 1_000_000_000))
+    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "live.rl",
+                     ftc_snapshot=stores / "ftc.rl", ftc_live=old, ftc_eval=stores / "eval.json")
+    with TestClient(app) as c:
+        assert c.get("/api/ftc/summary").json()["reports"] == 35
 
 
 def test_ftc_campaigns_graph_assess(client):

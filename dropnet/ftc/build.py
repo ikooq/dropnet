@@ -30,27 +30,8 @@ def split_day(days: list[str], train_share: float = 0.7) -> str:
     return days[int(len(days) * train_share)]
 
 
-def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSON, log=print) -> dict:
-    t0 = time.perf_counter()
-    reports = list(parse.read_reports(sorted(Path(raw).glob("*.csv*"))))
-    log(f"parsed {len(reports):,} reports")
-    work = Path(tempfile.mkdtemp(prefix="dropnet-ftc-")) / "graph"
-    conn = store.open_store(work)
-    try:
-        stats = load.load_reports(conn, reports)
-        load.ensure_fulltext(conn)
-        log(f"loaded {stats} in {time.perf_counter() - t0:.0f}s")
-        n = campaigns.write_campaigns(conn)
-        log(f"wrote {n:,} campaigns")
-        from . import networks
-        log(f"pool networks: {networks.link_pools(conn)}")
-        from . import semantic
-        semantic.write_profiles(conn, log=log)  # text profiles + vectors (when fastembed is installed) for hybrid search
-        result = evaluate.holdout(conn, split_day([r.created_day for r in reports]))
-        result["profile"] = campaigns.spoofing_profile(conn)
-    finally:
-        conn.close()
-    out = Path(out)
+def compact(work: Path, out: Path, log=print) -> Path:
+    """Write the working directory store to `out`: a Parquet `.rl` bundle with the Relate CLI, else a directory."""
     out.parent.mkdir(parents=True, exist_ok=True)
     cli = relate_cli()
     if cli:  # a compact Parquet bundle: ~40 MB instead of ~150 MB, fits a git repo
@@ -81,6 +62,33 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
                 if backup.exists():
                     os.replace(backup, out)
                 raise
+    return out
+
+
+def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSON, log=print) -> dict:
+    t0 = time.perf_counter()
+    reports = list(parse.read_reports(sorted(Path(raw).glob("*.csv*"))))
+    log(f"parsed {len(reports):,} reports")
+    work = Path(tempfile.mkdtemp(prefix="dropnet-ftc-")) / "graph"
+    conn = store.open_store(work)
+    try:
+        stats = load.load_reports(conn, reports)
+        load.ensure_fulltext(conn)
+        log(f"loaded {stats} in {time.perf_counter() - t0:.0f}s")
+        n = campaigns.write_campaigns(conn)
+        log(f"wrote {n:,} campaigns")
+        from . import networks
+        log(f"pool networks: {networks.link_pools(conn)}")
+        from . import numbering
+        if (numbering.NANPA_DIR / numbering.CODES_CSV).exists():  # carriers and rate centers from NANPA
+            log(f"numbering: {numbering.link(conn)}")
+        from . import semantic
+        semantic.write_profiles(conn, log=log)  # text profiles + vectors (when fastembed is installed) for hybrid search
+        result = evaluate.holdout(conn, split_day([r.created_day for r in reports]))
+        result["profile"] = campaigns.spoofing_profile(conn)
+    finally:
+        conn.close()
+    out = compact(work, Path(out), log=log)
     shutil.rmtree(work.parent, ignore_errors=True)
     result.update({"stats": stats, "campaigns": n, "seconds": round(time.perf_counter() - t0, 1),
                    "store_mb": round(out.stat().st_size / 1e6, 1) if out.is_file() else None,
@@ -94,4 +102,22 @@ def build(out: Path = FTC_STORE, raw: Path = FTC_RAW, eval_path: Path = EVAL_JSO
         except json.JSONDecodeError:
             pass
     eval_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    return result
+
+
+def augment(path: Path = FTC_STORE, step=None, log=print) -> dict:
+    """Run `step(conn)` on a copy of an existing store, then write it back compacted. Needs the Relate CLI."""
+    cli = relate_cli()
+    if not cli:
+        raise SystemExit("The Relate CLI is needed to rewrite a .rl bundle: https://relatedb.ai/docs/get-started/install")
+    work = Path(tempfile.mkdtemp(prefix="dropnet-augment-")) / "graph"
+    subprocess.run([cli, "clone", str(path), str(work)], check=True, capture_output=True,
+                   env={**os.environ, "RELATE_TELEMETRY": "off"})
+    conn = store.open_store(work)
+    try:
+        result = step(conn)
+    finally:
+        conn.close()
+    compact(work, Path(path), log=log)
+    shutil.rmtree(work.parent, ignore_errors=True)
     return result

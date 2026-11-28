@@ -18,6 +18,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+import relate
 
 from .. import config, ingest, report, store, tools
 
@@ -126,7 +127,9 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
         state["pool"] = pool
         state["conn"] = pool.submit(store.open_store, live).result()
         if ftc_snapshot.exists():
-            prepare_live(ftc_snapshot, ftc_live, reset)
+            # FTC what-if writes roll back. This copy can be refreshed when the checked-in data changes.
+            stale_ftc = ftc_live.exists() and ftc_live.stat().st_mtime_ns < ftc_snapshot.stat().st_mtime_ns
+            prepare_live(ftc_snapshot, ftc_live, reset or stale_ftc)
             state["ftc"] = pool.submit(store.open_store, ftc_live).result()
         try:
             yield
@@ -154,6 +157,17 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
         s["profile"] = run_ftc(ftc_campaigns.spoofing_profile)
         s["eval"] = json.loads(ftc_eval.read_text(encoding="utf-8")) if ftc_eval.exists() else None
         return s
+
+    @app.get("/api/ftc/schema")
+    def ftc_schema():
+        return run_ftc(tools.get_schema)
+
+    @app.post("/api/ftc/cypher")
+    def ftc_cypher(body: CypherIn):
+        try:
+            return run_ftc(tools.read_cypher, body.statement, body.params)
+        except (ValueError, relate.Error) as e:
+            raise HTTPException(400, str(e))
 
     @app.get("/api/ftc/campaigns")
     def ftc_campaign_list(limit: int = 60, kind: str | None = None):
@@ -194,6 +208,14 @@ def create_app(snapshot: Path | str = config.SNAPSHOT_PATH, live: Path | str = c
     @app.get("/api/ftc/networks")
     def ftc_networks():
         return run_ftc(ftc_api.networks)
+
+    @app.get("/api/ftc/carriers")
+    def ftc_carriers(limit: int = 25):
+        return run_ftc(ftc_api.dispatch_ftc, "carriers", {"limit": max(1, min(int(limit), 200))})
+
+    @app.get("/api/ftc/carriers/{name}")
+    def ftc_carrier(name: str):
+        return run_ftc(ftc_api.dispatch_ftc, "carrier_detail", {"carrier": name})
 
     @app.get("/api/ftc/states")
     def ftc_states():

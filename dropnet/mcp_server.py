@@ -156,9 +156,8 @@ def build_server(backend: Backend):
 
     @mcp.tool()
     def search_ranges(text: str, state: str | None = None, limit: int = 10) -> dict:
-        """Find ranges with complaint concentrations by what people say about the calls ("Medicare back brace", "fake IRS agent"):
-        hybrid search over each range's profile (Relate full-text + vector SEARCH, rank fusion), optionally only
-        ranges reported by consumers in one US state."""
+        """Search complaint-range profiles, optionally filtered to one US state.
+        Search uses full-text and adds vector ranking when the optional semantic dependencies are installed."""
         return backend.call("search_ranges", {"text": text, "state": state, "limit": limit})
 
     @mcp.tool()
@@ -166,6 +165,17 @@ def build_server(backend: Backend):
                      since_day: str | None = None) -> dict:
         """Count reports matching hypothetical NPA-NXX blocks or numbers. This does not measure prevented calls or legitimate-call impact. The transaction is rolled back."""
         return backend.call("whatif_block", {"blocks": blocks, "numbers": numbers, "since_day": since_day})
+
+    @mcp.tool()
+    def carriers(limit: int = 25) -> dict:
+        """REAL data: carriers (NANPA range holders) ranked by how many flagged ranges they hold, with flagged ranges
+        per 100 ranges held. A holder issued the numbers; it is not the caller. ALWAYS relay the `caution` field."""
+        return backend.call("carriers", {"limit": limit})
+
+    @mcp.tool()
+    def carrier_detail(carrier: str, limit: int = 40) -> dict:
+        """REAL data: one carrier's flagged ranges with rate centers, states and complaint categories."""
+        return backend.call("carrier_detail", {"carrier": carrier, "limit": limit})
 
     @mcp.tool()
     def build_case(campaign_id: str) -> str:

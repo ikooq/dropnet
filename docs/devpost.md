@@ -1,6 +1,6 @@
 # Dropnet — Devpost submission draft
 
-**Tagline:** One scam complaint names one phone number. Dropnet finds the number range behind thousands of them, in one Relate graph, and shows its evidence.
+**Tagline:** Dropnet connects unwanted-call complaints by phone-number range so an analyst can follow the evidence in Relate.
 
 **Demo:** https://ikooq.github.io/dropnet/
 
@@ -16,7 +16,7 @@ Dropnet loads 296,273 real FTC Do Not Call complaints into one Relate graph: `Re
 
 - **Check a number.** The page looks up any reported number in the browser and shows its range as a grid of 10,000 numbers, with the reported ones lit.
 - **Watch a range get flagged.** A timeline shows one range flagged on Oct 19, then 323 numbers nobody had reported yet appearing in it.
-- **Search by description.** "Someone pretending to be the IRS" finds matching ranges through hybrid search (Relate vector + full-text `SEARCH`, then a graph filter by state).
+- **Explore numbering assignments.** The full graph connects U.S. ranges to their NANPA code holders and rate centers. It distinguishes the assignee of a specific thousands-block from the holder of the six-digit code. The local Cypher examples rank OCNs by flagged ranges and find ranges that share an OCN.
 - **Test a rule first.** The what-if writes candidate range rules in a Relate transaction, counts the complaints they match, then rolls back.
 - **Give agents the same context.** An MCP server and a Claude Code hook return a number's evidence with a caution about faked caller IDs before an agent answers.
 
@@ -29,8 +29,10 @@ Dropnet loads 296,273 real FTC Do Not Call complaints into one Relate graph: `Re
 | **Fresh data:** 29,549 complaints filed Nov 13–16, after our snapshot ended | 3.6% | **13.2%** |
 | **Fresh data, calls in the new period** (21,834) | 3.3% | **11.8%** |
 
+At the same budget of 2,872 geographic prefixes, a naive ranking by distinct caller IDs matched 14.52% compared with Dropnet's 14.31%. That is 523.6 vs. 516.0 matches per million possible numbers. The [equal-budget comparison](EVIDENCE.md#equal-budget-comparison) explains the denominator and its limits.
+
 - **Early warning:** replaying 239,932 complaints day by day with only the previous days' knowledge, a number blocklist knew 2.6% of them, the range rule 11.9%. 23,726 numbers first appeared in a range Dropnet had already flagged.
-- **A prediction made before the data existed:** on Nov 23 we froze the rule's output (5,765 geographic ranges, 23,740 repeat numbers) with SHA-256 hashes, the test set and the pass marks, in a public commit. On Dec 8 it is scored, unchanged, on complaints filed after Nov 18 ([protocol](https://github.com/ikooq/dropnet/tree/main/docs/prediction)).
+- **Frozen-list evaluation:** on Nov 23 we froze the rule's output (5,765 geographic ranges, 23,740 repeat numbers) with SHA-256 hashes, the test set and the pass marks. The unchanged lists are scored on Dec 8 using complaints filed after Nov 18, a window that begins before the public commit. [Protocol](prediction/README.md)
 - **Not one lucky split:** ranges led from all 27 start days we tried, by at least 2.6×.
 - **A second agency agrees:** 49 of our 50 largest ranges also appear in the FCC's complaint data, against 9% of random ranges.
 - **Search:** the right complaint category in 78% of the top 10 results, against 29% for full-text alone.
@@ -41,7 +43,7 @@ The price: the geographic rules cover about 28.7 million possible numbers. Dropn
 
 ## How we built it on Relate
 
-- **One file is the product.** `data/ftc.rl` (78 MB) holds 296,273 reports, 248,930 numbers, 96,126 ranges and 1.5 million relationships, compacted with `relate clone --to-snapshot-format parquet`.
+- **One file is the product.** `data/ftc.rl` holds 296,273 reports, 248,930 numbers, 96,126 ranges, and the NANPA numbering assignments. It is compacted with `relate clone --to-snapshot-format parquet`.
 - **Cypher does the detection:** ranges, a network of 15 ranges that hit the same area codes on the same days, and the what-if in a rolled-back transaction.
 - **Every surface Relate offers:** the embedded Python engine, WebAssembly in the browser, Bolt, the HTTP Query API, MCP, full-text and vector indexes with `SEARCH`, and our own command extension, `relate run dropnet-ftc`, which turns raw FTC files into the same 6,091 ranges in 33 seconds.
 

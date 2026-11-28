@@ -13,7 +13,7 @@ const rangeOf = (b) => `${b.slice(0, 3)}-${b.slice(3, 6)}-xxxx`;
 const LABEL = { DEBT: "Debt relief", IMPOSTER_GOV: "Impersonation", MEDICAL: "Medical", OTHER: "Other", DROPPED: "Dropped call",
   NONE: "No subject", WARRANTY: "Warranty", HOME: "Home improvement", TRAVEL: "Travel", PRIZES: "Prizes", ENERGY: "Energy",
   TECH: "Tech support", WORK: "Work from home" };
-const DATA_V = 15;  // bump with the data files so browsers and the Pages cache fetch fresh copies
+const DATA_V = 16;  // bump with the data files so browsers and the Pages cache fetch fresh copies
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
 
@@ -38,12 +38,16 @@ function renderStatic() {
     $("#eval-bars").innerHTML = hbar(`Block every number ever reported`, ev.blocklist_all_seen.coverage, max)
       + hbar(`Block numbers with 2+ reports`, ev.baseline.coverage, max)
       + (ev.dropnet_geographic ? hbar(`Dropnet: also block ${fmt(ev.dropnet_geographic.block_rules)} local ranges`, ev.dropnet_geographic.coverage, max, true) : "")
+      + (ev.naive_geographic ? hbar(`Naive: same number of local ranges`, ev.naive_geographic.coverage, max) : "")
       + hbar(`Dropnet: plus toll-free ranges`, ev.dropnet.coverage, max, true);
     const rb = ev.robustness;
     $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} later reports matched numbers not previously reported.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet matched at
       least ${rb.rolling_summary.min_lift.toFixed(1)} times as many reports every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""}${ev.early_warning ? ` Replayed day by day, ${fmt(ev.early_warning.numbers_first_seen_after_flag)} numbers
       first appeared in a range that was already flagged, a median of ${ev.early_warning.days_first_complaint_to_flag.median} days after its first complaint.` : ""} The price: a range rule can affect up to
       10,000 numbers; legitimate-call impact is unknown.`;
+    if (ev.naive_geographic) {
+      $("#eval-note").innerHTML += ` At the same geographic prefix budget, Dropnet matched ${ev.dropnet_geographic.matches_per_million_numbers.toFixed(1)} complaints per million possible numbers and the naive ranking matched ${ev.naive_geographic.matches_per_million_numbers.toFixed(1)}.`;
+    }
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
     .map((p) => hbar(esc(LABEL[p.subject] || p.label), p.neighbor_share, 1)).join("");

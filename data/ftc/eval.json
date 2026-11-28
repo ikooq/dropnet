@@ -6,13 +6,15 @@
     "rules": 11968,
     "numbers_blocked": 11968,
     "covered": 4496,
-    "coverage": 0.0434
+    "coverage": 0.0434,
+    "matches_per_million_numbers": 375668.4
   },
   "dropnet": {
     "rules": 15649,
     "number_rules": 11968,
     "block_rules": 3681,
     "numbers_blocked": 36816511,
+    "matches_per_million_numbers": 620.1,
     "covered": 22829,
     "coverage": 0.2203,
     "new_numbers_caught": 17532,
@@ -130,6 +132,7 @@
     "number_rules": 11968,
     "block_rules": 2872,
     "numbers_blocked": 28730391,
+    "matches_per_million_numbers": 516.0,
     "covered": 14825,
     "coverage": 0.1431,
     "new_numbers_caught": 9978,
@@ -961,5 +964,16 @@
       ],
       "selection": "the geographic range with the most numbers first seen after the day it was flagged"
     }
+  },
+  "naive_geographic": {
+    "rules": 14840,
+    "number_rules": 11968,
+    "block_rules": 2872,
+    "numbers_blocked": 28730239,
+    "matches_per_million_numbers": 523.6,
+    "covered": 15043,
+    "coverage": 0.1452,
+    "new_numbers_caught": 10180,
+    "spoofed_caught": 2094
   }
 }

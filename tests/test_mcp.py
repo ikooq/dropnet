@@ -30,7 +30,8 @@ def free_port() -> int:
 def test_tool_names():
     assert set(mcp_server.TOOL_NAMES) == {"get_schema", "read_cypher", "find_campaign", "explain_link", "top_mules",
                                          "similar_scripts", "build_case", "list_campaigns", "ftc_summary",
-                                         "ftc_campaigns", "assess_number", "whatif_block", "search_ranges"}
+                                         "ftc_campaigns", "assess_number", "whatif_block", "search_ranges", "carriers",
+                                         "carrier_detail"}
 
 
 def test_ftc_tools_in_snapshot_mode(tmp_path):

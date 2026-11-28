@@ -77,7 +77,13 @@ def _print_eval(r: dict) -> None:
     g = r.get("dropnet_geographic")
     if g:
         print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {g['coverage']:.1%} |")
+    naive = r.get("naive_geographic")
+    if naive:
+        print(f"| Naive: + {naive['block_rules']:,} geographic blocks ranked by distinct numbers | {naive['rules']:,} | {naive['coverage']:.1%} |")
     print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {d['coverage']:.1%} |")
+    if naive and g and g["matches_per_million_numbers"] is not None:
+        print(f"\nEqual geographic prefix budgets, matches per million possible numbers: "
+              f"Dropnet {g['matches_per_million_numbers']:,.1f}, naive {naive['matches_per_million_numbers']:,.1f}.")
     print(f"\n{d['new_numbers_caught']:,} matching reports involved numbers not previously reported. Potential scope: rules cover up to "
           f"{d.get('numbers_blocked', 0) / 1e6:.1f} M numbers (blocklist: {b.get('numbers_blocked', b['rules']):,}); "
           f"risk: {d['spoofed_caught']:,} matching reports had matching caller and consumer area codes; this is not proof of spoofing.")
@@ -92,6 +98,38 @@ def cmd_ftc_eval(a: argparse.Namespace) -> int:
         _print_eval(evaluate.holdout(conn, a.split or build.split_day(days)))
     finally:
         conn.close()
+    return 0
+
+
+def cmd_ftc_numbering(a: argparse.Namespace) -> int:
+    """NANPA carriers and rate centers -> data/nanpa/*.csv.gz -> written into data/ftc.rl."""
+    import tempfile
+    from pathlib import Path
+    from . import store
+    from .ftc import build, numbering
+    if a.fetch:
+        tmp = Path(tempfile.mkdtemp(prefix="dropnet-nanpa-"))
+        codes = numbering.download(numbering.CODES_URL, tmp / "codes.zip")
+        blocks = numbering.download(numbering.BLOCKS_URL, tmp / "blocks.zip")
+        conn = store.open_store(build.FTC_STORE, read_only=True)
+        try:
+            ranges = {r["b"] for r in store.rows(conn, "MATCH (b:Block) RETURN b.npa_nxx AS b")}
+            subs = {r["n"][:7] for r in store.rows(conn, "MATCH (n:Number) WHERE n.toll_free = false "
+                                                       "RETURN n.number AS n")}
+        finally:
+            conn.close()
+        print(f"extracted {numbering.extract(codes, blocks, ranges, subs)} into {numbering.NANPA_DIR}")
+    print(f"linked {build.augment(build.FTC_STORE, numbering.link)} into {build.FTC_STORE}")
+    import json
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
+        ev["carrier_prior"] = numbering.carrier_prior(conn, ev["split_day"])
+        ev["carriers"] = numbering.carrier_ranking(conn, 25)
+    finally:
+        conn.close()
+    build.EVAL_JSON.write_text(json.dumps(ev, indent=2), encoding="utf-8")
+    print(json.dumps(ev["carrier_prior"], indent=2))
     return 0
 
 
@@ -239,6 +277,9 @@ def register(sub) -> None:
     fb = sub.add_parser("ftc-build", help="build data/ftc.rl from real FTC Do Not Call reports")
     fb.add_argument("--fetch", action="store_true", help="download the latest daily files from ftc.gov first")
     fb.set_defaults(fn=cmd_ftc_build)
+    nb = sub.add_parser("ftc-numbering", help="add NANPA carriers, rate centers and 1,000-blocks to data/ftc.rl")
+    nb.add_argument("--fetch", action="store_true", help="download the current NANPA files first (nanpa.com)")
+    nb.set_defaults(fn=cmd_ftc_numbering)
     fe = sub.add_parser("ftc-eval", help="temporal hold-out: blocklist vs Dropnet pool rules on real reports")
     fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")
     fe.set_defaults(fn=cmd_ftc_eval)

@@ -1,18 +1,21 @@
 """FastAPI app: the analyst UI and a JSON API over the FTC complaint graph.
 
-The committed data/ftc.rl is never written. On start the app copies it to data/live/ftc.rl (again only when the
+The committed data/ftc.rl is never written. On the first data request the app copies it to data/live/ftc.rl (again only when the
 committed file is newer, or with --reset) and is that copy's only writer; what-ifs roll back. MCP clients read
 through /api.
 """
 from __future__ import annotations
 
 import json
+import logging
 import re
 import shutil
 import tempfile
+from asyncio import shield, wrap_future
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException
@@ -24,6 +27,7 @@ import relate
 from .. import config, store, tools
 
 STATIC = Path(__file__).parent / "static"
+log = logging.getLogger(__name__)
 
 
 class WhatIfIn(BaseModel):
@@ -54,42 +58,73 @@ def create_app(reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR /
                ftc_eval: Path | str = config.DATA_DIR / "ftc" / "eval.json", ready_message: str | None = None) -> FastAPI:
     ftc_snapshot, ftc_live, ftc_eval = Path(ftc_snapshot), Path(ftc_live), Path(ftc_eval)
     state: dict[str, Any] = {}
+    graph_lock = Lock()
+
+    def load_graph():
+        try:
+            # What-if writes roll back. Refresh the working copy when the snapshot changes.
+            stale_ftc = ftc_live.exists() and ftc_live.stat().st_mtime_ns < ftc_snapshot.stat().st_mtime_ns
+            prepare_live(ftc_snapshot, ftc_live, reset or stale_ftc)
+            conn = store.open_store(ftc_live)
+        except Exception:
+            log.exception("Could not load the FTC graph")
+            raise
+        return conn
+
+    def start_graph():
+        with graph_lock:
+            if "ftc" not in state and ftc_snapshot.exists():
+                # Wait for the first data request so native loading can't delay the page and its assets.
+                pool = state["pool"]
+                graph = state["ftc"] = pool.submit(load_graph)
+                state["summary"] = pool.submit(lambda: _summary(graph.result()))
+            return state.get("ftc")
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
-        # Relate connections are thread-affine: one dedicated thread owns the live store and runs every query.
-        # That also makes it the store's only writer.
+        # Relate connections are thread-affine, including during shutdown.
         pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate")
         state["pool"] = pool
-        if ftc_snapshot.exists():
-            # FTC what-if writes roll back. This copy can be refreshed when the checked-in data changes.
-            stale_ftc = ftc_live.exists() and ftc_live.stat().st_mtime_ns < ftc_snapshot.stat().st_mtime_ns
-            prepare_live(ftc_snapshot, ftc_live, reset or stale_ftc)
-            state["ftc"] = pool.submit(store.open_store, ftc_live).result()
-            state["summary"] = pool.submit(_summary, state["ftc"])  # warm the first page while the browser opens
-        if ready_message:
-            print(ready_message, flush=True)
         try:
+            if ready_message:
+                print(ready_message, flush=True)
             yield
         finally:
-            for key in ("ftc",):
-                if key in state:
-                    pool.submit(state.pop(key).close).result()
-            pool.shutdown(wait=True)
+            graph = state.get("ftc")
+
+            def close_graph():
+                # This runs on the same worker, after the load and any queued queries.
+                if graph.exception() is None:
+                    graph.result().close()
+
+            cleanup = pool.submit(close_graph) if graph is not None else None
+            pool.shutdown(wait=False)
+            try:
+                if cleanup is not None:
+                    await shield(wrap_future(cleanup))
+            finally:
+                state.clear()
 
     app = FastAPI(title="Dropnet", lifespan=lifespan)
 
-    def run_ftc(fn, *a, **kw):
-        if "ftc" not in state:
+    def get_graph():
+        graph = start_graph()
+        if graph is None:
             raise HTTPException(404, "FTC data not built: run `python -m dropnet ftc-build`")
-        return state["pool"].submit(lambda: fn(state["ftc"], *a, **kw)).result()
+        try:
+            return graph.result()
+        except Exception as e:
+            raise HTTPException(503, "Could not load the FTC graph. See the server log.") from e
+
+    def run_ftc(fn, *a, **kw):
+        conn = get_graph()
+        return state["pool"].submit(fn, conn, *a, **kw).result()
 
     from ..ftc import api as ftc_api, campaigns as ftc_campaigns, whatif as ftc_whatif
 
     @app.get("/api/ftc/summary")
     def ftc_summary():
-        if "ftc" not in state:
-            raise HTTPException(404, "FTC data not built: run `python -m dropnet ftc-build`")
+        get_graph()
         s = dict(state["summary"].result())  # computed once: what-ifs always roll back, so it cannot change
         s["eval"] = json.loads(ftc_eval.read_text(encoding="utf-8")) if ftc_eval.exists() else None
         return s
@@ -172,8 +207,12 @@ def create_app(reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR /
             raise HTTPException(400, str(e))
 
     @app.get("/api/health")
-    def health():
-        return {"ok": True, "graph": ftc_snapshot.name, "loaded": "ftc" in state, "data": "FTC Do Not Call reports",
+    async def health():
+        graph = state.get("ftc")
+        done = graph is not None and graph.done()
+        return {"ok": True, "graph": ftc_snapshot.name, "loaded": done and graph.exception() is None,
+                "loading": graph is not None and not done,
+                "data": "FTC Do Not Call reports",
                 "synthetic": False}
 
     @app.post("/api/tools/{name}")
@@ -182,6 +221,8 @@ def create_app(reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR /
             raise HTTPException(404, f"unknown tool {name}")
         try:
             return run_ftc(ftc_api.dispatch_ftc, name, args)
+        except HTTPException:
+            raise
         except (KeyError, ValueError) as e:
             raise HTTPException(400, f"{type(e).__name__}: {e}")
         except Exception as e:  # Relate errors explain how to fix the query

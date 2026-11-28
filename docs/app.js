@@ -242,7 +242,7 @@ function openPool(id) {
   for (const x of states) if (topStates.has(x.s)) { add("S" + x.s, "State", x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "S" + x.s, type: "CALLED_INTO" } }); }
   for (const x of subj) if (topSubjects.has(x.s)) { add("T" + x.s, "Subject", LABEL[x.s] || x.s, 18); edges.push({ data: { id: `e${edges.length}`, source: "N" + x.n, target: "T" + x.s, type: "ABOUT" } }); }
   if (cy) cy.destroy();
-  cy = cytoscape({ container: $("#ftc-graph"), elements: [...nodes.values(), ...edges], wheelSensitivity: 0.25,
+  cy = cytoscape({ container: $("#ftc-graph"), elements: [...nodes.values(), ...edges],
     style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)",
         "font-size": 9, "font-family": "Archivo, sans-serif", color: css("--ink"), "text-valign": "bottom", "text-margin-y": 3 } },
       { selector: "node[kind = 'Block'], node[kind = 'State'], node[kind = 'Subject']", style: { shape: "round-rectangle", "font-size": 11, "font-weight": 700 } },

@@ -27,7 +27,11 @@ def client(ftc, tmp_path):
 
 def test_health_describes_the_ftc_graph(client):
     r = client.get("/api/health").json()
-    assert r["ok"] is True and r["loaded"] is True and r["synthetic"] is False and r["graph"] == "ftc.rl"
+    assert r["ok"] is True and r["synthetic"] is False and r["graph"] == "ftc.rl"
+    assert r["loaded"] is False and r["loading"] is False
+    assert client.get("/api/ftc/summary").status_code == 200
+    r = client.get("/api/health").json()
+    assert r["loaded"] is True and r["loading"] is False
 
 
 def test_index_served(client):
@@ -55,5 +59,5 @@ def test_summary_is_computed_once(client):
 def test_no_synthetic_live_copy(ftc, tmp_path):
     live = tmp_path / "live" / "ftc.rl"
     with TestClient(create_app(reset=True, ftc_snapshot=ftc, ftc_live=live)) as c:
-        assert c.get("/api/health").json()["ok"]
+        assert c.get("/api/ftc/summary").status_code == 200
     assert sorted(x.name for x in live.parent.iterdir() if x.suffix == ".rl") == ["ftc.rl"]

@@ -58,7 +58,7 @@ def test_proxy_uses_the_running_app(ftc, tmp_path):
     import uvicorn
     from dropnet.web.app import create_app
     port = free_port()
-    app = create_app(live=tmp_path / "live.rl", reset=True, ftc_snapshot=ftc, ftc_live=tmp_path / "ftc-live.rl")
+    app = create_app(reset=True, ftc_snapshot=ftc, ftc_live=tmp_path / "ftc-live.rl")
     server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="error"))
     t = threading.Thread(target=server.run, daemon=True)
     t.start()

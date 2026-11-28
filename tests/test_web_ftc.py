@@ -5,7 +5,7 @@ from urllib.parse import quote
 import pytest
 from fastapi.testclient import TestClient
 
-from dropnet import pipeline, store
+from dropnet import store
 from dropnet.ftc import campaigns, load, numbering
 from dropnet.web.app import create_app
 from tests.test_ftc_load import R
@@ -14,7 +14,6 @@ from tests.test_ftc_load import R
 @pytest.fixture(scope="module")
 def stores(tmp_path_factory):
     d = tmp_path_factory.mktemp("wf")
-    pipeline.build(d / "snap.rl", seed=1, n=60)
     reports = [R(i, f"866771{i % 6:04d}", victim_npa="303", state="Colorado") for i in range(30)]
     reports += [R(100 + i, f"303555{i:04d}", victim_npa="303", subject="MEDICAL") for i in range(5)]
     conn = store.open_store(d / "ftc.rl")
@@ -34,7 +33,7 @@ def stores(tmp_path_factory):
 
 @pytest.fixture
 def client(stores, tmp_path):
-    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "live.rl", reset=True,
+    app = create_app(reset=True,
                      ftc_snapshot=stores / "ftc.rl", ftc_live=tmp_path / "ftc-live.rl", ftc_eval=stores / "eval.json")
     with TestClient(app) as c:
         yield c
@@ -82,8 +81,7 @@ def test_ftc_snapshot_refreshes_an_older_live_copy(stores, tmp_path):
     with store.open_store(old) as conn:
         store.rows(conn, "CREATE (:Report {id: 'old'})")
     os.utime(old, (1_000_000_000, 1_000_000_000))
-    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "live.rl",
-                     ftc_snapshot=stores / "ftc.rl", ftc_live=old, ftc_eval=stores / "eval.json")
+    app = create_app(ftc_snapshot=stores / "ftc.rl", ftc_live=old, ftc_eval=stores / "eval.json")
     with TestClient(app) as c:
         assert c.get("/api/ftc/summary").json()["reports"] == 35
 
@@ -121,7 +119,7 @@ def test_ftc_tools_dispatch(client):
 
 
 def test_ftc_absent_is_graceful(stores, tmp_path):
-    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "l.rl", reset=True,
+    app = create_app(reset=True,
                      ftc_snapshot=tmp_path / "missing.rl", ftc_live=tmp_path / "fl.rl")
     with TestClient(app) as c:
         assert c.get("/api/ftc/summary").status_code == 404

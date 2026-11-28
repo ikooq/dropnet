@@ -11,11 +11,14 @@ def cmd_serve(a: argparse.Namespace) -> int:
     import uvicorn
 
     from .web.app import create_app
-    if not config.SNAPSHOT_PATH.exists():
-        print(f"No snapshot at {config.SNAPSHOT_PATH}. Run: python -m dropnet build")
+    ftc = config.DATA_DIR / "ftc.rl"
+    if not ftc.exists():
+        print(f"No graph at {ftc}. Run: python -m dropnet ftc-build --fetch")
         return 2
-    print(f"Dropnet → http://{a.host}:{a.port}  (live store: {config.LIVE_PATH}{', reset' if a.reset else ''})")
-    uvicorn.run(create_app(reset=a.reset), host=a.host, port=a.port, log_level="warning")
+    url = f"http://{a.host}:{a.port}"
+    print(f"Loading {ftc.name} into Relate ({ftc.stat().st_size / 1e6:.0f} MB, about 10 seconds)...", flush=True)
+    uvicorn.run(create_app(reset=a.reset, ready_message=f"Dropnet is ready: {url}"), host=a.host, port=a.port,
+                log_level="warning")
     return 0
 
 
@@ -290,10 +293,10 @@ def register(sub) -> None:
     fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")
     fe.set_defaults(fn=cmd_ftc_eval)
 
-    s = sub.add_parser("serve", help="run the web UI + API on the live copy of the snapshot")
+    s = sub.add_parser("serve", help="run the web UI + API on a working copy of data/ftc.rl")
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8000)
-    s.add_argument("--reset", action="store_true", help="start from a fresh copy of the snapshot")
+    s.add_argument("--reset", action="store_true", help="start from a fresh copy of data/ftc.rl")
     s.set_defaults(fn=cmd_serve)
 
     i = sub.add_parser("ingest", help="add one complaint (Russian text) to the live store and show its links")

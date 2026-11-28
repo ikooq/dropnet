@@ -58,14 +58,31 @@ def test_cli_hook_silent_without_numbers(tmp_path):
     assert out.returncode == 0 and out.stdout.strip() == ""
 
 
+def git_bash() -> str | None:
+    """The bash Claude Code runs hooks with. On Windows that is Git Bash: `bash` on PATH is often WSL's
+    C:\\Windows\\System32\\bash.exe, which fails without a Linux distribution (Bash/Service/0x8007072c)."""
+    import os
+    import shutil
+    import sys
+    from pathlib import Path
+    if sys.platform != "win32":
+        return shutil.which("bash")
+    candidates = [os.environ.get("CLAUDE_CODE_GIT_BASH_PATH")]
+    if git := shutil.which("git"):  # ...\Git\cmd\git.exe or ...\Git\bin\git.exe
+        candidates += [Path(git).parent.parent / "bin" / "bash.exe", Path(git).parent / "bash.exe"]
+    candidates += [Path(os.environ.get(v, "")) / "Git" / "bin" / "bash.exe"
+                   for v in ("ProgramFiles", "ProgramW6432", "LOCALAPPDATA") if os.environ.get(v)]
+    candidates.append(Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Git" / "bin" / "bash.exe")
+    return next((str(c) for c in candidates if c and Path(c).is_file()), None)
+
+
 def test_settings_hook_is_silent_without_the_package(tmp_path):
     """A judge who opens the repo in Claude Code before `pip install` must not see a failing hook."""
-    import shutil
     from pathlib import Path
-    bash = shutil.which("bash")
+    bash = git_bash()
     if not bash:
         import pytest
-        pytest.skip("bash not available")
+        pytest.skip("Git Bash not available")
     root = Path(__file__).resolve().parent.parent
     cmd = json.loads((root / ".claude" / "settings.json").read_text(encoding="utf-8"))[
         "hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]

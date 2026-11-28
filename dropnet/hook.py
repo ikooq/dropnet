@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from . import config
+from .numfmt import pct
 
 WEB_URL = "http://127.0.0.1:8000"  # `python -m dropnet serve`: answers in milliseconds, the graph is already loaded
 
@@ -74,7 +75,7 @@ def number_guard(prompt: str, ftc_store: Path | str = config.DATA_DIR / "ftc.rl"
             lines.append(f"- {pretty}: {LABEL['unknown']}.{context}")
             continue
         lines.append(f"- {pretty}: {LABEL[a['verdict']]}; {a['reports']} reports in {a['states']} states, "
-                     f"scam types {', '.join(a['subjects'][:3])}; {a['neighbor_share']:.0%} area-code match; "
+                     f"scam types {', '.join(a['subjects'][:3])}; {pct(a['neighbor_share'], 0)} area-code match; "
                      f"block {a['block'][:3]}-{a['block'][3:]} has {a['block_numbers']} reported numbers.")
         h = a.get("holder")
         if h and h.get("range_holder"):

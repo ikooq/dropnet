@@ -16,7 +16,7 @@ def cmd_serve(a: argparse.Namespace) -> int:
         print(f"No graph at {ftc}. Run: python -m dropnet ftc-build --fetch")
         return 2
     url = f"http://{a.host}:{a.port}"
-    print(f"Loading {ftc.name} into Relate ({ftc.stat().st_size / 1e6:.0f} MB, about 10 seconds)...", flush=True)
+    print(f"Loading {ftc.name} into Relate ({ftc.stat().st_size / 1e6:.0f} MB, 10 to 15 seconds)...", flush=True)
     uvicorn.run(create_app(reset=a.reset, ready_message=f"Dropnet is ready: {url}"), host=a.host, port=a.port,
                 log_level="warning")
     return 0
@@ -71,19 +71,20 @@ def cmd_ftc_build(a: argparse.Namespace) -> int:
 
 
 def _print_eval(r: dict) -> None:
+    from .numfmt import pct
     b, d, allseen = r["baseline"], r["dropnet"], r["blocklist_all_seen"]
     print(f"\nReal FTC reports: train before {r['split_day']} ({r['train_reports']:,}) · test after "
           f"({r['test_reports']:,})")
     print(f"| rules | count | later-filed reports matched |\n|---|---:|---:|")
-    print(f"| every number ever reported | {allseen['rules']:,} | {allseen['coverage']:.1%} |")
-    print(f"| blocklist: numbers with ≥2 reports | {b['rules']:,} | {b['coverage']:.1%} |")
+    print(f"| every number ever reported | {allseen['rules']:,} | {pct(allseen['coverage'])} |")
+    print(f"| blocklist: numbers with ≥2 reports | {b['rules']:,} | {pct(b['coverage'])} |")
     g = r.get("dropnet_geographic")
     if g:
-        print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {g['coverage']:.1%} |")
+        print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {pct(g['coverage'])} |")
     naive = r.get("naive_geographic")
     if naive:
-        print(f"| Naive: + {naive['block_rules']:,} geographic blocks ranked by distinct numbers | {naive['rules']:,} | {naive['coverage']:.1%} |")
-    print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {d['coverage']:.1%} |")
+        print(f"| Naive: + {naive['block_rules']:,} geographic blocks ranked by distinct numbers | {naive['rules']:,} | {pct(naive['coverage'])} |")
+    print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {pct(d['coverage'])} |")
     if naive and g and g["matches_per_million_numbers"] is not None:
         print(f"\nEqual geographic prefix budgets, matches per million possible numbers: "
               f"Dropnet {g['matches_per_million_numbers']:,.1f}, naive {naive['matches_per_million_numbers']:,.1f}.")

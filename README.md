@@ -28,7 +28,8 @@ numbers can be ported. Dropnet never blocks anything.
 
 ## Run locally
 
-Python 3.10 or later. No API key, no database server: the graph is the checked-in file `data/ftc.rl`.
+Python 3.10 or later. No API key, no database server: the graph is the checked-in file `data/ftc.rl` (89 MB, so the
+clone takes a minute or more).
 
 ```bash
 python -m venv .venv
@@ -38,18 +39,30 @@ python -m pip install -e .
 python -m dropnet serve
 ```
 
-Open [localhost:8000](http://127.0.0.1:8000):
+On Windows, if `python` opens the Microsoft Store instead of running, use the Python launcher for the first line:
+`py -m venv .venv`. After activating the venv, `python` is the venv's own Python and the other lines work as written.
 
-1. Check `771-999-0716`. The result shows **FRACTEL, LLC** as the prefix holder (OCN `965H`, 606 flagged out of
-   2,858 prefixes it holds) and **ONVOY, LLC** as the assignee of the 1,000-number block.
+`serve` prints "Dropnet is ready" after 10 to 15 seconds, while Relate loads the graph. Then open
+[localhost:8000](http://127.0.0.1:8000):
+
+1. Type `771-999-0716` in **Check a reported number** and press **Assess**. The result shows **FRACTEL, LLC** as the
+   prefix holder (OCN `965H`, 606 flagged out of 2,858 prefixes it holds) and **ONVOY, LLC** as the assignee of the
+   1,000-number block. (The browser demo's button is called **Check**.)
 2. In **Who holds flagged ranges**, open a carrier to see its flagged ranges, rate centers and complaint categories.
-3. Click **Open range 771-999 in graph** in the number result, then choose a range under **Flagged ranges sharing OCN 965H**.
-   Run a what-if, or download the case as
-   its own `.rl` file.
+3. Click **Open range 771-999 in graph** in the number result, then choose a range under **Flagged ranges sharing OCN
+   965H**. Run a what-if, or download the case as its own `.rl` file.
 
-`python -m dropnet ftc-eval` prints the hold-out table. `python -m dropnet check-claims` checks that the numbers in this README, EVIDENCE, the
-submission text and the diagram match it. `python -m pip install -e ".[dev]"` then `python -m pytest`
-runs the tests.
+### Evaluation and tests
+
+`serve` keeps its terminal busy. Run these in a second terminal with the venv activated (or stop `serve` with Ctrl+C
+first):
+
+```bash
+python -m dropnet ftc-eval          # the hold-out table
+python -m dropnet check-claims      # the numbers in README, EVIDENCE, the submission and the diagram match it
+python -m pip install -e ".[dev]"   # required once before the tests: installs pytest
+python -m pytest
+```
 
 ## How it uses Relate
 

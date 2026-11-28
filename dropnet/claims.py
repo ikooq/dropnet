@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 
 from . import config
+from .numfmt import pct_number
 
 FILES = {"README": "README.md", "EVIDENCE": "docs/EVIDENCE.md", "devpost": "docs/devpost.md",
          "index": "docs/index.html", "diagram": "docs/img/architecture.svg"}
@@ -57,7 +58,7 @@ CLAIMS: list[tuple[str, str, tuple[str, ...], tuple[str, ...]]] = [
 
 
 def pct(x: float, digits: int = 1) -> str:
-    return f"{x * 100:.{digits}f}"
+    return pct_number(x, digits)
 
 
 def expected(ev: dict) -> dict[str, str]:
@@ -76,6 +77,29 @@ def expected(ev: dict) -> dict[str, str]:
         "fcc_confirmed": str(ev["fcc_crosscheck"]["pools_confirmed"]),
         "fcc_checked": str(ev["fcc_crosscheck"]["pools_checked"]),
     }
+
+
+# rows of the `ftc-eval` table, in print order, and the result each row prints
+CLI_ROWS = ("blocklist_all_seen", "baseline", "dropnet_geographic", "naive_geographic", "dropnet")
+
+
+def cli_vs_browser(ev: dict, demo: dict) -> list[str]:
+    """`python -m dropnet ftc-eval` must print the shares the browser shows from docs/data/graph.json."""
+    import contextlib
+    import io
+    from .cli_live import _print_eval
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        _print_eval(ev)
+    printed = re.findall(r"^\|[^|\n]+\|[^|\n]+\| (\d+\.\d)% \|$", out.getvalue(), re.M)
+    if len(printed) != len(CLI_ROWS):
+        return [f"ftc-eval printed {len(printed)} share rows, expected {len(CLI_ROWS)}"]
+    problems = []
+    for part, cli in zip(CLI_ROWS, printed):
+        browser = pct(demo["eval"][part]["coverage"])  # what the page's toFixed(1) shows
+        if cli != browser:
+            problems.append(f"ftc-eval prints {cli}% for {part}; the browser shows {browser}%")
+    return problems
 
 
 def check(root: Path | str = config.ROOT, graph: bool = False) -> list[str]:
@@ -104,6 +128,21 @@ def check(root: Path | str = config.ROOT, graph: bool = False) -> list[str]:
     for part in ("baseline", "dropnet_geographic", "naive_geographic", "dropnet"):
         if demo["eval"].get(part, {}).get("coverage") != ev[part]["coverage"]:
             problems.append(f"docs/data/graph.json: eval.{part}.coverage differs from data/ftc/eval.json")
+    problems += cli_vs_browser(ev, demo)
+    # EVIDENCE's holder table, one row per start day and number of leaders
+    splits = {(s["split_day"], str(s["top"])): (pct(s["leader_flagged_later"]), pct(s["other_flagged_later"]),
+                                                 f"{s['lift']:.1f}") for s in ev.get("carrier_prior_splits", [])}
+    rows_seen = 0
+    for m in re.finditer(r"^\| (2026-\d\d-\d\d) \| (\d+) \| (\d+\.\d)% \| (\d+\.\d)% \| (\d+\.\d)× \|$",
+                         texts["EVIDENCE"], re.M):
+        rows_seen += 1
+        want_row = splits.get((m[1], m[2]))
+        if want_row != (m[3], m[4], m[5]):
+            line = texts["EVIDENCE"].count("\n", 0, m.start()) + 1
+            problems.append(f"docs/EVIDENCE.md:{line}: holder split {m[1]}/{m[2]} says {m[3]}%, {m[4]}%, {m[5]}×; "
+                            f"data says {want_row}")
+    if rows_seen != len(splits):
+        problems.append(f"docs/EVIDENCE.md: holder table has {rows_seen} rows, eval.json {len(splits)} splits")
     demo_carriers = json.loads((root / "docs" / "data" / "carriers.json").read_text(encoding="utf-8"))["carriers"]
     if demo_carriers[:15] != ev["carriers"][:15]:
         problems.append("docs/data/carriers.json: top 15 holders differ from data/ftc/eval.json")

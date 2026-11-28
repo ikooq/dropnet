@@ -46,6 +46,24 @@
         <div id="spoof-bars"></div>
       </div>
     </div>
+    <section class="panel carrier-panel" aria-labelledby="carrier-title">
+      <h2 id="carrier-title">Who holds flagged ranges</h2>
+      <p class="muted">The 15 holders with the most flagged ranges. The rate is the number flagged per 100 ranges held.</p>
+      <p class="muted" id="carrier-status" role="status">Loading carrier assignments…</p>
+      <div class="carrier-scroll" id="carrier-ranking" role="region" aria-label="Carrier ranking" tabindex="0" hidden>
+        <table class="grid carrier-table">
+          <thead><tr>
+            <th scope="col">Carrier</th><th scope="col" class="num">Flagged per 100</th>
+            <th scope="col" class="num">Flagged</th><th scope="col" class="num">Ranges held</th>
+            <th scope="col" class="num">Reports</th><th scope="col" class="num">Reported numbers</th>
+            <th scope="col" class="num">OCNs</th><th scope="col" class="num">States</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="carrier-detail" aria-live="polite" tabindex="-1"></div>
+      <p class="caution" id="carrier-caution" hidden></p>
+    </section>
     <div class="panel" id="net-panel" style="margin-bottom:18px;display:none"></div>
     <div class="panel lookup">
       <h2>Check a reported number</h2>

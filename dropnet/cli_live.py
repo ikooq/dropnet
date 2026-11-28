@@ -11,11 +11,14 @@ def cmd_serve(a: argparse.Namespace) -> int:
     import uvicorn
 
     from .web.app import create_app
-    if not config.SNAPSHOT_PATH.exists():
-        print(f"No snapshot at {config.SNAPSHOT_PATH}. Run: python -m dropnet build")
+    ftc = config.DATA_DIR / "ftc.rl"
+    if not ftc.exists():
+        print(f"No graph at {ftc}. Run: python -m dropnet ftc-build --fetch")
         return 2
-    print(f"Dropnet → http://{a.host}:{a.port}  (live store: {config.LIVE_PATH}{', reset' if a.reset else ''})")
-    uvicorn.run(create_app(reset=a.reset), host=a.host, port=a.port, log_level="warning")
+    url = f"http://{a.host}:{a.port}"
+    print(f"Loading {ftc.name} into Relate ({ftc.stat().st_size / 1e6:.0f} MB, about 10 seconds)...", flush=True)
+    uvicorn.run(create_app(reset=a.reset, ready_message=f"Dropnet is ready: {url}"), host=a.host, port=a.port,
+                log_level="warning")
     return 0
 
 
@@ -77,10 +80,21 @@ def _print_eval(r: dict) -> None:
     g = r.get("dropnet_geographic")
     if g:
         print(f"| Dropnet: + {g['block_rules']:,} geographic pool blocks | {g['rules']:,} | {g['coverage']:.1%} |")
+    naive = r.get("naive_geographic")
+    if naive:
+        print(f"| Naive: + {naive['block_rules']:,} geographic blocks ranked by distinct numbers | {naive['rules']:,} | {naive['coverage']:.1%} |")
     print(f"| Dropnet: + {d['block_rules']:,} pool blocks incl. toll-free | {d['rules']:,} | {d['coverage']:.1%} |")
+    if naive and g and g["matches_per_million_numbers"] is not None:
+        print(f"\nEqual geographic prefix budgets, matches per million possible numbers: "
+              f"Dropnet {g['matches_per_million_numbers']:,.1f}, naive {naive['matches_per_million_numbers']:,.1f}.")
     print(f"\n{d['new_numbers_caught']:,} matching reports involved numbers not previously reported. Potential scope: rules cover up to "
           f"{d.get('numbers_blocked', 0) / 1e6:.1f} M numbers (blocklist: {b.get('numbers_blocked', b['rules']):,}); "
           f"risk: {d['spoofed_caught']:,} matching reports had matching caller and consumer area codes; this is not proof of spoofing.")
+
+
+def cmd_check_claims(a: argparse.Namespace) -> int:
+    from . import claims
+    return claims.main(graph=a.graph)
 
 
 def cmd_ftc_eval(a: argparse.Namespace) -> int:
@@ -92,6 +106,42 @@ def cmd_ftc_eval(a: argparse.Namespace) -> int:
         _print_eval(evaluate.holdout(conn, a.split or build.split_day(days)))
     finally:
         conn.close()
+    return 0
+
+
+def cmd_ftc_numbering(a: argparse.Namespace) -> int:
+    """NANPA carriers and rate centers -> data/nanpa/*.csv.gz -> written into data/ftc.rl."""
+    import tempfile
+    from pathlib import Path
+    from . import store
+    from .ftc import build, numbering
+    if a.fetch:
+        tmp = Path(tempfile.mkdtemp(prefix="dropnet-nanpa-"))
+        codes = numbering.download(numbering.CODES_URL, tmp / "codes.zip")
+        blocks = numbering.download(numbering.BLOCKS_URL, tmp / "blocks.zip")
+        conn = store.open_store(build.FTC_STORE, read_only=True)
+        try:
+            ranges = {r["b"] for r in store.rows(conn, "MATCH (b:Block) RETURN b.npa_nxx AS b")}
+            subs = {r["n"][:7] for r in store.rows(conn, "MATCH (n:Number) WHERE n.toll_free = false "
+                                                       "RETURN n.number AS n")}
+        finally:
+            conn.close()
+        print(f"extracted {numbering.extract(codes, blocks, ranges, subs)} into {numbering.NANPA_DIR}")
+    if not a.eval_only:
+        print(f"linked {build.augment(build.FTC_STORE, numbering.link)} into {build.FTC_STORE}")
+    import json
+    conn = store.open_store(build.FTC_STORE, read_only=True)
+    try:
+        ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
+        ev["carrier_prior"] = numbering.carrier_prior(conn, ev["split_day"])
+        ev["carrier_prior_splits"] = [  # the same test from other start days and with more leaders
+            {k: v for k, v in numbering.carrier_prior(conn, day, top=top).items() if k != "leaders"} | {"top": top}
+            for day in ("2026-10-20", "2026-10-26", "2026-11-02", "2026-11-06") for top in (10, 25)]
+        ev["carriers"] = numbering.carrier_ranking(conn, 25)
+    finally:
+        conn.close()
+    build.EVAL_JSON.write_text(json.dumps(ev, indent=2), encoding="utf-8")
+    print(json.dumps(ev["carrier_prior"], indent=2))
     return 0
 
 
@@ -239,14 +289,22 @@ def register(sub) -> None:
     fb = sub.add_parser("ftc-build", help="build data/ftc.rl from real FTC Do Not Call reports")
     fb.add_argument("--fetch", action="store_true", help="download the latest daily files from ftc.gov first")
     fb.set_defaults(fn=cmd_ftc_build)
+    nb = sub.add_parser("ftc-numbering", help="add NANPA carriers, rate centers and 1,000-blocks to data/ftc.rl")
+    nb.add_argument("--fetch", action="store_true", help="download the current NANPA files first (nanpa.com)")
+    nb.add_argument("--eval-only", action="store_true",
+                    help="skip rewriting data/ftc.rl; only record the carrier results in data/ftc/eval.json")
+    nb.set_defaults(fn=cmd_ftc_numbering)
     fe = sub.add_parser("ftc-eval", help="temporal hold-out: blocklist vs Dropnet pool rules on real reports")
     fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")
     fe.set_defaults(fn=cmd_ftc_eval)
+    cc = sub.add_parser("check-claims", help="check the numbers in README, EVIDENCE, devpost and the diagram")
+    cc.add_argument("--graph", action="store_true", help="also recount reports in data/ftc.rl")
+    cc.set_defaults(fn=cmd_check_claims)
 
-    s = sub.add_parser("serve", help="run the web UI + API on the live copy of the snapshot")
+    s = sub.add_parser("serve", help="run the web UI + API on a working copy of data/ftc.rl")
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8000)
-    s.add_argument("--reset", action="store_true", help="start from a fresh copy of the snapshot")
+    s.add_argument("--reset", action="store_true", help="start from a fresh copy of data/ftc.rl")
     s.set_defaults(fn=cmd_serve)
 
     i = sub.add_parser("ingest", help="add one complaint (Russian text) to the live store and show its links")

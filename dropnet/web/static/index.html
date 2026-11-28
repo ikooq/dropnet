@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dropnet</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+  <script src="cytoscape-3.30.2.min.js"></script>
 </head>
 <body>
 <header class="top">
@@ -17,18 +17,15 @@
     </svg>
     <div>
       <div class="name">Dropnet</div>
-      <div class="tag">Scattered fraud complaints → one connected case</div>
+      <div class="tag">Investigate unwanted-call reports by number range</div>
     </div>
   </div>
   <div class="stats" id="stats"></div>
-  <span class="badge" title="FTC Do Not Call complaint data (US public data). The free-text demo tabs use synthetic data.">Real FTC data · free-text demo is synthetic</span>
+  <span class="badge" title="FTC Do Not Call consumer complaints">FTC complaint data</span>
 </header>
 
 <nav class="tabs" role="tablist">
   <button role="tab" data-tab="real" class="active">Real reports (FTC)</button>
-  <button role="tab" data-tab="ingest">Free-text demo: new complaint</button>
-  <button role="tab" data-tab="campaigns">Free-text campaigns</button>
-  <button role="tab" data-tab="inbox">Free-text inbox</button>
   <button role="tab" data-tab="query">Query the graph</button>
 </nav>
 
@@ -49,6 +46,24 @@
         <div id="spoof-bars"></div>
       </div>
     </div>
+    <section class="panel carrier-panel" aria-labelledby="carrier-title">
+      <h2 id="carrier-title">Who holds flagged ranges</h2>
+      <p class="muted">The 15 holders with the most flagged ranges. The rate is the number flagged per 100 ranges held.</p>
+      <p class="muted" id="carrier-status" role="status">Loading carrier assignments…</p>
+      <div class="carrier-scroll" id="carrier-ranking" role="region" aria-label="Carrier ranking" tabindex="0" hidden>
+        <table class="grid carrier-table">
+          <thead><tr>
+            <th scope="col">Carrier</th><th scope="col" class="num">Flagged per 100</th>
+            <th scope="col" class="num">Flagged</th><th scope="col" class="num">Ranges held</th>
+            <th scope="col" class="num">Reports</th><th scope="col" class="num">Reported numbers</th>
+            <th scope="col" class="num">OCNs</th><th scope="col" class="num">States</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="carrier-detail" aria-live="polite" tabindex="-1"></div>
+      <p class="caution" id="carrier-caution" hidden></p>
+    </section>
     <div class="panel" id="net-panel" style="margin-bottom:18px;display:none"></div>
     <div class="panel lookup">
       <h2>Check a reported number</h2>
@@ -60,6 +75,8 @@
       <aside class="camp-list" id="ftc-list"></aside>
       <div class="camp-main">
         <div class="camp-head" id="ftc-head"></div>
+        <p class="muted small" id="ftc-numbering" hidden></p>
+        <div id="ftc-related"></div>
         <div class="graph-wrap"><div id="ftc-graph"></div><div class="legend" id="ftc-legend"></div></div>
         <div class="panel detail" id="ftc-whatif"></div>
       </div>
@@ -68,60 +85,11 @@
       reported, not proven offenders — caller ID is easily spoofed.</p>
   </section>
 
-  <!-- New complaint -->
-  <section id="tab-ingest" class="tab">
-    <div class="split">
-      <div class="panel">
-        <h2>Paste a complaint</h2>
-        <p class="muted">Russian free text, as a victim wrote it. Dropnet extracts phones, cards, IBANs, links,
-          aliases and the scam tactic, writes them into the Relate graph and tells you what this complaint is part of.</p>
-        <div class="samples" id="samples"></div>
-        <textarea id="ing-text" rows="9" placeholder="Мне позвонили из службы безопасности банка…"></textarea>
-        <div class="row">
-          <label>Region <select id="ing-region"></select></label>
-          <button class="primary" id="ing-go">Link it</button>
-        </div>
-      </div>
-      <div class="panel" id="ing-result">
-        <div class="empty">The result appears here: which campaign, through which card / phone / domain, with the
-          victim's own words as evidence.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Campaigns -->
-  <section id="tab-campaigns" class="tab">
-    <div class="camp-layout">
-      <aside class="camp-list" id="camp-list"></aside>
-      <div class="camp-main">
-        <div class="camp-head" id="camp-head"></div>
-        <div class="graph-wrap">
-          <div id="graph"></div>
-          <div class="legend" id="legend"></div>
-        </div>
-        <div class="panel detail" id="detail"><span class="muted">Click a node or a connection to see the
-          evidence behind it.</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Inbox -->
-  <section id="tab-inbox" class="tab">
-    <div class="row toolbar">
-      <label>Campaign <select id="inbox-filter"><option value="">All complaints</option></select></label>
-      <span class="muted" id="inbox-count"></span>
-      <span class="spacer"></span>
-      <button id="inbox-prev">← Newer</button><button id="inbox-next">Older →</button>
-    </div>
-    <table class="grid" id="inbox"><thead><tr><th>ID</th><th>Filed</th><th>Region</th><th>Tactic</th>
-      <th class="num">Amount</th><th>Campaign</th><th>Summary</th></tr></thead><tbody></tbody></table>
-  </section>
-
   <!-- Query -->
   <section id="tab-query" class="tab">
     <div class="panel">
       <h2>Ask the graph in Cypher</h2>
-      <p class="muted">Read-only. The same queries work through MCP in Claude Code (<code>read_cypher</code>).</p>
+      <p class="muted">Read-only. Queries use the same FTC graph as the configured Relate MCP server.</p>
       <div class="samples" id="q-samples"></div>
       <textarea id="q-text" rows="6" spellcheck="false"></textarea>
       <div class="row"><button class="primary" id="q-go">Run</button><span class="muted" id="q-meta"></span></div>
@@ -129,7 +97,7 @@
     </div>
   </section>
 </main>
-<footer>Dropnet · embedded <b>Relate</b> graph in a single file · <a href="api/schema" target="_blank">schema</a>
+<footer>Dropnet · embedded <b>Relate</b> graph in a single file · <a href="api/ftc/schema" target="_blank">schema</a>
   · <a href="https://github.com/relatedb/relate" target="_blank" rel="noopener">Relate on GitHub</a></footer>
 <script src="app.js"></script>
 </body>

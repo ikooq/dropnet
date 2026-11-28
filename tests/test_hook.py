@@ -56,3 +56,51 @@ def test_cli_hook_silent_without_numbers(tmp_path):
     out = subprocess.run([sys.executable, "-m", "dropnet", "hook", "--ftc", str(make(tmp_path))],
                          input=json.dumps({"prompt": "hello"}), capture_output=True, text=True, timeout=120)
     assert out.returncode == 0 and out.stdout.strip() == ""
+
+
+def test_settings_hook_is_silent_without_the_package(tmp_path):
+    """A judge who opens the repo in Claude Code before `pip install` must not see a failing hook."""
+    import shutil
+    from pathlib import Path
+    bash = shutil.which("bash")
+    if not bash:
+        import pytest
+        pytest.skip("bash not available")
+    root = Path(__file__).resolve().parent.parent
+    cmd = json.loads((root / ".claude" / "settings.json").read_text(encoding="utf-8"))[
+        "hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
+    r = subprocess.run([bash, "-c", cmd], input='{"prompt": "is 866-771-0001 a scam?"}', capture_output=True,
+                       text=True, env={"PATH": str(tmp_path)})  # no dropnet on PATH
+    assert r.returncode == 0 and r.stdout == ""
+
+
+def test_running_app_answers_first(tmp_path):
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    class App(BaseHTTPRequestHandler):
+        def do_GET(self):
+            body = json.dumps({"verdict": "pool", "reports": 7, "states": 2, "subjects": ["DEBT"],
+                               "neighbor_share": 0.0, "block": "771999", "block_numbers": 53,
+                               "holder": {"range_holder": "HOLDER A", "block_carrier": "CARRIER B",
+                                          "rate_center": "RC", "state": "DC"}}).encode()
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *a):
+            pass
+
+    srv = HTTPServer(("127.0.0.1", 0), App)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        ctx = hook.number_guard("771-999-0716?", tmp_path / "missing.rl", web_url=f"http://127.0.0.1:{srv.server_port}")
+    finally:
+        srv.shutdown()
+    assert "7 reports" in ctx and "HOLDER A as the range's holder" in ctx and "assigned to CARRIER B" in ctx
+    assert "it is not the caller" in ctx
+
+
+def test_no_app_falls_back_to_the_file(tmp_path):
+    ctx = hook.number_guard("866-771-0001", make(tmp_path), web_url="http://127.0.0.1:1")
+    assert "NUMBER POOL" in ctx

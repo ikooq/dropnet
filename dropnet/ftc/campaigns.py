@@ -96,7 +96,20 @@ def spoofing_profile(conn: relate.Connection) -> list[dict]:
 
 
 def assess_number(conn: relate.Connection, number: str) -> dict:
-    """Evidence about one reported number — and how careful to be with it."""
+    """Evidence about one reported number, who NANPA lists as holding its range, and how careful to be with it."""
+    out = _assess_number(conn, number)
+    from . import numbering
+    out["holder"] = numbering.number_holder(conn, out["number"]) if numbering.has_numbering(conn) else None
+    if out["block_numbers"] >= POOL_MIN_NUMBERS:
+        pools = rows(conn, "MATCH (c:FtcCampaign {id: $id, kind: 'pool'}) RETURN c.id AS id LIMIT 1",
+                     {"id": f"POOL-{out['block']}"})
+        out["pool_campaign_id"] = pools[0]["id"] if pools else None
+    else:
+        out["pool_campaign_id"] = None
+    return out
+
+
+def _assess_number(conn: relate.Connection, number: str) -> dict:
     from .parse import _number
     d = _number(number)
     if not d:

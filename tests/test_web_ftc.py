@@ -1,10 +1,12 @@
 import json
+import os
+from urllib.parse import quote
 
 import pytest
 from fastapi.testclient import TestClient
 
-from dropnet import pipeline, store
-from dropnet.ftc import campaigns, load
+from dropnet import store
+from dropnet.ftc import campaigns, load, numbering
 from dropnet.web.app import create_app
 from tests.test_ftc_load import R
 
@@ -12,12 +14,20 @@ from tests.test_ftc_load import R
 @pytest.fixture(scope="module")
 def stores(tmp_path_factory):
     d = tmp_path_factory.mktemp("wf")
-    pipeline.build(d / "snap.rl", seed=1, n=60)
     reports = [R(i, f"866771{i % 6:04d}", victim_npa="303", state="Colorado") for i in range(30)]
     reports += [R(100 + i, f"303555{i:04d}", victim_npa="303", subject="MEDICAL") for i in range(5)]
     conn = store.open_store(d / "ftc.rl")
     load.load_reports(conn, reports)
     campaigns.write_campaigns(conn, min_numbers=5)
+    store.rows(conn, """
+        MATCH (b:Block {npa_nxx: '866771'})
+        SET b.state = 'IL'
+        CREATE (b)-[:HELD_BY]->(:Carrier {ocn: '0001'})-[:PART_OF]->
+               (:CarrierGroup {name: 'Example & Telecom', codes_held: 8})
+        CREATE (b)-[:IN_RATE_CENTER]->(:RateCenter {id: 'IL:EXAMPLE', name: 'EXAMPLE', state: 'IL'})
+        CREATE (b)<-[:PART_OF]-(:SubBlock {id: '8667710'})-[:ASSIGNED_TO]->
+               (:Carrier {ocn: '0002'})-[:PART_OF]->(:CarrierGroup {name: 'Block Assignee'})
+    """)
     conn.close()
     (d / "eval.json").write_text(json.dumps({"baseline": {"coverage": 0.043}}), encoding="utf-8")
     return d
@@ -25,7 +35,7 @@ def stores(tmp_path_factory):
 
 @pytest.fixture
 def client(stores, tmp_path):
-    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "live.rl", reset=True,
+    app = create_app(reset=True,
                      ftc_snapshot=stores / "ftc.rl", ftc_live=tmp_path / "ftc-live.rl", ftc_eval=stores / "eval.json")
     with TestClient(app) as c:
         yield c
@@ -40,6 +50,44 @@ def test_ftc_summary(client):
     assert all("neighbor_share" in x for x in st)
 
 
+def test_ftc_carrier_ranking_and_detail(client):
+    assert "Who holds flagged ranges" in client.get("/").text
+    ranking = client.get("/api/ftc/carriers", params={"limit": 15})
+    assert ranking.status_code == 200
+    result = ranking.json()
+    assert result == {
+        "carriers": [{"carrier": "Example & Telecom", "ranges_held": 8, "flagged": 1, "reports": 30,
+                      "numbers": 6, "ocns": 1, "states": 1, "flagged_per_100_ranges": 12.5}],
+        "caution": numbering.CAUTION,
+    }
+    name = quote(result["carriers"][0]["carrier"], safe="")
+    detail = client.get(f"/api/ftc/carriers/{name}")
+    assert detail.status_code == 200
+    details = detail.json()
+    assert details["caution"] == result["caution"]
+    assert details["carrier"] == "Example & Telecom"
+    assert details["subjects"] == [{"subject": "DEBT", "reports": 30}]
+    top = details["ranges"][0]
+    assert (top["block"], top["rate_center"], top["state"]) == ("866771", "EXAMPLE", "IL")
+
+
+def test_ftc_cypher_queries_the_ftc_store(client):
+    response = client.post("/api/ftc/cypher", json={"statement": "MATCH (r:Report) RETURN count(r) AS reports"})
+    assert response.status_code == 200
+    assert response.json()["rows"] == [{"reports": 35}]
+    assert client.get("/api/ftc/schema").status_code == 200
+
+
+def test_ftc_snapshot_refreshes_an_older_live_copy(stores, tmp_path):
+    old = tmp_path / "ftc-live.rl"
+    with store.open_store(old) as conn:
+        store.rows(conn, "CREATE (:Report {id: 'old'})")
+    os.utime(old, (1_000_000_000, 1_000_000_000))
+    app = create_app(ftc_snapshot=stores / "ftc.rl", ftc_live=old, ftc_eval=stores / "eval.json")
+    with TestClient(app) as c:
+        assert c.get("/api/ftc/summary").json()["reports"] == 35
+
+
 def test_ftc_campaigns_graph_assess(client):
     camps = client.get("/api/ftc/campaigns").json()
     assert camps[0]["id"] == "POOL-866771"
@@ -48,6 +96,21 @@ def test_ftc_campaigns_graph_assess(client):
     assert client.get("/api/ftc/campaigns/POOL-000000/graph").status_code == 404
     a = client.get("/api/ftc/number/(303) 555-0001").json()
     assert a["verdict"] == "likely_spoofed" and "not proof" in a["caution"]
+
+
+def test_ftc_number_and_mcp_report_the_same_assignments(client):
+    number = "8667710001"
+    assessment = client.get(f"/api/ftc/number/{number}").json()
+    assert assessment["pool_campaign_id"] == "POOL-866771"
+    assert client.get("/api/ftc/campaigns/POOL-866771/graph").status_code == 200
+    tool = client.post("/api/tools/assess_number", json={"number": number}).json()
+    prefix = {"name": "Example & Telecom", "prefix": "866771", "ocn": "0001", "rate_center": "EXAMPLE",
+              "state": "IL", "ranges_held": 8, "flagged_ranges_held": 1}
+    assignee = {"name": "Block Assignee", "block": "8667710", "ocn": "0002"}
+    assert assessment["holder"]["prefix_holder"] == prefix
+    assert assessment["holder"]["thousands_block_assignee"] == assignee
+    assert tool["holder"] == {"prefix_holder": prefix, "thousands_block_assignee": assignee, "caution": numbering.CAUTION}
+    assert tool["caution"] == assessment["caution"] and "Caller ID can be spoofed" in tool["caution"]
 
 
 def test_ftc_whatif_and_export(client):
@@ -73,7 +136,7 @@ def test_ftc_tools_dispatch(client):
 
 
 def test_ftc_absent_is_graceful(stores, tmp_path):
-    app = create_app(snapshot=stores / "snap.rl", live=tmp_path / "l.rl", reset=True,
+    app = create_app(reset=True,
                      ftc_snapshot=tmp_path / "missing.rl", ftc_live=tmp_path / "fl.rl")
     with TestClient(app) as c:
         assert c.get("/api/ftc/summary").status_code == 404

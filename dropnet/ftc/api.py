@@ -5,6 +5,7 @@ import relate
 
 from ..store import rows
 from ..tools import jsonable
+from . import numbering
 from .parse import SUBJECT_LABEL
 
 
@@ -72,8 +73,24 @@ def campaign_graph(conn: relate.Connection, campaign_id: str, max_numbers: int =
     for s in subjects:
         node(f"T:{s['subject']}", "Subject", SUBJECT_LABEL.get(s["subject"], s["subject"]))
         edges.append({"source": f"N:{s['num']}", "target": f"T:{s['subject']}", "type": "ABOUT", "n": s["n"]})
+    assignment = numbering.range_network(conn, nums[0]["block"]) if nums else None
+    if assignment:
+        block_id = f"B:{nums[0]['block']}"
+        if assignment["rate_center_id"]:
+            center_id = f"RC:{assignment['rate_center_id']}"
+            node(center_id, "RateCenter", assignment["rate_center"])
+            edges.append({"source": block_id, "target": center_id, "type": "IN_RATE_CENTER"})
+        if assignment["ocn"]:
+            carrier_id = f"C:{assignment['ocn']}"
+            node(carrier_id, "Carrier", f"OCN {assignment['ocn']}", holder=assignment["holder"])
+            edges.append({"source": block_id, "target": carrier_id, "type": "HELD_BY"})
+            for related in assignment["related"]:
+                digits = related["block"]
+                related_id = f"B:{digits}"
+                node(related_id, "RelatedBlock", f"{digits[:3]}-{digits[3:]}", campaign=related["campaign"])
+                edges.append({"source": related_id, "target": carrier_id, "type": "HELD_BY"})
     return {"campaign": jsonable(dict(camp[0]["c"].items())), "nodes": list(nodes.values()), "edges": edges,
-            "states_total": len(by_state)}
+            "states_total": len(by_state), "numbering": assignment}
 
 
 def networks(conn: relate.Connection) -> list[dict]:
@@ -106,7 +123,8 @@ def search_pools(conn: relate.Connection, text: str, limit: int = 20) -> dict:
     return {"subjects": subjects, "pools": pools}
 
 
-FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block", "search_ranges"]
+FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block", "search_ranges", "carriers",
+                  "carrier_detail", "ftc_read_cypher", "ftc_schema"]
 
 
 def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
@@ -116,13 +134,29 @@ def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
     if name == "ftc_campaigns":
         return campaign_list(conn, int(args.get("limit", 20)), args.get("kind"))
     if name == "assess_number":
-        return campaigns.assess_number(conn, args["number"])
+        result = campaigns.assess_number(conn, args["number"])
+        if holder := result["holder"]:
+            result["holder"] = {key: holder[key] for key in ("prefix_holder", "thousands_block_assignee", "caution")}
+        return result
     if name == "search_ranges":
         from . import semantic
         return semantic.search(conn, args["text"], limit=int(args.get("limit") or 10), state=args.get("state"))
     if name == "whatif_block":
         return whatif.whatif(conn, blocks=args.get("blocks"), numbers=args.get("numbers"),
                              since_day=args.get("since_day"))
+    if name == "ftc_read_cypher":
+        from ..tools import check_read_only, read_cypher
+        check_read_only(args.get("statement", ""))
+        return read_cypher(conn, args["statement"], args.get("params") or {})
+    if name == "ftc_schema":
+        from ..tools import get_schema
+        return get_schema(conn)
+    if name == "carriers":
+        from . import numbering
+        return {"carriers": numbering.carrier_ranking(conn, int(args.get("limit") or 25)), "caution": numbering.CAUTION}
+    if name == "carrier_detail":
+        from . import numbering
+        return numbering.carrier_detail(conn, args["carrier"], int(args.get("limit") or 40))
     raise LookupError(name)
 
 

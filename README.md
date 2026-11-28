@@ -1,97 +1,71 @@
 # Dropnet
 
-**Scam reports arrive one at a time. The scams don't.** Dropnet puts 296,273 real FTC phone-complaint reports into one
-Relate graph and finds the number ranges behind them — a pattern a blocklist of single numbers never sees — without
-blaming the people whose numbers get faked.
+**Scam reports arrive one at a time. The scams don't.** 92% of the 248,930 phone numbers in 296,273 FTC complaints
+were reported exactly once, so a list of reported numbers is always behind. What repeats is the **range**, the first six
+digits of a number. Dropnet connects the complaints, numbers, ranges and the carriers that hold those ranges in one
+Relate graph, so an analyst can see the pattern and follow the evidence.
 
-**[Try it in your browser](https://ikooq.github.io/dropnet/)** · [Every result and how to reproduce it](docs/EVIDENCE.md) · [Submission](docs/devpost.md)
+**One number.** Rules learned from complaints before Nov 2 matched **4.3%** of the 103,620 later complaints when they
+listed repeat numbers, and **14.3%** when they also listed 2,872 flagged ranges. The gain comes from watching ranges,
+not from a clever ranking: at the same budget, ranges picked simply by how many numbers were reported from them matched
+**14.5%** and ours **14.3%**. What Dropnet adds is the graph: why a range is flagged, who holds it, and what is linked to
+it.
 
-![Dropnet on 296,273 real FTC reports](docs/img/real-overview.png)
+**One case.** Dropnet flagged range `365-826` on Oct 19. Over the next 24 days, **323 numbers** from it appeared in
+complaints for the first time. No list of numbers could have held them; the range was already flagged.
 
-## Why ranges
+**Why a graph.** Each US range links to the carrier NANPA lists as its holder. One traversal shows that four of the 15
+holders with the most flagged ranges hold 20 or more flagged ranges per 100 they hold, against about 1 for the three
+largest wireless carriers, and that unflagged ranges of the leading holders became flagged later 3.7 times as often as
+others.
 
-92% of the 248,930 reported numbers were reported exactly once: callers move on before a list of numbers catches up.
-What repeats is the **range**, the first six digits (10,000 numbers). `Report → Number → Block` makes it visible.
-Ranges are built only from reports whose caller area code differs from the consumer's, because a caller ID that copies
-the consumer's own area code is often faked. Every answer, in the app, API, MCP tools and Claude Code hook, says so.
+A range or a holder is a lead for a person to check, not proof: complaints are unverified, caller ID can be faked, and
+numbers can be ported. Dropnet never blocks anything.
 
-## Results
+[Open the browser demo](https://ikooq.github.io/dropnet/#early) · [Every result, its method and its limits](docs/EVIDENCE.md)
 
-Rules learned from the 192,653 complaints filed before 2026-11-02:
+![Checking 771-999-0716 in the browser demo: its range has 53 reported numbers](docs/img/demo-check.png)
 
-| Test set | Numbers reported ≥ 2 times | + 2,872 geographic ranges | + toll-free ranges |
-|---|---:|---:|---:|
-| 103,620 complaints filed after the split | 4.3% | **14.3%** | 22.0% |
-| 92,712 of them about calls made after the split | 3.5% | **12.7%** | — |
-| **Fresh data:** 29,549 complaints filed Nov 13–16, after the snapshot ended | 3.6% | **13.2%** | 20.0% |
-| Fresh data, calls made in the new period (21,834) | 3.3% | **11.8%** | 18.2% |
+## Run locally
 
-- **Early warning:** replayed day by day with only the previous days' knowledge, a number blocklist knew 2.6% of
-  239,932 complaints, the range rule 11.9%. 23,726 numbers first appeared in a range that was already flagged.
-- **Pre-registered:** on 2026-11-23 the rule's output (5,765 geographic ranges, 23,740 repeat numbers) was frozen with
-  hashes, test set and pass marks in [docs/prediction/](docs/prediction/README.md). It is scored on 2026-12-08.
-- **Stable:** ahead from all 27 start days, at least 2.6×.
-- **Confirmed elsewhere:** 49 of the 50 largest ranges also appear in the FCC's own complaints, against 9% of random ranges.
-- **Search by meaning:** the right complaint category in 78% of the top 10, against 29% by words alone.
-- **Agents:** without Dropnet a real Claude Code agent answered "unknown" for 37 of 40 numbers and advised blocking all
-  14 whose caller ID matched the consumer's area code; with the MCP tool it followed the evidence in 39 of 40 (agreement with our rules, not ground truth).
-- **Human look:** one blinded reviewer rated 10 of 10 strong ranges and 1 of 10 controls worth investigating
-  ([report](docs/validation-study/EXPERT_REVIEW.md)).
+Python 3.10 or later. No API key, no database server: the graph is the checked-in file `data/ftc.rl`.
 
-**What these numbers are not:** matches against unverified complaints, not fraud proven or calls blocked. The
-geographic rules cover about 28.7 million numbers and the data hold no legitimate calls, so their cost to legitimate
-callers is unknown. Dropnet ranks ranges for a person to decide; it never blocks anything.
+```bash
+python -m venv .venv
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -e .
+python -m dropnet serve
+```
+
+Open [localhost:8000](http://127.0.0.1:8000):
+
+1. Check `771-999-0716`. The result shows **FRACTEL, LLC** as the prefix holder (OCN `965H`, 606 flagged out of
+   2,858 prefixes it holds) and **ONVOY, LLC** as the assignee of the 1,000-number block.
+2. In **Who holds flagged ranges**, open a carrier to see its flagged ranges, rate centers and complaint categories.
+3. Click **Open range 771-999 in graph** in the number result, then choose a range under **Flagged ranges sharing OCN 965H**.
+   Run a what-if, or download the case as
+   its own `.rl` file.
+
+`python -m dropnet ftc-eval` prints the hold-out table. `python -m dropnet check-claims` checks that the numbers in this README, EVIDENCE, the
+submission text and the diagram match it. `python -m pip install -e ".[dev]"` then `python -m pytest`
+runs the tests.
 
 ## How it uses Relate
 
-`data/ftc.rl` (78 MB, committed) is the whole investigation in one file: 296,273 reports, 248,930 numbers, 96,126
-blocks, 1.5 million relationships, 6,146 campaigns. Built in a directory store, then compacted with
-`relate clone --to-snapshot-format parquet`; a single campaign can be exported as its own `.rl` file.
+- **One file:** `data/ftc.rl` holds 296,273 reports, 248,930 numbers, 96,126 ranges and their NANPA holders, rate
+  centers and 1,000-number block assignments, compacted to Parquet with `relate clone`.
+- **Cypher on the embedded engine** finds the ranges, ranks holders, and runs what-ifs in a transaction that is rolled
+  back.
+- **WebAssembly:** the browser demo runs Relate on a smaller graph.
+- **MCP:** `.mcp.json` starts Dropnet's own read-only tools (`assess_number`, `carriers`, `read_cypher`, …) and
+  `relate serve --mcp` on the same file, so an agent sees the evidence and its caution before it answers.
+  It needs the `dropnet` command on PATH: start `claude` from the activated virtual environment. In the Claude desktop
+  app, which does not see the venv, add a local entry once:
+  `claude mcp add --scope local dropnet -- <repo>/.venv/Scripts/python.exe -m dropnet mcp`
+  (`.venv/bin/python` on macOS/Linux).
+- Also: full-text and optional vector `SEARCH`, Bolt and the HTTP Query API, and a `relate run dropnet-ftc` extension.
+  Details in [EVIDENCE.md](docs/EVIDENCE.md).
 
-| Relate feature | where |
-|---|---|
-| embedded engine (`relate-db`), `UNWIND`/`MERGE` batch load (296k reports in ~2 min) | `dropnet/ftc/load.py` |
-| campaign detection as Cypher aggregations | `dropnet/ftc/campaigns.py` |
-| explicit transaction + rollback for what-if rules; one campaign → its own `.rl` | `dropnet/ftc/whatif.py` |
-| WebAssembly in the browser demo (~1 s load) | `docs/app.js` |
-| hybrid search: vector + full-text `SEARCH`, rank fusion, then a graph filter by state; local embeddings | `dropnet/ftc/semantic.py` |
-| MCP: our server and Relate's `relate serve --mcp stdio --read-only` | `.mcp.json` |
-| command extension: `relate run dropnet-ftc --path data/ftc/raw -d graph` (296,273 reports → 6,091 ranges in 33 s) | `dropnet/relate_ext/` |
-| HTTP Query API v2 and Bolt with the official `neo4j` driver | `dropnet/ftc/bolt.py` |
-
-## Setup and run
-
-Python **3.10+** (tested on 3.14, Windows 11). No API key, no database server.
-
-```bash
-git clone https://github.com/ikooq/dropnet && cd dropnet
-python -m venv .venv
-# Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
-pip install -e .
-python -m dropnet serve        # → http://127.0.0.1:8000
-```
-
-Then pick a pool, click a number, run **What-if**, check `833-766-1884`, download a case as `.rl`.
-
-```bash
-python -m dropnet ftc-eval                 # the hold-out table, from data/ftc.rl
-python -m dropnet ftc-build --fetch        # re-download the FTC files and rebuild (needs the Relate CLI)
-python -m dropnet site                     # refresh the browser demo data in docs/
-pip install -e ".[dev]" && pytest          # tests
-```
-
-## Data and limitations
-
-- Complaint dates, caller IDs and categories are self-reported. A range is an investigative lead, not proof of fraud or
-  of a common operator; an NPA-NXX is a numbering prefix, not evidence of who controls it.
-- The app and the browser lookup flag call dates later than filing dates without changing source values.
-- `data/dropnet.rl` is a separate synthetic demo of free-text complaints; it is not part of the FTC results.
-- The demo server has no authentication and is meant for a trusted local machine, not public deployment.
-- `likely_spoofed` is a legacy field name for the area-code-match heuristic; it does not establish verified spoofing.
-
-## Disclosure
-
-Built for the Relate by Neo4j Hackathon 2026. MIT license. FTC and FCC public data. AI coding tools assisted the
-implementation and documentation; I am responsible for reviewing and testing the result. The human review is in
-[docs/validation-study/](docs/validation-study/EXPERT_REVIEW.md); two earlier rounds in
-[docs/independent-review/](docs/independent-review/README.md) were not independent enough to count as evidence.
+Built for the Relate by Neo4j Hackathon. MIT license. FTC, FCC and NANPA public data. AI coding tools assisted the
+implementation and documentation; the disclosure is in [EVIDENCE.md](docs/EVIDENCE.md).

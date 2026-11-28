@@ -13,9 +13,14 @@ const rangeOf = (b) => `${b.slice(0, 3)}-${b.slice(3, 6)}-xxxx`;
 const LABEL = { DEBT: "Debt relief", IMPOSTER_GOV: "Impersonation", MEDICAL: "Medical", OTHER: "Other", DROPPED: "Dropped call",
   NONE: "No subject", WARRANTY: "Warranty", HOME: "Home improvement", TRAVEL: "Travel", PRIZES: "Prizes", ENERGY: "Energy",
   TECH: "Tech support", WORK: "Work from home" };
-const DATA_V = 15;  // bump with the data files so browsers and the Pages cache fetch fresh copies
+const DATA_V = 17;  // bump with the data files so browsers and the Pages cache fetch fresh copies
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
+
+function scrollToSection(id) {
+  const section = document.getElementById(id);
+  if (location.hash === `#${id}` && section && !section.hidden) section.scrollIntoView();
+}
 
 function q(cypher, params) {
   const r = JSON.parse(db.execute(cypher, params ? JSON.stringify(params) : null));
@@ -38,12 +43,16 @@ function renderStatic() {
     $("#eval-bars").innerHTML = hbar(`Block every number ever reported`, ev.blocklist_all_seen.coverage, max)
       + hbar(`Block numbers with 2+ reports`, ev.baseline.coverage, max)
       + (ev.dropnet_geographic ? hbar(`Dropnet: also block ${fmt(ev.dropnet_geographic.block_rules)} local ranges`, ev.dropnet_geographic.coverage, max, true) : "")
+      + (ev.naive_geographic ? hbar(`Naive: same number of local ranges`, ev.naive_geographic.coverage, max) : "")
       + hbar(`Dropnet: plus toll-free ranges`, ev.dropnet.coverage, max, true);
     const rb = ev.robustness;
     $("#eval-note").innerHTML = `${fmt(ev.dropnet.new_numbers_caught)} later reports matched numbers not previously reported.${rb ? ` We repeated the test from ${rb.rolling_summary.splits} different start days: Dropnet matched at
       least ${rb.rolling_summary.min_lift.toFixed(1)} times as many reports every time, ${rb.rolling_summary.median_lift.toFixed(1)} times typically.` : ""}${ev.early_warning ? ` Replayed day by day, ${fmt(ev.early_warning.numbers_first_seen_after_flag)} numbers
       first appeared in a range that was already flagged, a median of ${ev.early_warning.days_first_complaint_to_flag.median} days after its first complaint.` : ""} The price: a range rule can affect up to
       10,000 numbers; legitimate-call impact is unknown.`;
+    if (ev.naive_geographic) {
+      $("#eval-note").innerHTML += ` At the same geographic prefix budget, Dropnet matched ${ev.dropnet_geographic.matches_per_million_numbers.toFixed(1)} complaints per million possible numbers and the naive ranking matched ${ev.naive_geographic.matches_per_million_numbers.toFixed(1)}.`;
+    }
   }
   $("#spoof-bars").innerHTML = data.profile.filter((p) => p.reports > 1000).sort((a, b) => b.neighbor_share - a.neighbor_share)
     .map((p) => hbar(esc(LABEL[p.subject] || p.label), p.neighbor_share, 1)).join("");
@@ -135,6 +144,7 @@ async function renderPrereg() {
     <a href="https://github.com/ikooq/dropnet/tree/main/docs/prediction" target="_blank" rel="noopener">Lists, hashes and protocol</a>.
     The result is published whatever it is.`;
   $("#prereg").hidden = false;
+  scrollToSection("prereg");
 }
 
 function loadGraph() {
@@ -347,11 +357,16 @@ const VERDICT = {
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
 let latestLookup = 0;
+const resultFragment = (number) => `#n=${number}`;
+const sharedNumber = () => /^#n=([2-9]\d{9})$/.exec(location.hash)?.[1];
 async function check(raw, example = false) {
   const request = ++latestLookup;
   const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
   if (!/^[2-9]\d{9}$/.test(n)) { $("#num-out").innerHTML = `<p>Enter a 10-digit US or Canadian number, like 866-771-6581.</p>`; return; }
-  if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
+  if (!example) {
+    $("#num-in").value = dash(n);
+    history.replaceState(null, "", resultFragment(n));
+  }
   let L;
   if (!example) $("#num-out").innerHTML = `<p class="quiet">Loading the complaint lookup…</p>`;
   try { L = await loadLookup(); } catch {
@@ -394,11 +409,15 @@ async function check(raw, example = false) {
     if (frozen.has(n.slice(0, 6))) html += `<p class="quiet">This range is on the list Dropnet froze on Nov 23 for its
       <a href="#prereg">pre-registered test</a>.</p>`;
   } catch { /* the frozen list is optional here */ }
-  $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
+  $("#num-out").innerHTML = html + `<p class="links"><a href="${resultFragment(n)}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`
     + `<div class="caution">${esc(data.caution)}</div>`;
 }
 $("#num-form").addEventListener("submit", (e) => { e.preventDefault(); check($("#num-in").value); });
+addEventListener("hashchange", () => {
+  const shared = sharedNumber();
+  if (data && shared) check(shared);
+});
 
 // hover and click on the range: every cell is a phone number
 const tip = $("#grid-tip");
@@ -440,13 +459,48 @@ function run() {
 }
 $("#q-go").addEventListener("click", run);
 
+async function renderCarriers() {
+  const status = $("#carrier-status");
+  try {
+    const response = await fetch("data/carriers.json?v=" + DATA_V);
+    if (!response.ok) throw new Error(response.status);
+    const { carriers, caution } = await response.json();
+    $("#carrier-caution").textContent = caution;
+    $("#carrier-caution").hidden = false;
+    if (!carriers.length) {
+      status.textContent = "No carrier assignments are available in this snapshot.";
+      return;
+    }
+    const rate = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const totals = ["flagged", "ranges_held", "reports", "numbers", "ocns", "states"];
+    $("#carrier-ranking tbody").innerHTML = carriers.map((c) => `<tr>
+      <th scope="row">${esc(c.carrier)}</th>
+      <td class="num carrier-rate">${c.flagged_per_100_ranges == null ? "—" : rate.format(c.flagged_per_100_ranges)}</td>
+      ${totals.map((key) => `<td class="num">${fmt(c[key])}</td>`).join("")}
+    </tr>`).join("");
+    $("#carrier-ranking").hidden = false;
+    status.hidden = true;
+  } catch {
+    status.textContent = "Carrier assignments could not be loaded.";
+  }
+}
+
 (async function boot() {
+  const url = new URL(location.href);
+  const legacyNumber = url.searchParams.get("n");
+  if (url.searchParams.has("n")) {
+    url.searchParams.delete("n");
+    history.replaceState(null, "", url);
+  }
+  renderCarriers();
   data = await (await fetch("data/graph.json?v=" + DATA_V)).json();
   renderStatic();
   renderEarly();
+  scrollToSection("early");
   renderPrereg();
-  const shared = new URLSearchParams(location.search).get("n");
-  check(shared || "8667716581", !shared);  // the hero works before the graph engine has loaded
+  const shared = sharedNumber() || legacyNumber;
+  if (shared) check(shared);
+  else if (!["#early", "#prereg"].includes(location.hash)) check("8667716581", true);
   await init();
   db = new RelateDb();
   loadGraph();

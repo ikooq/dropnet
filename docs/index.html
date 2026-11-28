@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
   <title>Dropnet</title>
   <link rel="icon" href="data:,">
   <meta name="description" content="Check a phone number against FTC unwanted-call complaints. Dropnet explores concentrations of reported numbers, in a Relate graph running in your browser.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
 </head>
 <body>
@@ -28,7 +29,7 @@
         <input id="num-in" placeholder="866-771-6581" inputmode="tel" maxlength="16">
         <button class="go" id="num-go" type="submit">Check</button>
       </form>
-      <div id="num-out" aria-live="polite"><p class="quiet" id="num-hint">Checks reported numbers and ranges in the loaded FTC dataset. It runs in your browser; the number never leaves it.</p></div>
+      <div id="num-out" aria-live="polite"><p class="quiet" id="num-hint">Checks the loaded FTC data in your browser. Result links keep the number after #, outside the HTTP request.</p></div>
     </div>
     <figure class="range">
       <canvas id="grid" width="500" height="500" aria-label="The 10,000 numbers of this range"></canvas>
@@ -80,6 +81,23 @@
     <p class="quiet" id="prereg-proof"></p>
   </section>
 
+  <section aria-labelledby="carrier-title">
+    <h2 id="carrier-title">Who holds flagged ranges</h2>
+    <p class="quiet">The 15 holders with the most flagged ranges. The rate is the number flagged per 100 ranges held.</p>
+    <p class="quiet" id="carrier-status" role="status">Loading carrier assignments…</p>
+    <div class="carrier-scroll" id="carrier-ranking" role="region" aria-label="Carrier ranking" tabindex="0" hidden>
+      <table class="grid carrier-table">
+        <thead><tr>
+          <th scope="col">Carrier</th><th scope="col" class="num">Flagged per 100</th>
+          <th scope="col" class="num">Flagged</th><th scope="col" class="num">Ranges held</th>
+          <th scope="col" class="num">Reports</th><th scope="col" class="num">Reported numbers</th>
+          <th scope="col" class="num">OCNs</th><th scope="col" class="num">States</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="caution" id="carrier-caution" hidden></p>
+  </section>
   <section id="net-panel" hidden></section>
   <section id="whatif"></section>
 
@@ -106,6 +124,6 @@
   </section>
 </main>
 <footer><p id="source"></p><p>Built on Relate by Neo4j, WebAssembly build. Data: FTC Do Not Call complaints, US public data.</p></footer>
-<script type="module" src="app.js?v=16"></script>
+<script type="module" src="app.js?v=20"></script>
 </body>
 </html>

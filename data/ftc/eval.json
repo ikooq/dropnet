@@ -6,13 +6,15 @@
     "rules": 11968,
     "numbers_blocked": 11968,
     "covered": 4496,
-    "coverage": 0.0434
+    "coverage": 0.0434,
+    "matches_per_million_numbers": 375668.4
   },
   "dropnet": {
     "rules": 15649,
     "number_rules": 11968,
     "block_rules": 3681,
     "numbers_blocked": 36816511,
+    "matches_per_million_numbers": 620.1,
     "covered": 22829,
     "coverage": 0.2203,
     "new_numbers_caught": 17532,
@@ -130,6 +132,7 @@
     "number_rules": 11968,
     "block_rules": 2872,
     "numbers_blocked": 28730391,
+    "matches_per_million_numbers": 516.0,
     "covered": 14825,
     "coverage": 0.1431,
     "new_numbers_caught": 9978,
@@ -961,5 +964,419 @@
       ],
       "selection": "the geographic range with the most numbers first seen after the day it was flagged"
     }
-  }
+  },
+  "naive_geographic": {
+    "rules": 14840,
+    "number_rules": 11968,
+    "block_rules": 2872,
+    "numbers_blocked": 28730239,
+    "matches_per_million_numbers": 523.6,
+    "covered": 15043,
+    "coverage": 0.1452,
+    "new_numbers_caught": 10180,
+    "spoofed_caught": 2094
+  },
+  "carrier_prior": {
+    "split_day": "2026-11-02",
+    "leaders": [
+      {
+        "carrier": "HD CARRIER LLC",
+        "flagged_per_100_ranges": 17.9
+      },
+      {
+        "carrier": "PEERLESS NETWORK OF CALIFORNIA, LLC",
+        "flagged_per_100_ranges": 15.7
+      },
+      {
+        "carrier": "IP HORIZON LLC",
+        "flagged_per_100_ranges": 13.7
+      },
+      {
+        "carrier": "FRACTEL, LLC",
+        "flagged_per_100_ranges": 12.5
+      },
+      {
+        "carrier": "PEERLESS NETWORK OF NEW YORK, LLC",
+        "flagged_per_100_ranges": 11.9
+      },
+      {
+        "carrier": "PEERLESS NETWORK OF TEXAS, LLC",
+        "flagged_per_100_ranges": 7.0
+      },
+      {
+        "carrier": "WIDE VOICE, LLC",
+        "flagged_per_100_ranges": 6.0
+      },
+      {
+        "carrier": "ONVOY, LLCV",
+        "flagged_per_100_ranges": 5.1
+      },
+      {
+        "carrier": "EXIANT COMMUNICATIONS LLC",
+        "flagged_per_100_ranges": 4.5
+      },
+      {
+        "carrier": "ONVOY, LLC",
+        "flagged_per_100_ranges": 4.5
+      }
+    ],
+    "open_ranges": 61384,
+    "leader_ranges": 9002,
+    "other_ranges": 52382,
+    "leader_flagged_later": 0.0752,
+    "other_flagged_later": 0.0205,
+    "lift": 3.7,
+    "new_flagged_ranges": 1841,
+    "new_flagged_held_by_leaders": 686
+  },
+  "carriers": [
+    {
+      "carrier": "ONVOY, LLC",
+      "ranges_held": 12913,
+      "flagged": 915,
+      "reports": 9308,
+      "numbers": 8385,
+      "ocns": 44,
+      "states": 44,
+      "flagged_per_100_ranges": 7.1
+    },
+    {
+      "carrier": "FRACTEL, LLC",
+      "ranges_held": 2858,
+      "flagged": 606,
+      "reports": 6298,
+      "numbers": 5910,
+      "ocns": 1,
+      "states": 38,
+      "flagged_per_100_ranges": 21.2
+    },
+    {
+      "carrier": "BANDWIDTH.COM CLEC, LLC",
+      "ranges_held": 4820,
+      "flagged": 305,
+      "reports": 2705,
+      "numbers": 2541,
+      "ocns": 35,
+      "states": 35,
+      "flagged_per_100_ranges": 6.3
+    },
+    {
+      "carrier": "LEVEL 3 COMMUNICATIONS, LLC",
+      "ranges_held": 9078,
+      "flagged": 193,
+      "reports": 2402,
+      "numbers": 1696,
+      "ocns": 35,
+      "states": 35,
+      "flagged_per_100_ranges": 2.1
+    },
+    {
+      "carrier": "CELLCO PARTNERSHIP DBA VERIZON WIRELESS",
+      "ranges_held": 17691,
+      "flagged": 178,
+      "reports": 1544,
+      "numbers": 1420,
+      "ocns": 39,
+      "states": 39,
+      "flagged_per_100_ranges": 1.0
+    },
+    {
+      "carrier": "NEW CINGULAR WIRELESS PCS, LLC",
+      "ranges_held": 18816,
+      "flagged": 159,
+      "reports": 1415,
+      "numbers": 1305,
+      "ocns": 4,
+      "states": 34,
+      "flagged_per_100_ranges": 0.8
+    },
+    {
+      "carrier": "IP HORIZON LLC",
+      "ranges_held": 630,
+      "flagged": 131,
+      "reports": 1216,
+      "numbers": 1137,
+      "ocns": 1,
+      "states": 20,
+      "flagged_per_100_ranges": 20.8
+    },
+    {
+      "carrier": "T-MOBILE USA, INC.",
+      "ranges_held": 7584,
+      "flagged": 108,
+      "reports": 1035,
+      "numbers": 899,
+      "ocns": 1,
+      "states": 16,
+      "flagged_per_100_ranges": 1.4
+    },
+    {
+      "carrier": "PAETEC ITEL, LLC",
+      "ranges_held": 5551,
+      "flagged": 105,
+      "reports": 1132,
+      "numbers": 1012,
+      "ocns": 1,
+      "states": 26,
+      "flagged_per_100_ranges": 1.9
+    },
+    {
+      "carrier": "MCIMETRO ACCESS TRANSMISSION SERVICES LLC",
+      "ranges_held": 5544,
+      "flagged": 88,
+      "reports": 861,
+      "numbers": 813,
+      "ocns": 18,
+      "states": 25,
+      "flagged_per_100_ranges": 1.6
+    },
+    {
+      "carrier": "TELEPORT COMMUNICATIONS AMERICA, LLC",
+      "ranges_held": 3859,
+      "flagged": 86,
+      "reports": 733,
+      "numbers": 677,
+      "ocns": 25,
+      "states": 20,
+      "flagged_per_100_ranges": 2.2
+    },
+    {
+      "carrier": "TON80 COMMUNICATIONS, LLC",
+      "ranges_held": 1582,
+      "flagged": 85,
+      "reports": 709,
+      "numbers": 670,
+      "ocns": 1,
+      "states": 26,
+      "flagged_per_100_ranges": 5.4
+    },
+    {
+      "carrier": "HD CARRIER LLC",
+      "ranges_held": 336,
+      "flagged": 77,
+      "reports": 865,
+      "numbers": 792,
+      "ocns": 1,
+      "states": 28,
+      "flagged_per_100_ranges": 22.9
+    },
+    {
+      "carrier": "ONVOY SPECTRUM, LLC",
+      "ranges_held": 1774,
+      "flagged": 75,
+      "reports": 635,
+      "numbers": 587,
+      "ocns": 1,
+      "states": 23,
+      "flagged_per_100_ranges": 4.2
+    },
+    {
+      "carrier": "EON TELECOM, INC.",
+      "ranges_held": 84,
+      "flagged": 62,
+      "reports": 3211,
+      "numbers": 3088,
+      "ocns": 1,
+      "states": 14,
+      "flagged_per_100_ranges": 73.8
+    },
+    {
+      "carrier": "SOUTHWESTERN BELL",
+      "ranges_held": 5979,
+      "flagged": 48,
+      "reports": 566,
+      "numbers": 448,
+      "ocns": 1,
+      "states": 5,
+      "flagged_per_100_ranges": 0.8
+    },
+    {
+      "carrier": "PEERLESS NETWORK OF CALIFORNIA, LLC",
+      "ranges_held": 197,
+      "flagged": 44,
+      "reports": 479,
+      "numbers": 445,
+      "ocns": 1,
+      "states": 1,
+      "flagged_per_100_ranges": 22.3
+    },
+    {
+      "carrier": "NUSO, LLC",
+      "ranges_held": 739,
+      "flagged": 43,
+      "reports": 331,
+      "numbers": 289,
+      "ocns": 3,
+      "states": 29,
+      "flagged_per_100_ranges": 5.8
+    },
+    {
+      "carrier": "METROPCS, INC.",
+      "ranges_held": 3846,
+      "flagged": 40,
+      "reports": 328,
+      "numbers": 296,
+      "ocns": 1,
+      "states": 20,
+      "flagged_per_100_ranges": 1.0
+    },
+    {
+      "carrier": "TELNYX LLC",
+      "ranges_held": 604,
+      "flagged": 37,
+      "reports": 413,
+      "numbers": 383,
+      "ocns": 1,
+      "states": 22,
+      "flagged_per_100_ranges": 6.1
+    },
+    {
+      "carrier": "COMCAST IP PHONE, LLC",
+      "ranges_held": 1860,
+      "flagged": 34,
+      "reports": 286,
+      "numbers": 279,
+      "ocns": 1,
+      "states": 20,
+      "flagged_per_100_ranges": 1.8
+    },
+    {
+      "carrier": "COMMIO, LLC",
+      "ranges_held": 820,
+      "flagged": 34,
+      "reports": 253,
+      "numbers": 237,
+      "ocns": 1,
+      "states": 15,
+      "flagged_per_100_ranges": 4.1
+    },
+    {
+      "carrier": "OMNIPOINT COMMUNICATIONS, INC.",
+      "ranges_held": 1783,
+      "flagged": 32,
+      "reports": 250,
+      "numbers": 225,
+      "ocns": 3,
+      "states": 3,
+      "flagged_per_100_ranges": 1.8
+    },
+    {
+      "carrier": "PACIFIC BELL",
+      "ranges_held": 4911,
+      "flagged": 31,
+      "reports": 332,
+      "numbers": 313,
+      "ocns": 1,
+      "states": 1,
+      "flagged_per_100_ranges": 0.6
+    },
+    {
+      "carrier": "ONVOY, LLCV",
+      "ranges_held": 369,
+      "flagged": 27,
+      "reports": 227,
+      "numbers": 210,
+      "ocns": 1,
+      "states": 1,
+      "flagged_per_100_ranges": 7.3
+    }
+  ],
+  "carrier_prior_splits": [
+    {
+      "split_day": "2026-10-20",
+      "open_ranges": 32711,
+      "leader_ranges": 5979,
+      "other_ranges": 26732,
+      "leader_flagged_later": 0.2231,
+      "other_flagged_later": 0.0695,
+      "lift": 3.2,
+      "new_flagged_ranges": 3829,
+      "new_flagged_held_by_leaders": 1542,
+      "top": 10
+    },
+    {
+      "split_day": "2026-10-20",
+      "open_ranges": 32711,
+      "leader_ranges": 8831,
+      "other_ranges": 23880,
+      "leader_flagged_later": 0.1951,
+      "other_flagged_later": 0.0615,
+      "lift": 3.2,
+      "new_flagged_ranges": 3829,
+      "new_flagged_held_by_leaders": 1993,
+      "top": 25
+    },
+    {
+      "split_day": "2026-10-26",
+      "open_ranges": 47728,
+      "leader_ranges": 7606,
+      "other_ranges": 40122,
+      "leader_flagged_later": 0.1365,
+      "other_flagged_later": 0.0397,
+      "lift": 3.4,
+      "new_flagged_ranges": 2833,
+      "new_flagged_held_by_leaders": 1079,
+      "top": 10
+    },
+    {
+      "split_day": "2026-10-26",
+      "open_ranges": 47728,
+      "leader_ranges": 11428,
+      "other_ranges": 36300,
+      "leader_flagged_later": 0.1201,
+      "other_flagged_later": 0.0347,
+      "lift": 3.5,
+      "new_flagged_ranges": 2833,
+      "new_flagged_held_by_leaders": 1430,
+      "top": 25
+    },
+    {
+      "split_day": "2026-11-02",
+      "open_ranges": 61384,
+      "leader_ranges": 9002,
+      "other_ranges": 52382,
+      "leader_flagged_later": 0.0752,
+      "other_flagged_later": 0.0205,
+      "lift": 3.7,
+      "new_flagged_ranges": 1841,
+      "new_flagged_held_by_leaders": 686,
+      "top": 10
+    },
+    {
+      "split_day": "2026-11-02",
+      "open_ranges": 61384,
+      "leader_ranges": 14165,
+      "other_ranges": 47219,
+      "leader_flagged_later": 0.0661,
+      "other_flagged_later": 0.0172,
+      "lift": 3.8,
+      "new_flagged_ranges": 1841,
+      "new_flagged_held_by_leaders": 952,
+      "top": 25
+    },
+    {
+      "split_day": "2026-11-06",
+      "open_ranges": 69053,
+      "leader_ranges": 9573,
+      "other_ranges": 59480,
+      "leader_flagged_later": 0.0429,
+      "other_flagged_later": 0.0113,
+      "lift": 3.8,
+      "new_flagged_ranges": 1122,
+      "new_flagged_held_by_leaders": 414,
+      "top": 10
+    },
+    {
+      "split_day": "2026-11-06",
+      "open_ranges": 69053,
+      "leader_ranges": 14813,
+      "other_ranges": 54240,
+      "leader_flagged_later": 0.0386,
+      "other_flagged_later": 0.0094,
+      "lift": 4.1,
+      "new_flagged_ranges": 1122,
+      "new_flagged_held_by_leaders": 581,
+      "top": 25
+    }
+  ]
 }

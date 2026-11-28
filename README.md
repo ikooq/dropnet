@@ -36,10 +36,11 @@ python -m dropnet serve
 
 Open [localhost:8000](http://127.0.0.1:8000):
 
-1. Check a number, for example `771-999-0716`: its range is flagged, NANPA lists one carrier as the range's holder and
-   another as the carrier its 1,000-number block was assigned to.
+1. Check `771-999-0716`. The result shows **FRACTEL, LLC** as the prefix holder (OCN `965H`, 606 flagged out of
+   2,858 prefixes it holds) and **ONVOY, LLC** as the assignee of the 1,000-number block.
 2. In **Who holds flagged ranges**, open a carrier to see its flagged ranges, rate centers and complaint categories.
-3. Select a range in the case graph and follow its OCN to other flagged ranges. Run a what-if, or download the case as
+3. Click **Open range 771-999 in graph** in the number result, then choose a range under **Flagged ranges sharing OCN 965H**.
+   Run a what-if, or download the case as
    its own `.rl` file.
 
 `python -m dropnet ftc-eval` prints the hold-out table. `python -m pip install -e ".[dev]"` then `python -m pytest`

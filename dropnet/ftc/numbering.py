@@ -262,11 +262,18 @@ def number_holder(conn: relate.Connection, number: str) -> dict | None:
         OPTIONAL MATCH (s:SubBlock {id: $s})-[:ASSIGNED_TO]->(sc:Carrier)-[:PART_OF]->(sg:CarrierGroup)
         OPTIONAL MATCH (g)<-[:PART_OF]-(:Carrier)<-[:HELD_BY]-(fb:Block)<-[:USES_BLOCK]-(:FtcCampaign {kind: 'pool'})
         RETURN c.ocn AS ocn, g.name AS range_holder, rc.name AS rate_center, rc.state AS state,
-               sg.name AS block_carrier, g.codes_held AS holder_ranges, count(DISTINCT fb) AS holder_flagged""",
+               sg.name AS block_carrier, sc.ocn AS block_ocn,
+               g.codes_held AS holder_ranges, count(DISTINCT fb) AS holder_flagged""",
              {"b": block, "s": sub})
     if not r:
         return None
     x = r[0]
+    block_ocn = x.pop("block_ocn")
+    x["prefix_holder"] = {"name": x["range_holder"], "prefix": block, "ocn": x["ocn"],
+                          "rate_center": x["rate_center"], "state": x["state"],
+                          "ranges_held": x["holder_ranges"], "flagged_ranges_held": x["holder_flagged"]}
+    x["thousands_block_assignee"] = ({"name": x["block_carrier"], "block": sub, "ocn": block_ocn}
+                                     if x["block_carrier"] else None)
     x["carrier"] = x["block_carrier"] or x["range_holder"]
     x["caution"] = CAUTION
     return x

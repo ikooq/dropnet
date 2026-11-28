@@ -351,11 +351,16 @@ const VERDICT = {
   "1": ["", "Reported once", "One report is weak evidence on its own."],
 };
 let latestLookup = 0;
+const resultFragment = (number) => `#n=${number}`;
+const sharedNumber = () => /^#n=([2-9]\d{9})$/.exec(location.hash)?.[1];
 async function check(raw, example = false) {
   const request = ++latestLookup;
   const n = String(raw).replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
   if (!/^[2-9]\d{9}$/.test(n)) { $("#num-out").innerHTML = `<p>Enter a 10-digit US or Canadian number, like 866-771-6581.</p>`; return; }
-  if (!example) { $("#num-in").value = dash(n); history.replaceState(null, "", "?n=" + n + location.hash); }
+  if (!example) {
+    $("#num-in").value = dash(n);
+    history.replaceState(null, "", resultFragment(n));
+  }
   let L;
   if (!example) $("#num-out").innerHTML = `<p class="quiet">Loading the complaint lookup…</p>`;
   try { L = await loadLookup(); } catch {
@@ -398,11 +403,15 @@ async function check(raw, example = false) {
     if (frozen.has(n.slice(0, 6))) html += `<p class="quiet">This range is on the list Dropnet froze on Nov 23 for its
       <a href="#prereg">pre-registered test</a>.</p>`;
   } catch { /* the frozen list is optional here */ }
-  $("#num-out").innerHTML = html + `<p class="links"><a href="?n=${n}">Link to this result</a>, or
+  $("#num-out").innerHTML = html + `<p class="links"><a href="${resultFragment(n)}">Link to this result</a>, or
     <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">report the call to the FTC</a>.</p>`
     + `<div class="caution">${esc(data.caution)}</div>`;
 }
 $("#num-form").addEventListener("submit", (e) => { e.preventDefault(); check($("#num-in").value); });
+addEventListener("hashchange", () => {
+  const shared = sharedNumber();
+  if (data && shared) check(shared);
+});
 
 // hover and click on the range: every cell is a phone number
 const tip = $("#grid-tip");
@@ -471,12 +480,18 @@ async function renderCarriers() {
 }
 
 (async function boot() {
+  const url = new URL(location.href);
+  const legacyNumber = url.searchParams.get("n");
+  if (url.searchParams.has("n")) {
+    url.searchParams.delete("n");
+    history.replaceState(null, "", url);
+  }
   renderCarriers();
   data = await (await fetch("data/graph.json?v=" + DATA_V)).json();
   renderStatic();
   renderEarly();
   renderPrereg();
-  const shared = new URLSearchParams(location.search).get("n");
+  const shared = sharedNumber() || legacyNumber;
   check(shared || "8667716581", !shared);  // the hero works before the graph engine has loaded
   await init();
   db = new RelateDb();

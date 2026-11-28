@@ -23,8 +23,8 @@ INSTRUCTIONS = """Dropnet: real FTC Do Not Call complaints (US public data) in a
 (:FtcCampaign {kind: pool|repeat})-[:USES_BLOCK|USES_NUMBER]->(...)
 (:Block)-[:HELD_BY]->(:Carrier {ocn})-[:PART_OF]->(:CarrierGroup), (:Block)-[:IN_RATE_CENTER]->(:RateCenter)
 (:Number)-[:IN_SUBBLOCK]->(:SubBlock)-[:ASSIGNED_TO]->(:Carrier)
-Rules: complaints are unverified and caller ID can be faked. A carrier holds or was assigned numbers; it is not the
-caller. Never call a number's owner or a carrier a scammer, and always relay the `caution` field."""
+Rules: complaints are unverified and caller ID can be faked. A numbering assignment does not establish who placed
+the call. Never call a number's owner or a carrier a scammer, and always relay the `caution` field."""
 
 
 class Backend:
@@ -112,9 +112,13 @@ def build_server(backend: Backend):
 
     @mcp.tool()
     def assess_number(number: str) -> dict:
-        """Evidence about a phone number reported to the FTC: reports, states, scam types, its range's pool, the
-        NANPA holder of its range, and a verdict (likely_spoofed / pool / repeat / single / unknown).
-        ALWAYS relay the `caution` field. Area-code matches are indicators, not proof of spoofing or ownership."""
+        """Get FTC complaint evidence and NANPA assignments for a number. Report holder.prefix_holder.name
+        and holder.thousands_block_assignee.name separately when both are available. Ranges held and flagged
+        ranges held belong to prefix_holder.name only. Name that company if citing its counts.
+        ALWAYS relay the complaint caution and, when present, holder.caution. Caller ID can be spoofed, and
+        numbering assignments do not establish who placed the call. Describe neighbor_share as the observed
+        share of matching area codes. A zero match rate shows only that the reports have no such matches.
+        Follow advice.block. When it is "nothing", do not recommend blocking based on these records."""
         return backend.call("assess_number", {"number": number})
 
     @mcp.tool()

@@ -123,6 +123,12 @@ table.grid { width: 100%; border-collapse: collapse; background: var(--panel); b
 #carrier-detail h3, #carrier-detail h4 { margin: 6px 0; }
 .carrier-ranges { min-width: 30rem; }
 #carrier-caution { margin-bottom: 0; }
+.lookup-assignments { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 12px; margin: 12px 0; }
+.lookup-assignments > div { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.lookup-assignments dt { color: var(--muted); font-size: 12px; }
+.lookup-assignments dd { margin: 3px 0 0; }
+.range-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .err { color: var(--c-cashout); font-family: var(--mono); white-space: pre-wrap; }
 .lede { font-size: 17px; max-width: 900px; margin: 4px 0 14px; }
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }

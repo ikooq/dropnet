@@ -24,7 +24,9 @@ def stores(tmp_path_factory):
         SET b.state = 'IL'
         CREATE (b)-[:HELD_BY]->(:Carrier {ocn: '0001'})-[:PART_OF]->
                (:CarrierGroup {name: 'Example & Telecom', codes_held: 8})
-        CREATE (b)-[:IN_RATE_CENTER]->(:RateCenter {id: 'IL:EXAMPLE', name: 'EXAMPLE'})
+        CREATE (b)-[:IN_RATE_CENTER]->(:RateCenter {id: 'IL:EXAMPLE', name: 'EXAMPLE', state: 'IL'})
+        CREATE (b)<-[:PART_OF]-(:SubBlock {id: '8667710'})-[:ASSIGNED_TO]->
+               (:Carrier {ocn: '0002'})-[:PART_OF]->(:CarrierGroup {name: 'Block Assignee'})
     """)
     conn.close()
     (d / "eval.json").write_text(json.dumps({"baseline": {"coverage": 0.043}}), encoding="utf-8")
@@ -94,6 +96,21 @@ def test_ftc_campaigns_graph_assess(client):
     assert client.get("/api/ftc/campaigns/POOL-000000/graph").status_code == 404
     a = client.get("/api/ftc/number/(303) 555-0001").json()
     assert a["verdict"] == "likely_spoofed" and "not proof" in a["caution"]
+
+
+def test_ftc_number_and_mcp_report_the_same_assignments(client):
+    number = "8667710001"
+    assessment = client.get(f"/api/ftc/number/{number}").json()
+    assert assessment["pool_campaign_id"] == "POOL-866771"
+    assert client.get("/api/ftc/campaigns/POOL-866771/graph").status_code == 200
+    tool = client.post("/api/tools/assess_number", json={"number": number}).json()
+    prefix = {"name": "Example & Telecom", "prefix": "866771", "ocn": "0001", "rate_center": "EXAMPLE",
+              "state": "IL", "ranges_held": 8, "flagged_ranges_held": 1}
+    assignee = {"name": "Block Assignee", "block": "8667710", "ocn": "0002"}
+    assert assessment["holder"]["prefix_holder"] == prefix
+    assert assessment["holder"]["thousands_block_assignee"] == assignee
+    assert tool["holder"] == {"prefix_holder": prefix, "thousands_block_assignee": assignee, "caution": numbering.CAUTION}
+    assert tool["caution"] == assessment["caution"] and "Caller ID can be spoofed" in tool["caution"]
 
 
 def test_ftc_whatif_and_export(client):

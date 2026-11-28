@@ -134,7 +134,10 @@ def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
     if name == "ftc_campaigns":
         return campaign_list(conn, int(args.get("limit", 20)), args.get("kind"))
     if name == "assess_number":
-        return campaigns.assess_number(conn, args["number"])
+        result = campaigns.assess_number(conn, args["number"])
+        if holder := result["holder"]:
+            result["holder"] = {key: holder[key] for key in ("prefix_holder", "thousands_block_assignee", "caution")}
+        return result
     if name == "search_ranges":
         from . import semantic
         return semantic.search(conn, args["text"], limit=int(args.get("limit") or 10), state=args.get("state"))

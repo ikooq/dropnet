@@ -181,14 +181,18 @@ async function loadReal() {
     <div class="meta">${esc((c.subjects || []).join(", "))}${c.toll_free ? " · toll-free" : ""}</div></button>`).join("");
   $("#ftc-list").querySelectorAll(".camp-card").forEach((b) => b.addEventListener("click", () => openFtc(b.dataset.id)));
   const initial = ftcCampaigns.find((c) => !c.toll_free) || ftcCampaigns[0];
-  if (initial) await openFtc(initial.id);
+  if (initial && !latestGraphRequest) await openFtc(initial.id);
   return true;
 }
+let latestGraphRequest = 0;
+const fmtRange = (block) => `${block.slice(0, 3)}-${block.slice(3)}`;
 async function openFtc(id) {
-  document.querySelectorAll("#ftc-list .camp-card").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
+  const request = ++latestGraphRequest;
   const g = await api(`api/ftc/campaigns/${id}/graph`);
+  if (request !== latestGraphRequest) return false;
+  document.querySelectorAll("#ftc-list .camp-card").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
   const k = g.campaign, blk = id.replace("POOL-", "");
-  $("#ftc-head").innerHTML = `<h2>${esc(blk.slice(0, 3))}-${esc(blk.slice(3))}-xxxx</h2>
+  $("#ftc-head").innerHTML = `<h2 tabindex="-1">${esc(fmtRange(blk))}-xxxx</h2>
     <span class="badge">${k.numbers} numbers</span><span class="badge">${k.reports.toLocaleString()} reports</span>
     <span class="badge">${k.states} states</span><span class="badge">${esc(k.first_day || "")} → ${esc(k.last_day || "")}</span>
     <span class="spacer"></span><a href="api/ftc/campaigns/${esc(id)}/export"><button>Download case (.rl)</button></a>`;
@@ -224,6 +228,10 @@ async function openFtc(id) {
     g.numbering.rate_center && `Rate center: ${g.numbering.rate_center}.`,
     "Shared OCN describes a numbering assignment. It does not establish who placed a call."
   ].filter(Boolean).join(" ") : "";
+  $("#ftc-related").innerHTML = g.numbering?.related.length ? `<div class="range-links">
+    <span>Flagged ranges sharing OCN ${esc(g.numbering.ocn)}</span>
+    ${g.numbering.related.map((r) => `<button type="button" data-range-campaign="${esc(r.campaign)}">${esc(fmtRange(r.block))}</button>`).join("")}
+    <span class="muted" role="status"></span></div>` : "";
   const picks = [k, ...ftcCampaigns.filter((c) => c.id !== id).slice(0, 11)];
   $("#ftc-whatif").innerHTML = `<b>How many later-filed reports match these ranges?</b>
     <div class="whatif-pick">${picks.map((c) => `<label><input type="checkbox" value="${esc(c.id.replace("POOL-", ""))}" ${c.id === id ? "checked" : ""}> ${esc(c.id.replace("POOL-", ""))}</label>`).join("")}</div>
@@ -239,7 +247,40 @@ async function openFtc(id) {
         ${r.spoofed_reports_in_scope ? `<br><span class="muted">${r.spoofed_reports_in_scope.toLocaleString()} matching reports had matching area codes; this does not prove spoofing.</span>` : ""}</p>`;
     } catch (e) { $("#whatif-out").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   });
+  return true;
 }
+
+async function followRange(event) {
+  const button = event.target.closest("button[data-range-campaign]");
+  if (!button) return;
+  const status = button.parentElement.querySelector("[role='status']");
+  status.textContent = "Loading range…";
+  try {
+    if (await openFtc(button.dataset.rangeCampaign)) {
+      const heading = $("#ftc-head h2");
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: "start" });
+    }
+    status.textContent = "";
+  } catch {
+    status.textContent = "Could not open this range. Try again.";
+  }
+}
+
+function numberingEvidence(holder) {
+  if (!holder?.prefix_holder) return "";
+  const prefix = holder.prefix_holder, assignee = holder.thousands_block_assignee;
+  return `<dl class="lookup-assignments">
+    <div><dt>Prefix holder · ${esc(fmtRange(prefix.prefix))}</dt>
+      <dd><strong>${esc(prefix.name)}</strong> (OCN ${esc(prefix.ocn)})</dd>
+      <dd>${esc(prefix.name)} holds ${carrierCount.format(prefix.ranges_held)} prefixes. ${carrierCount.format(prefix.flagged_ranges_held)} are flagged in this snapshot.</dd>
+    </div>
+    <div><dt>1,000-number block assignee${assignee ? ` · ${esc(fmtRange(assignee.block.slice(0, 6)))}-${esc(assignee.block.slice(6))}xxx` : ""}</dt>
+      <dd>${assignee ? `<strong>${esc(assignee.name)}</strong> (OCN ${esc(assignee.ocn)})` : "No assignment in the loaded NANPA data."}</dd>
+    </div>
+  </dl><p class="muted small">${esc(holder.caution)}</p>`;
+}
+
 let latestAssessment = 0;
 async function assess(number) {
   const request = ++latestAssessment;
@@ -256,16 +297,21 @@ async function assess(number) {
   if (request !== latestAssessment) return;
   const label = { likely_spoofed: "Area-code match", pool: "Part of a number pool", repeat: "Repeatedly reported", single: "Reported", unknown: "Not in the reports" }[a.verdict];
   $("#num-out").innerHTML = `<p class="verdict ${a.verdict}">${label}</p>` + (a.reports ? `<p>${a.reports.toLocaleString()} reports ·
-    ${a.states} states · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
+    ${a.states} ${a.states === 1 ? "state" : "states"} · ${esc((a.subjects || []).join(", "))} · ${pct(a.neighbor_share)} area-code match · block ${esc(a.block)} has
     ${a.block_numbers} reported numbers meeting pool criteria · ${esc(a.first_day)} → ${esc(a.last_day)}</p>` +
     (a.repeated_number_signal ? `<p>This number appears in at least 3 complaints. Repeated reports are a lead for review, not proof of wrongdoing or independent callers.</p>` : "") +
     (a.date_quality?.call_after_filing ? `<div class="caution">Date warning: ${a.date_quality.call_after_filing} complaint(s) report a call date later than the filing date. Source values are unchanged; the cause is unknown.<ul>${a.date_quality.examples.map(x => `<li>Report ${esc(x.report_id)}: filed ${esc(x.filing_date)}, reported call ${esc(x.reported_call_date)}</li>`).join("")}</ul>Showing up to five examples.</div>` : "") +
     (a.date_quality && (a.date_quality.missing || a.date_quality.invalid) ? `<div class="caution">Date check unavailable for ${a.date_quality.missing} missing and ${a.date_quality.invalid} invalid date pair(s).</div>` : "") :
-    a.in_pool_range ? `<p>No reports for this number in the loaded window; its range contains ${a.block_numbers} reported numbers meeting the pool criteria. This does not establish who called.</p>` : "") + `<div class="caution">${esc(a.caution)}</div>`;
+    a.in_pool_range ? `<p>No reports for this number in the loaded window; its range contains ${a.block_numbers} reported numbers meeting the pool criteria. This does not establish who called.</p>` : "")
+    + numberingEvidence(a.holder)
+    + (a.pool_campaign_id ? `<div class="range-links"><button type="button" data-range-campaign="${esc(a.pool_campaign_id)}">Open range ${esc(fmtRange(a.block))} in graph</button><span class="muted" role="status"></span></div>` : "")
+    + `<div class="caution">${esc(a.caution)}</div>`;
   document.querySelector(".lookup").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 $("#num-go").addEventListener("click", () => assess($("#num-in").value));
 $("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") assess($("#num-in").value); });
+$("#num-out").addEventListener("click", followRange);
+$("#ftc-related").addEventListener("click", followRange);
 
 /* ----------------------------------------------------------------- boot */
 (async function boot() {

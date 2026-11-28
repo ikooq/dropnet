@@ -100,6 +100,12 @@ def assess_number(conn: relate.Connection, number: str) -> dict:
     out = _assess_number(conn, number)
     from . import numbering
     out["holder"] = numbering.number_holder(conn, out["number"]) if numbering.has_numbering(conn) else None
+    if out["block_numbers"] >= POOL_MIN_NUMBERS:
+        pools = rows(conn, "MATCH (c:FtcCampaign {id: $id, kind: 'pool'}) RETURN c.id AS id LIMIT 1",
+                     {"id": f"POOL-{out['block']}"})
+        out["pool_campaign_id"] = pools[0]["id"] if pools else None
+    else:
+        out["pool_campaign_id"] = None
     return out
 
 

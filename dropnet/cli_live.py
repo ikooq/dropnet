@@ -119,12 +119,16 @@ def cmd_ftc_numbering(a: argparse.Namespace) -> int:
         finally:
             conn.close()
         print(f"extracted {numbering.extract(codes, blocks, ranges, subs)} into {numbering.NANPA_DIR}")
-    print(f"linked {build.augment(build.FTC_STORE, numbering.link)} into {build.FTC_STORE}")
+    if not a.eval_only:
+        print(f"linked {build.augment(build.FTC_STORE, numbering.link)} into {build.FTC_STORE}")
     import json
     conn = store.open_store(build.FTC_STORE, read_only=True)
     try:
         ev = json.loads(build.EVAL_JSON.read_text(encoding="utf-8"))
         ev["carrier_prior"] = numbering.carrier_prior(conn, ev["split_day"])
+        ev["carrier_prior_splits"] = [  # the same test from other start days and with more leaders
+            {k: v for k, v in numbering.carrier_prior(conn, day, top=top).items() if k != "leaders"} | {"top": top}
+            for day in ("2026-10-20", "2026-10-26", "2026-11-02", "2026-11-06") for top in (10, 25)]
         ev["carriers"] = numbering.carrier_ranking(conn, 25)
     finally:
         conn.close()
@@ -279,6 +283,8 @@ def register(sub) -> None:
     fb.set_defaults(fn=cmd_ftc_build)
     nb = sub.add_parser("ftc-numbering", help="add NANPA carriers, rate centers and 1,000-blocks to data/ftc.rl")
     nb.add_argument("--fetch", action="store_true", help="download the current NANPA files first (nanpa.com)")
+    nb.add_argument("--eval-only", action="store_true",
+                    help="skip rewriting data/ftc.rl; only record the carrier results in data/ftc/eval.json")
     nb.set_defaults(fn=cmd_ftc_numbering)
     fe = sub.add_parser("ftc-eval", help="temporal hold-out: blocklist vs Dropnet pool rules on real reports")
     fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")

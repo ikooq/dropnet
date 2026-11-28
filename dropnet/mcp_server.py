@@ -1,8 +1,7 @@
-"""MCP server (stdio) that lets any agent investigate the Dropnet graph.
+"""MCP server (stdio) that gives any agent the evidence in the FTC complaint graph before it answers.
 
-If `python -m dropnet serve` is running it proxies to its API, so the agent sees complaints
-ingested a moment ago and never fights the web app for Relate's single-writer lock.
-Otherwise it opens the committed snapshot read-only.
+If `python -m dropnet serve` is running it proxies to its API, so the agent never fights the web app for Relate's
+single-writer lock. Otherwise it opens data/ftc.rl read-only (what-if runs on a throw-away copy).
 """
 from __future__ import annotations
 
@@ -15,32 +14,29 @@ from pathlib import Path
 from typing import Any
 
 from . import config, store, tools
+from .ftc.api import FTC_TOOL_NAMES, dispatch_ftc
 
-from .ftc.api import FTC_TOOL_NAMES, dispatch_ftc  # noqa: E402
-
-TOOL_NAMES = tools.TOOL_NAMES + FTC_TOOL_NAMES
-INSTRUCTIONS = """Dropnet: a Relate graph of (synthetic) Kazakh fraud complaints.
-Nodes: Complaint (Russian text + English gloss), Phone, Card (masked), Account (IBAN), Url, Domain, Persona (alias),
-Tactic, Region, Bank, Campaign, Extraction (provenance: the quote each link comes from).
-Relationships: CONTACTED_BY, PAID_TO, FORWARDED_TO (money moving between cards), VISITED, ON_DOMAIN, MENTIONS_PERSONA,
-USED_TACTIC, FILED_IN, SIMILAR_SCRIPT {score}, PART_OF (Campaign), FROM/FOUND (Extraction).
-Rules: every claim must cite node ids, a path (use explain_link) and a victim quote. Nodes with hub=true are
-legitimate shared numbers (e.g. marketplace support) and are NOT evidence. All data is synthetic."""
+TOOL_NAMES = list(FTC_TOOL_NAMES)
+INSTRUCTIONS = """Dropnet: real FTC Do Not Call complaints (US public data) in a Relate graph, joined to NANPA numbering data.
+(:Report)-[:FROM_NUMBER]->(:Number)-[:IN_BLOCK]->(:Block {npa_nxx})-[:IN_AREA]->(:AreaCode)
+(:Report)-[:ABOUT]->(:Subject), -[:VICTIM_IN]->(:State), -[:VICTIM_AREA]->(:AreaCode)
+(:FtcCampaign {kind: pool|repeat})-[:USES_BLOCK|USES_NUMBER]->(...)
+(:Block)-[:HELD_BY]->(:Carrier {ocn})-[:PART_OF]->(:CarrierGroup), (:Block)-[:IN_RATE_CENTER]->(:RateCenter)
+(:Number)-[:IN_SUBBLOCK]->(:SubBlock)-[:ASSIGNED_TO]->(:Carrier)
+Rules: complaints are unverified and caller ID can be faked. A carrier holds or was assigned numbers; it is not the
+caller. Never call a number's owner or a carrier a scammer, and always relay the `caution` field."""
 
 
 class Backend:
-    def __init__(self, web_url: str | None = None, snapshot: str | Path | None = None,
-                 ftc_snapshot: str | Path | None = None):
+    def __init__(self, web_url: str | None = None, ftc_snapshot: str | Path | None = None):
         self.web_url = (web_url or os.environ.get("DROPNET_WEB_URL") or "http://127.0.0.1:8000").rstrip("/")
-        self.snapshot = Path(snapshot or os.environ.get("DROPNET_SNAPSHOT") or config.SNAPSHOT_PATH)
         self.ftc_snapshot = Path(ftc_snapshot or os.environ.get("DROPNET_FTC_SNAPSHOT") or config.DATA_DIR / "ftc.rl")
         self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate-mcp")
-        self._conn = None
         self._ftc = None
         self._ftc_rw = None
         self._tmp = None
 
-    def _local_ftc(self, name: str, args: dict) -> Any:
+    def _local(self, name: str, args: dict) -> Any:
         import shutil
         import tempfile
         if name == "whatif_block":  # needs a writable store: a throw-away copy keeps the snapshot untouched
@@ -60,15 +56,10 @@ class Backend:
         except (OSError, ValueError, urllib.error.URLError):
             return "snapshot"
 
-    def _local(self, name: str, args: dict) -> Any:
-        if self._conn is None:
-            self._conn = store.open_store(self.snapshot, read_only=True)
-        return tools.dispatch(self._conn, name, args)
-
     def call(self, name: str, args: dict) -> Any:
         if name not in TOOL_NAMES:
             raise LookupError(name)
-        if name == "read_cypher":
+        if name == "ftc_read_cypher":
             tools.check_read_only(args.get("statement", ""))
         if self.mode() == "proxy":
             req = urllib.request.Request(f"{self.web_url}/api/tools/{name}", data=json.dumps(args).encode(),
@@ -79,12 +70,10 @@ class Backend:
             except urllib.error.HTTPError as e:
                 detail = json.loads(e.read() or b"{}").get("detail", str(e))
                 raise ValueError(detail) from None
-        if name in FTC_TOOL_NAMES:
-            return self._pool.submit(self._local_ftc, name, args).result()
         return self._pool.submit(self._local, name, args).result()
 
     def close(self) -> None:
-        for attr in ("_conn", "_ftc", "_ftc_rw"):
+        for attr in ("_ftc", "_ftc_rw"):
             c = getattr(self, attr)
             if c is not None:
                 self._pool.submit(c.close).result()
@@ -98,60 +87,34 @@ class Backend:
 def build_server(backend: Backend):
     from mcp.server.mcpserver import MCPServer
 
-    mcp = MCPServer("dropnet", instructions=INSTRUCTIONS, version="0.1.0")
+    mcp = MCPServer("dropnet", instructions=INSTRUCTIONS, version="0.2.0")
 
     @mcp.tool()
     def get_schema() -> dict:
-        """Node labels and relationship types with counts, and the key property of each label."""
-        return backend.call("get_schema", {})
+        """Node labels and relationship types of the FTC graph, with counts."""
+        return backend.call("ftc_schema", {})
 
     @mcp.tool()
     def read_cypher(statement: str, params: dict | None = None) -> dict:
-        """Run ONE read-only Cypher statement against the Relate graph (writes are rejected).
-        Vector search: CALL db.index.vector.queryNodes('complaint_script', k, vector)."""
-        return backend.call("read_cypher", {"statement": statement, "params": params or {}})
-
-    @mcp.tool()
-    def list_campaigns() -> list:
-        """All detected campaigns, largest first, with size, damage, regions, period, tactics and confidence."""
-        return backend.call("list_campaigns", {})
-
-    @mcp.tool()
-    def find_campaign(complaint_id: str) -> dict:
-        """The campaign a complaint (e.g. CMP-0042) belongs to, or campaign=null if it is not linked."""
-        return backend.call("find_campaign", {"complaint_id": complaint_id})
-
-    @mcp.tool()
-    def explain_link(a: str, b: str) -> dict:
-        """Shortest evidence path between two complaints through phones, cards, money transfers, domains or aliases
-        (never through hub nodes), with the victims' own quotes. Falls back to script similarity."""
-        return backend.call("explain_link", {"a": a, "b": b})
-
-    @mcp.tool()
-    def top_mules(campaign_id: str, n: int = 5) -> list:
-        """Accounts that received money in a campaign: cash-out sinks first, then mule cards, with victim counts."""
-        return backend.call("top_mules", {"campaign_id": campaign_id, "n": n})
-
-    @mcp.tool()
-    def similar_scripts(text: str, k: int = 5) -> list:
-        """Complaints whose scam script is closest to `text` (Relate vector index), with their campaigns."""
-        return backend.call("similar_scripts", {"text": text, "k": k})
+        """Run ONE read-only Cypher statement against the FTC graph (writes are rejected). Use $parameters."""
+        return backend.call("ftc_read_cypher", {"statement": statement, "params": params or {}})
 
     @mcp.tool()
     def ftc_summary() -> dict:
-        """REAL data: totals of the FTC Do Not Call reports graph (US, public) and, per scam type, the share of
-        reports with matching caller and consumer area codes. This is not proof of spoofing."""
+        """Totals of the FTC Do Not Call reports graph and, per scam type, the share of reports with matching caller
+        and consumer area codes. This is not proof of spoofing."""
         return backend.call("ftc_summary", {})
 
     @mcp.tool()
     def ftc_campaigns(limit: int = 20, kind: str | None = None) -> list:
-        """REAL data: number pools (many numbers from one NPA-NXX block) and repeat numbers, by report volume."""
+        """Number pools (many numbers from one NPA-NXX range) and repeat numbers, by report volume."""
         return backend.call("ftc_campaigns", {"limit": limit, "kind": kind})
 
     @mcp.tool()
     def assess_number(number: str) -> dict:
-        """Evidence about a phone number reported to the FTC: reports, states, scam types, its block's pool, and a
-        verdict (likely_spoofed / pool / repeat / single / unknown). ALWAYS relay the `caution` field. Area-code matches are indicators, not proof of spoofing or ownership."""
+        """Evidence about a phone number reported to the FTC: reports, states, scam types, its range's pool, the
+        NANPA holder of its range, and a verdict (likely_spoofed / pool / repeat / single / unknown).
+        ALWAYS relay the `caution` field. Area-code matches are indicators, not proof of spoofing or ownership."""
         return backend.call("assess_number", {"number": number})
 
     @mcp.tool()
@@ -163,24 +126,20 @@ def build_server(backend: Backend):
     @mcp.tool()
     def whatif_block(blocks: list[str] | None = None, numbers: list[str] | None = None,
                      since_day: str | None = None) -> dict:
-        """Count reports matching hypothetical NPA-NXX blocks or numbers. This does not measure prevented calls or legitimate-call impact. The transaction is rolled back."""
+        """Count reports matching hypothetical NPA-NXX ranges or numbers. This does not measure prevented calls or
+        legitimate-call impact. The transaction is rolled back."""
         return backend.call("whatif_block", {"blocks": blocks, "numbers": numbers, "since_day": since_day})
 
     @mcp.tool()
     def carriers(limit: int = 25) -> dict:
-        """REAL data: carriers (NANPA range holders) ranked by how many flagged ranges they hold, with flagged ranges
-        per 100 ranges held. A holder issued the numbers; it is not the caller. ALWAYS relay the `caution` field."""
+        """Carriers (NANPA range holders) ranked by how many flagged ranges they hold, with flagged ranges per 100
+        ranges held. A holder issued the numbers; it is not the caller. ALWAYS relay the `caution` field."""
         return backend.call("carriers", {"limit": limit})
 
     @mcp.tool()
     def carrier_detail(carrier: str, limit: int = 40) -> dict:
-        """REAL data: one carrier's flagged ranges with rate centers, states and complaint categories."""
+        """One carrier's flagged ranges with rate centers, states and complaint categories."""
         return backend.call("carrier_detail", {"carrier": carrier, "limit": limit})
-
-    @mcp.tool()
-    def build_case(campaign_id: str) -> str:
-        """A full markdown case file for a campaign: summary, accounts to freeze, evidence paths, quotes, actions."""
-        return backend.call("build_case", {"campaign_id": campaign_id})
 
     return mcp
 

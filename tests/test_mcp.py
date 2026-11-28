@@ -8,14 +8,18 @@ import time
 
 import pytest
 
-from dropnet import mcp_server, pipeline
-from dropnet.synth.generate import generate
+from dropnet import mcp_server, store
+from dropnet.ftc import campaigns, load
+from tests.test_ftc_load import R
 
 
 @pytest.fixture(scope="module")
-def snap(tmp_path_factory):
-    p = tmp_path_factory.mktemp("mcp") / "snap.rl"
-    pipeline.build(p, seed=1, n=150)
+def ftc(tmp_path_factory):
+    p = tmp_path_factory.mktemp("mcp") / "ftc.rl"
+    c = store.open_store(p)
+    load.load_reports(c, [R(i, f"866771{i % 6:04d}", victim_npa="303") for i in range(30)])
+    campaigns.write_campaigns(c, min_numbers=5)
+    c.close()
     return p
 
 
@@ -27,77 +31,55 @@ def free_port() -> int:
     return port
 
 
-def test_tool_names():
-    assert set(mcp_server.TOOL_NAMES) == {"get_schema", "read_cypher", "find_campaign", "explain_link", "top_mules",
-                                         "similar_scripts", "build_case", "list_campaigns", "ftc_summary",
-                                         "ftc_campaigns", "assess_number", "whatif_block", "search_ranges", "carriers",
-                                         "carrier_detail"}
+def test_tool_names_are_ftc_only():
+    assert set(mcp_server.TOOL_NAMES) == {"ftc_summary", "ftc_campaigns", "assess_number", "whatif_block",
+                                         "search_ranges", "carriers", "carrier_detail", "ftc_read_cypher",
+                                         "ftc_schema"}
+    assert "synthetic" not in mcp_server.INSTRUCTIONS.lower()
 
 
-def test_ftc_tools_in_snapshot_mode(tmp_path):
-    from dropnet import store
-    from dropnet.ftc import campaigns, load
-    from tests.test_ftc_load import R
-    ftc = tmp_path / "ftc.rl"
-    c = store.open_store(ftc)
-    load.load_reports(c, [R(i, f"866771{i % 6:04d}", victim_npa="303") for i in range(30)])
-    campaigns.write_campaigns(c, min_numbers=5)
-    c.close()
+def test_ftc_tools_in_snapshot_mode(ftc):
     before = ftc.read_bytes()
-    b = mcp_server.Backend(web_url="http://127.0.0.1:1", snapshot=tmp_path / "x.rl", ftc_snapshot=ftc)
+    b = mcp_server.Backend(web_url="http://127.0.0.1:1", ftc_snapshot=ftc)
     try:
+        assert b.mode() == "snapshot"
         assert b.call("assess_number", {"number": "866-771-0001"})["verdict"] == "pool"
         assert b.call("ftc_campaigns", {"limit": 3})[0]["id"] == "POOL-866771"
+        assert b.call("ftc_read_cypher", {"statement": "MATCH (r:Report) RETURN count(r) AS n"})["rows"] == [{"n": 30}]
+        with pytest.raises(ValueError):
+            b.call("ftc_read_cypher", {"statement": "MATCH (n) DETACH DELETE n"})
         assert b.call("whatif_block", {"blocks": ["866771"]})["reports_stopped"] == 30
     finally:
         b.close()
     assert ftc.read_bytes() == before  # what-if ran on a temporary copy
 
 
-def test_snapshot_mode(snap):
-    b = mcp_server.Backend(web_url="http://127.0.0.1:1", snapshot=snap)
-    try:
-        assert b.mode() == "snapshot"
-        ds = generate(seed=1, n=150)
-        r = b.call("find_campaign", {"complaint_id": ds.truth["A"][1]})
-        assert r["campaign"]["id"] == "CAMP-" + ds.truth["A"][0].split("-")[1]
-        assert "## Evidence paths" in b.call("build_case", {"campaign_id": r["campaign"]["id"]})
-        with pytest.raises(ValueError):
-            b.call("read_cypher", {"statement": "MATCH (n) DELETE n"})
-    finally:
-        b.close()
-
-
-def test_proxy_sees_live_ingest(snap, tmp_path):
+def test_proxy_uses_the_running_app(ftc, tmp_path):
     import uvicorn
     from dropnet.web.app import create_app
     port = free_port()
-    server = uvicorn.Server(uvicorn.Config(create_app(snapshot=snap, live=tmp_path / "live.rl", reset=True, ftc_snapshot=tmp_path / "no-ftc.rl"),
-                                           host="127.0.0.1", port=port, log_level="error"))
+    app = create_app(live=tmp_path / "live.rl", reset=True, ftc_snapshot=ftc, ftc_live=tmp_path / "ftc-live.rl")
+    server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="error"))
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
-    for _ in range(100):
+    for _ in range(200):
         if server.started:
             break
         time.sleep(0.05)
     try:
-        import httpx
-        r = httpx.post(f"http://127.0.0.1:{port}/api/ingest",
-                       json={"text": "Перевела 10 000 тг на карту 4000 0012 3456 7890."}).json()
-        b = mcp_server.Backend(web_url=f"http://127.0.0.1:{port}", snapshot=snap)
+        b = mcp_server.Backend(web_url=f"http://127.0.0.1:{port}", ftc_snapshot=tmp_path / "missing.rl")
         assert b.mode() == "proxy"
-        found = b.call("find_campaign", {"complaint_id": r["complaint_id"]})
-        assert found["complaint"]["id"] == r["complaint_id"]  # snapshot could not know this complaint
+        assert b.call("assess_number", {"number": "8667710002"})["verdict"] == "pool"
         with pytest.raises(ValueError):
-            b.call("read_cypher", {"statement": "CREATE (n)"})
+            b.call("ftc_read_cypher", {"statement": "CREATE (n)"})
         b.close()
     finally:
         server.should_exit = True
         t.join(timeout=5)
 
 
-def test_stdio_server_lists_and_calls_tools(snap):
-    env = {**os.environ, "DROPNET_WEB_URL": "http://127.0.0.1:1", "DROPNET_SNAPSHOT": str(snap)}
+def test_stdio_server_lists_and_calls_tools(ftc):
+    env = {**os.environ, "DROPNET_WEB_URL": "http://127.0.0.1:1", "DROPNET_FTC_SNAPSHOT": str(ftc)}
     p = subprocess.Popen([sys.executable, "-m", "dropnet", "mcp"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, env=env, text=True, encoding="utf-8")
 
@@ -116,9 +98,8 @@ def test_stdio_server_lists_and_calls_tools(snap):
         p.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
         p.stdin.flush()
         tl = rpc(2, "tools/list", {})
-        assert {t["name"] for t in tl["result"]["tools"]} >= {"find_campaign", "explain_link", "read_cypher"}
-        call = rpc(3, "tools/call", {"name": "list_campaigns", "arguments": {}})
-        text = json.dumps(call["result"])
-        assert "CAMP-" in text
+        assert {t["name"] for t in tl["result"]["tools"]} >= {"assess_number", "carriers", "read_cypher"}
+        call = rpc(3, "tools/call", {"name": "assess_number", "arguments": {"number": "8667710001"}})
+        assert "caution" in json.dumps(call["result"])
     finally:
         p.kill()

@@ -124,7 +124,7 @@ def search_pools(conn: relate.Connection, text: str, limit: int = 20) -> dict:
 
 
 FTC_TOOL_NAMES = ["ftc_summary", "ftc_campaigns", "assess_number", "whatif_block", "search_ranges", "carriers",
-                  "carrier_detail"]
+                  "carrier_detail", "ftc_read_cypher", "ftc_schema"]
 
 
 def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
@@ -141,6 +141,13 @@ def dispatch_ftc(conn: relate.Connection, name: str, args: dict):
     if name == "whatif_block":
         return whatif.whatif(conn, blocks=args.get("blocks"), numbers=args.get("numbers"),
                              since_day=args.get("since_day"))
+    if name == "ftc_read_cypher":
+        from ..tools import check_read_only, read_cypher
+        check_read_only(args.get("statement", ""))
+        return read_cypher(conn, args["statement"], args.get("params") or {})
+    if name == "ftc_schema":
+        from ..tools import get_schema
+        return get_schema(conn)
     if name == "carriers":
         from . import numbering
         return {"carriers": numbering.carrier_ranking(conn, int(args.get("limit") or 25)), "caution": numbering.CAUTION}

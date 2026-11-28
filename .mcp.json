@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "dropnet": {
+      "command": "dropnet",
+      "args": ["mcp"]
+    },
     "relate-native": {
       "command": "relate",
       "args": ["serve", "--database", "data/ftc.rl", "--mcp", "stdio", "--read-only"]

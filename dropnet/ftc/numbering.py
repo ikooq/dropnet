@@ -194,13 +194,14 @@ def range_network(conn: relate.Connection, block: str, limit: int = 6) -> dict |
     if not assignment or not (assignment[0]["ocn"] or assignment[0]["rate_center_id"]):
         return None
     result = assignment[0]
+    # Start from the ~4.7k flagged ranges, not from every range the OCN holds: a large holder has thousands, and
+    # walking them took 5 s for OCN 965H; this order returns the same rows in milliseconds.
     result["related"] = rows(conn, """
-        MATCH (:Block {npa_nxx: $block})-[:HELD_BY]->(:Carrier)<-[:HELD_BY]-(b:Block)
-        MATCH (b)<-[:USES_BLOCK]-(p:FtcCampaign {kind: 'pool'})
+        MATCH (p:FtcCampaign {kind: 'pool'})-[:USES_BLOCK]->(b:Block)-[:HELD_BY]->(:Carrier {ocn: $ocn})
         WHERE b.npa_nxx <> $block
         RETURN b.npa_nxx AS block, p.id AS campaign, p.reports AS reports
         ORDER BY reports DESC, block LIMIT $limit
-    """, {"block": block, "limit": limit}) if result["ocn"] else []
+    """, {"block": block, "ocn": result["ocn"], "limit": limit}) if result["ocn"] else []
     return result
 
 

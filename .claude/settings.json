@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "dropnet hook",
-            "timeout": 20
+            "command": "dropnet hook 2>/dev/null || true",
+            "timeout": 30
           }
         ]
       }

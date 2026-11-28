@@ -13,7 +13,7 @@ const rangeOf = (b) => `${b.slice(0, 3)}-${b.slice(3, 6)}-xxxx`;
 const LABEL = { DEBT: "Debt relief", IMPOSTER_GOV: "Impersonation", MEDICAL: "Medical", OTHER: "Other", DROPPED: "Dropped call",
   NONE: "No subject", WARRANTY: "Warranty", HOME: "Home improvement", TRAVEL: "Travel", PRIZES: "Prizes", ENERGY: "Energy",
   TECH: "Tech support", WORK: "Work from home" };
-const DATA_V = 16;  // bump with the data files so browsers and the Pages cache fetch fresh copies
+const DATA_V = 17;  // bump with the data files so browsers and the Pages cache fetch fresh copies
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let db, data, cy;
 
@@ -444,7 +444,34 @@ function run() {
 }
 $("#q-go").addEventListener("click", run);
 
+async function renderCarriers() {
+  const status = $("#carrier-status");
+  try {
+    const response = await fetch("data/carriers.json?v=" + DATA_V);
+    if (!response.ok) throw new Error(response.status);
+    const { carriers, caution } = await response.json();
+    $("#carrier-caution").textContent = caution;
+    $("#carrier-caution").hidden = false;
+    if (!carriers.length) {
+      status.textContent = "No carrier assignments are available in this snapshot.";
+      return;
+    }
+    const rate = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const totals = ["flagged", "ranges_held", "reports", "numbers", "ocns", "states"];
+    $("#carrier-ranking tbody").innerHTML = carriers.map((c) => `<tr>
+      <th scope="row">${esc(c.carrier)}</th>
+      <td class="num carrier-rate">${c.flagged_per_100_ranges == null ? "—" : rate.format(c.flagged_per_100_ranges)}</td>
+      ${totals.map((key) => `<td class="num">${fmt(c[key])}</td>`).join("")}
+    </tr>`).join("");
+    $("#carrier-ranking").hidden = false;
+    status.hidden = true;
+  } catch {
+    status.textContent = "Carrier assignments could not be loaded.";
+  }
+}
+
 (async function boot() {
+  renderCarriers();
   data = await (await fetch("data/graph.json?v=" + DATA_V)).json();
   renderStatic();
   renderEarly();

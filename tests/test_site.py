@@ -1,6 +1,8 @@
 import json
 
-from dropnet import site
+from dropnet import site, store
+from dropnet.ftc import campaigns, load, numbering
+from tests.test_ftc_load import R
 from tests.test_hook import make
 
 
@@ -44,4 +46,27 @@ def test_site_files_exist():
     html = (root / "index.html").read_text(encoding="utf-8")
     assert "@relate/relate-wasm@1.0.1/relate.js" in (root / "app.js").read_text(encoding="utf-8")
     assert "data/graph.json" in (root / "app.js").read_text(encoding="utf-8")
+    assert '"data/carriers.json?v=" + DATA_V' in (root / "app.js").read_text(encoding="utf-8")
+    assert "Who holds flagged ranges" in html
     assert "<title>" in html
+
+
+def test_export_carrier_ranking_and_caution(tmp_path):
+    snapshot = tmp_path / "ftc.rl"
+    with store.open_store(snapshot) as conn:
+        load.load_reports(conn, [R(i, f"217834{i:04d}", victim_npa="303") for i in range(5)])
+        campaigns.write_campaigns(conn)
+        store.rows(conn, """
+            MATCH (b:Block {npa_nxx: '217834'})
+            SET b.state = 'IL'
+            CREATE (b)-[:HELD_BY]->(:Carrier {ocn: '0001'})-[:PART_OF]->
+                   (:CarrierGroup {name: 'Example Telecom', codes_held: 8})
+        """)
+    out = tmp_path / "demo" / "graph.json"
+    site.export(snapshot, out, eval_path=tmp_path / "missing.json")
+    result = json.loads(out.with_name("carriers.json").read_text(encoding="utf-8"))
+    assert result == {
+        "carriers": [{"carrier": "Example Telecom", "ranges_held": 8, "flagged": 1, "reports": 5,
+                      "numbers": 5, "ocns": 1, "states": 1, "flagged_per_100_ranges": 12.5}],
+        "caution": numbering.CAUTION,
+    }

@@ -60,6 +60,76 @@ function hbar(label, value, max, ours) {
   return `<div class="hbar ${ours ? "ours" : ""}"><span>${label}</span><div class="track"><div class="fill"
     style="width:${Math.max(1, (100 * value) / max)}%"></div></div><span class="v">${pct(value)}</span></div>`;
 }
+
+const carrierCount = new Intl.NumberFormat("en-US");
+const carrierRate = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const carrierTotals = ["flagged", "ranges_held", "reports", "numbers", "ocns", "states"];
+
+function showCarrierCaution(caution) {
+  const note = $("#carrier-caution");
+  note.textContent = caution;
+  note.hidden = false;
+}
+
+async function loadCarriers() {
+  const status = $("#carrier-status");
+  try {
+    const { carriers, caution } = await api("api/ftc/carriers?limit=15");
+    showCarrierCaution(caution);
+    if (!carriers.length) {
+      status.textContent = "No carrier assignments are available in this snapshot.";
+      return;
+    }
+    $("#carrier-ranking tbody").innerHTML = carriers.map((c) => `<tr class="clickable">
+      <th scope="row"><button type="button" data-carrier="${esc(c.carrier)}" aria-controls="carrier-detail">${esc(c.carrier)}</button></th>
+      <td class="num carrier-rate">${c.flagged_per_100_ranges == null ? "—" : carrierRate.format(c.flagged_per_100_ranges)}</td>
+      ${carrierTotals.map((key) => `<td class="num">${carrierCount.format(c[key])}</td>`).join("")}
+    </tr>`).join("");
+    $("#carrier-ranking").hidden = false;
+    status.hidden = true;
+  } catch {
+    status.textContent = "Carrier assignments could not be loaded.";
+  }
+}
+
+let carrierRequest = 0;
+$("#carrier-ranking tbody").addEventListener("click", async (event) => {
+  const button = event.target.closest("tr")?.querySelector("button[data-carrier]");
+  if (!button) return;
+  const request = ++carrierRequest;
+  const output = $("#carrier-detail");
+  const name = button.dataset.carrier;
+  $("#carrier-ranking [aria-current]")?.removeAttribute("aria-current");
+  button.setAttribute("aria-current", "true");
+  output.textContent = `Loading ${name}…`;
+  try {
+    const { carrier, ranges, subjects, caution } = await api(`api/ftc/carriers/${encodeURIComponent(name)}`);
+    if (request !== carrierRequest) return;
+    showCarrierCaution(caution);
+    const subjectList = subjects.length
+      ? `<ul>${subjects.map((s) => `<li>${esc(s.subject)} · ${carrierCount.format(s.reports)} reports</li>`).join("")}</ul>`
+      : '<p class="muted">No complaint subjects in the listed ranges.</p>';
+    const rangeList = ranges.length
+      ? `<div class="carrier-scroll" role="region" aria-label="Flagged carrier ranges" tabindex="0">
+        <table class="grid carrier-ranges"><thead><tr>
+          <th scope="col">Range</th><th scope="col">Rate center</th><th scope="col">State</th>
+          <th scope="col" class="num">Reports</th><th scope="col" class="num">Reported numbers</th><th scope="col">OCN</th>
+        </tr></thead><tbody>${ranges.map((r) => `<tr>
+          <th scope="row">${esc(r.block.slice(0, 3))}-${esc(r.block.slice(3))}</th>
+          <td>${esc(r.rate_center || "—")}</td><td>${esc(r.state || "—")}</td>
+          <td class="num">${carrierCount.format(r.reports)}</td><td class="num">${carrierCount.format(r.numbers)}</td>
+          <td>${esc(r.ocn)}</td>
+        </tr>`).join("")}</tbody></table></div>`
+      : '<p class="muted">No flagged ranges for this holder.</p>';
+    output.innerHTML = `<h3>${esc(carrier)}</h3><h4>Top complaint subjects in these ranges</h4>${subjectList}
+      <h4>Flagged ranges</h4>${rangeList}`;
+  } catch {
+    if (request !== carrierRequest) return;
+    output.textContent = `The flagged ranges for ${name} could not be loaded.`;
+  }
+  output.focus();
+});
+
 async function loadReal() {
   let s;
   try { s = await api("api/ftc/summary"); } catch (e) {
@@ -200,5 +270,5 @@ $("#num-in").addEventListener("keydown", (e) => { if (e.key === "Enter") assess(
 /* ----------------------------------------------------------------- boot */
 (async function boot() {
   showTab(location.hash === "#query" ? "query" : "real");
-  await loadReal();
+  await Promise.all([loadReal(), loadCarriers()]);
 })();

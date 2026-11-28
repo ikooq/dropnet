@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from . import config, store
-from .ftc import api, campaigns
+from .ftc import api, campaigns, numbering
 from .ftc.date_quality import chronology
 from .store import rows
 
@@ -111,9 +111,13 @@ def export(ftc_store: Path | str = config.DATA_DIR / "ftc.rl", out: Path | str =
                 "pools": pools, "networks": api.networks(conn),
                 "eval": json.loads(Path(eval_path).read_text(encoding="utf-8")) if Path(eval_path).exists() else None,
                 "source": "FTC Do Not Call complaint data (US public data)", "caution": campaigns.CAUTION}
+        carriers = {"carriers": numbering.carrier_ranking(conn, 15), "caution": numbering.CAUTION}
     finally:
         conn.close()
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    out.with_name("carriers.json").write_text(
+        json.dumps(carriers, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n"
+    )
     return json.loads(out.read_text(encoding="utf-8"))

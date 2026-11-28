@@ -1,11 +1,12 @@
 import json
 import os
+from urllib.parse import quote
 
 import pytest
 from fastapi.testclient import TestClient
 
 from dropnet import pipeline, store
-from dropnet.ftc import campaigns, load
+from dropnet.ftc import campaigns, load, numbering
 from dropnet.web.app import create_app
 from tests.test_ftc_load import R
 
@@ -19,6 +20,13 @@ def stores(tmp_path_factory):
     conn = store.open_store(d / "ftc.rl")
     load.load_reports(conn, reports)
     campaigns.write_campaigns(conn, min_numbers=5)
+    store.rows(conn, """
+        MATCH (b:Block {npa_nxx: '866771'})
+        SET b.state = 'IL'
+        CREATE (b)-[:HELD_BY]->(:Carrier {ocn: '0001'})-[:PART_OF]->
+               (:CarrierGroup {name: 'Example & Telecom', codes_held: 8})
+        CREATE (b)-[:IN_RATE_CENTER]->(:RateCenter {id: 'IL:EXAMPLE', name: 'EXAMPLE'})
+    """)
     conn.close()
     (d / "eval.json").write_text(json.dumps({"baseline": {"coverage": 0.043}}), encoding="utf-8")
     return d
@@ -39,6 +47,27 @@ def test_ftc_summary(client):
     assert all("neighbor_share" in p and "label" in p for p in s["profile"])  # derived fields survive JSON
     st = client.get("/api/ftc/states").json()
     assert all("neighbor_share" in x for x in st)
+
+
+def test_ftc_carrier_ranking_and_detail(client):
+    assert "Who holds flagged ranges" in client.get("/").text
+    ranking = client.get("/api/ftc/carriers", params={"limit": 15})
+    assert ranking.status_code == 200
+    result = ranking.json()
+    assert result == {
+        "carriers": [{"carrier": "Example & Telecom", "ranges_held": 8, "flagged": 1, "reports": 30,
+                      "numbers": 6, "ocns": 1, "states": 1, "flagged_per_100_ranges": 12.5}],
+        "caution": numbering.CAUTION,
+    }
+    name = quote(result["carriers"][0]["carrier"], safe="")
+    detail = client.get(f"/api/ftc/carriers/{name}")
+    assert detail.status_code == 200
+    details = detail.json()
+    assert details["caution"] == result["caution"]
+    assert details["carrier"] == "Example & Telecom"
+    assert details["subjects"] == [{"subject": "DEBT", "reports": 30}]
+    top = details["ranges"][0]
+    assert (top["block"], top["rate_center"], top["state"]) == ("866771", "EXAMPLE", "IL")
 
 
 def test_ftc_cypher_queries_the_ftc_store(client):

@@ -8,7 +8,7 @@
 
 ## Screenshots (upload to the Devpost gallery)
 
-`docs/img/demo-check.png` (number check), `docs/img/demo-early.png` (the 365-826 timeline), `docs/img/holders.png` (who holds flagged ranges), `docs/img/app-lookup.png` (a number's prefix holder and block assignee), `docs/img/app-graph.png` (its range linked to other flagged ranges through the holder), `docs/img/architecture.svg` (data flow).
+In this order (the first is the cover): 1. `docs/img/demo-check.png` (number check), 2. `docs/img/app-graph.png` (its range linked to other flagged ranges through the holder), 3. `docs/img/holders.png` (who holds flagged ranges), 4. `docs/img/demo-early.png` (the 365-826 timeline), 5. `docs/img/app-lookup.png` (a number's prefix holder and block assignee), 6. `docs/img/architecture.png` (data flow; Devpost does not take SVG).
 
 ## Inspiration
 

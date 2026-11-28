@@ -1,6 +1,6 @@
 """FastAPI app: the analyst UI and a JSON API over the FTC complaint graph.
 
-The committed data/ftc.rl is never written. On start the app copies it to data/live/ftc.rl (again only when the
+The committed data/ftc.rl is never written. On the first data request the app copies it to data/live/ftc.rl (again only when the
 committed file is newer, or with --reset) and is that copy's only writer; what-ifs roll back. MCP clients read
 through /api.
 """
@@ -11,6 +11,7 @@ import logging
 import re
 import shutil
 import tempfile
+from asyncio import shield, wrap_future
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -82,16 +83,26 @@ def create_app(reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR /
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         # Relate connections are thread-affine, including during shutdown.
-        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate") as pool:
-            state["pool"] = pool
+        pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="relate")
+        state["pool"] = pool
+        try:
+            if ready_message:
+                print(ready_message, flush=True)
+            yield
+        finally:
+            graph = state.get("ftc")
+
+            def close_graph():
+                # This runs on the same worker, after the load and any queued queries.
+                if graph.exception() is None:
+                    graph.result().close()
+
+            cleanup = pool.submit(close_graph) if graph is not None else None
+            pool.shutdown(wait=False)
             try:
-                if ready_message:
-                    print(ready_message, flush=True)
-                yield
+                if cleanup is not None:
+                    await shield(wrap_future(cleanup))
             finally:
-                graph = state.get("ftc")
-                if graph is not None and graph.exception() is None:
-                    pool.submit(graph.result().close).result()
                 state.clear()
 
     app = FastAPI(title="Dropnet", lifespan=lifespan)
@@ -196,9 +207,11 @@ def create_app(reset: bool = False, ftc_snapshot: Path | str = config.DATA_DIR /
             raise HTTPException(400, str(e))
 
     @app.get("/api/health")
-    def health():
-        graph = start_graph()
-        return {"ok": True, "graph": ftc_snapshot.name, "loaded": graph is not None and graph.exception() is None,
+    async def health():
+        graph = state.get("ftc")
+        done = graph is not None and graph.done()
+        return {"ok": True, "graph": ftc_snapshot.name, "loaded": done and graph.exception() is None,
+                "loading": graph is not None and not done,
                 "data": "FTC Do Not Call reports",
                 "synthetic": False}
 

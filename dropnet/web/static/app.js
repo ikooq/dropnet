@@ -133,7 +133,7 @@ $("#carrier-ranking tbody").addEventListener("click", async (event) => {
 async function loadReal() {
   let s;
   try { s = await api("api/ftc/summary"); } catch (e) {
-    $("#real-lede").innerHTML = `Real FTC data is not built yet — run <code>python -m dropnet ftc-build</code>.`; return false;
+    $("#real-lede").textContent = e.message; return false;
   }
   const stats = [["FTC reports", s.reports], ["reported numbers", s.numbers], ["number pools", s.campaigns.pool || 0]];
   $("#stats").innerHTML = stats.map(([label, count]) => `<div class="stat"><b>${count.toLocaleString()}</b><span>${label}</span></div>`).join("");
@@ -205,7 +205,7 @@ async function openFtc(id) {
   const els = [...g.nodes.map((n) => ({ data: { id: n.id, label: short(n), kind: n.kind, color: C[n.kind], w: n.kind === "Number" ? 8 + Math.min(22, Math.sqrt(n.reports || 1) * 1.6) : 16, raw: n } })),
     ...g.edges.map((e, i) => ({ data: { id: `f${i}`, source: e.source, target: e.target, type: e.type } }))];
   if (ftcCy) ftcCy.destroy();
-  ftcCy = cytoscape({ container: $("#ftc-graph"), elements: els, wheelSensitivity: 0.25,
+  ftcCy = cytoscape({ container: $("#ftc-graph"), elements: els,
     style: [{ selector: "node", style: { "background-color": "data(color)", label: "data(label)", width: "data(w)", height: "data(w)", "font-size": 8, color: css("--ink"), "text-valign": "bottom", "text-margin-y": 2 } },
       { selector: "node[kind = 'Block']", style: { shape: "round-rectangle", width: 40, height: 40, "font-weight": 700, "font-size": 11 } },
       { selector: "node[kind = 'State'], node[kind = 'Subject'], node[kind = 'Carrier'], node[kind = 'RateCenter'], node[kind = 'RelatedBlock']", style: { shape: "round-rectangle", "font-size": 8,

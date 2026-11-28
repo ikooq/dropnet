@@ -5,8 +5,9 @@ entrant's own work. The voice-over below is about 240 words, so it fits in under
 
 ## Before you record
 
-- Run `python -m dropnet serve` and wait for "Dropnet is ready". Open `http://127.0.0.1:8000` once, so the first page
-  is already loaded when you start recording.
+- Run `python -m dropnet serve` and open `http://127.0.0.1:8000`. The graph loads on this first open: wait about 10
+  seconds until the carrier table and a range graph are on screen, then start recording. Before that the server does
+  not respond.
 - Open the browser demo (`https://ikooq.github.io/dropnet/`, or `python -m http.server` inside `docs/` before the
   merge) in a second tab.
 - In a terminal, in the repository folder with the virtual environment active (or after the `claude mcp add` step in

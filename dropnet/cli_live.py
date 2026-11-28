@@ -16,10 +16,17 @@ def cmd_serve(a: argparse.Namespace) -> int:
         print(f"No graph at {ftc}. Run: python -m dropnet ftc-build --fetch")
         return 2
     url = f"http://{a.host}:{a.port}"
-    print(f"Loading {ftc.name} into Relate ({ftc.stat().st_size / 1e6:.0f} MB, 10 to 15 seconds)...", flush=True)
-    uvicorn.run(create_app(reset=a.reset, ready_message=f"Dropnet is ready: {url}"), host=a.host, port=a.port,
-                log_level="warning")
+    # Printed by the app once it accepts connections. The graph itself loads on the first data request.
+    uvicorn.run(create_app(reset=a.reset, ready_message=serve_message(url, ftc.stat().st_size)), host=a.host,
+                port=a.port, log_level="warning")
     return 0
+
+
+def serve_message(url: str, graph_bytes: int) -> str:
+    """What `serve` prints: the page opens at once; the graph loads when it is first opened. Relate opens the file
+    while holding Python's GIL, so the server does not respond during that load; the message says so."""
+    return (f"Dropnet page: {url}. The graph ({graph_bytes / 1e6:.0f} MB) loads when you first open it: "
+            f"about 10 seconds, during which the server does not respond.")
 
 
 def cmd_ingest(a: argparse.Namespace) -> int:

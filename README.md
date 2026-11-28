@@ -42,8 +42,10 @@ python -m dropnet serve
 On Windows, if `python` opens the Microsoft Store instead of running, use the Python launcher for the first line:
 `py -m venv .venv`. After activating the venv, `python` is the venv's own Python and the other lines work as written.
 
-`serve` prints "Dropnet is ready" after 10 to 15 seconds, while Relate loads the graph. Then open
-[localhost:8000](http://127.0.0.1:8000):
+`serve` prints the page address at once. Open [localhost:8000](http://127.0.0.1:8000): the page appears immediately
+with "Loading the graph…", and the data follow about 10 seconds later. The graph loads on that first open; Relate
+opens the 89 MB file while holding Python's GIL, so the server does not respond to anything else during those seconds.
+Later requests are fast. Then:
 
 1. Type `771-999-0716` in **Check a reported number** and press **Assess**. The result shows **FRACTEL, LLC** as the
    prefix holder (OCN `965H`, 606 flagged out of 2,858 prefixes it holds) and **ONVOY, LLC** as the assignee of the

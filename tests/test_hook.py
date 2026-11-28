@@ -121,3 +121,52 @@ def test_running_app_answers_first(tmp_path):
 def test_no_app_falls_back_to_the_file(tmp_path):
     ctx = hook.number_guard("866-771-0001", make(tmp_path), web_url="http://127.0.0.1:1")
     assert "NUMBER POOL" in ctx
+
+
+def _app(handler_body):
+    """A stand-in for `dropnet serve` whose number endpoint runs handler_body(self)."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    class App(BaseHTTPRequestHandler):
+        def do_GET(self):
+            handler_body(self)
+
+        def log_message(self, *a):
+            pass
+
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), App)
+    srv.daemon_threads = True
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+def test_app_still_loading_its_graph_falls_back_to_the_file_quickly(tmp_path):
+    """While `serve` loads the graph (~10 s) the number endpoint does not answer; the hook must not wait for it."""
+    import threading
+    import time
+    release = threading.Event()
+    srv = _app(lambda h: release.wait(10))
+    try:
+        t = time.monotonic()
+        ctx = hook.number_guard("866-771-0001", make(tmp_path), web_url=f"http://127.0.0.1:{srv.server_port}")
+        elapsed = time.monotonic() - t
+    finally:
+        release.set()
+        srv.shutdown()
+    assert "NUMBER POOL" in ctx  # answered from data/ftc.rl
+    assert elapsed < 4  # one 1-second timeout, then the file; not one timeout per number
+
+
+def test_app_that_cannot_load_the_graph_falls_back_to_the_file(tmp_path):
+    def unavailable(h):
+        h.send_response(503)
+        h.end_headers()
+        h.wfile.write(b'{"detail": "Could not load the FTC graph."}')
+    srv = _app(unavailable)
+    try:
+        ctx = hook.number_guard("866-771-0001 or 866-771-0002", make(tmp_path),
+                                web_url=f"http://127.0.0.1:{srv.server_port}")
+    finally:
+        srv.shutdown()
+    assert "NUMBER POOL" in ctx

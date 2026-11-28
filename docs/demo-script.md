@@ -1,7 +1,7 @@
 # Dropnet: demo video script (1:50)
 
 You record this yourself: your screen, your voice, your editing. The contest rules require the video to be the
-entrant's own work. The voice-over below is about 220 words, so it fits in under two minutes at a calm pace.
+entrant's own work. The voice-over below is about 240 words, so it fits in under two minutes at a calm pace.
 
 ## Before you record
 
@@ -22,7 +22,7 @@ entrant's own work. The voice-over below is about 220 words, so it fits in under
 |---|---|---|
 | 0:00–0:12 | Browser demo, top of the page. | "People reported almost three hundred thousand unwanted calls to the FTC in five weeks. Ninety-two percent of the numbers were reported only once. A list of numbers is always one step behind." |
 | 0:12–0:30 | Type `771-999-0716`, press **Check**. The 10,000-number grid lights up. | "So Dropnet looks at the range: the first six digits. This number was reported three times. Its range has fifty-three reported numbers. That is the pattern a list of single numbers never sees." |
-| 0:30–0:52 | Scroll to **The range was known before its numbers were**. Point at the flag day, then the red bars. | "Range 365-826 was flagged on October nineteenth. In the next three weeks, three hundred twenty-three new numbers from it showed up in complaints. Nobody had reported them yet, but the range was already flagged. On later complaints, numbers alone matched 4.3 percent. Adding ranges: 14.3." |
+| 0:30–0:52 | Scroll to **The range was known before its numbers were**. Point at the flag day, then the red bars. | "Range 365-826 was flagged on October nineteenth. In the next three weeks, three hundred twenty-three new numbers from it showed up in complaints. Nobody had reported them yet, but the range was already flagged. On later complaints, numbers alone matched 4.3 percent. Adding ranges: 14.3. Even a simple range ranking does as well; the value is in what the graph shows next." |
 | 0:52–1:18 | Local app. Point at the "per 100" column in **Who holds flagged ranges**. Then check `771-999-0716`: show the two cards (prefix holder FRACTEL, 1,000-block assignee ONVOY), click **Open range 771-999 in graph**, then one range under **Flagged ranges sharing OCN 965H**. | "Here the graph matters. Relate links each range to the carrier that holds it in the national numbering records. A few small carriers hold over twenty flagged ranges per hundred; the big wireless carriers, about one. From one number, the graph walks to its holder, and on to other flagged ranges that holder has." |
 | 1:18–1:40 | Terminal with `claude`. Type: `Is 771-999-0716 a scam? Who holds its range?` Show the tool call to `assess_number` and the answer. | "Agents get the same evidence. Through Dropnet's MCP server, Claude checks the number in the graph, names the range's holder, and repeats the caution: a holder issued the number; it is not the caller." |
 | 1:40–1:50 | Back to the browser demo, the GitHub link visible. | "Complaints are unverified and caller IDs can be faked, so Dropnet ranks leads for a person to check. It never blocks anything. Dropnet, on Relate." |

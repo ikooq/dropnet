@@ -6,14 +6,18 @@ digits of a number. Dropnet connects the complaints, numbers, ranges and the car
 Relate graph, so an analyst can see the pattern and follow the evidence.
 
 **One number.** Rules learned from complaints before Nov 2 matched **4.3%** of the 103,620 later complaints when they
-listed repeat numbers, and **14.3%** when they also listed 2,872 flagged ranges.
+listed repeat numbers, and **14.3%** when they also listed 2,872 flagged ranges. The gain comes from watching ranges,
+not from a clever ranking: at the same budget, ranges picked simply by how many numbers were reported from them matched
+**14.5%** and ours **14.3%**. What Dropnet adds is the graph: why a range is flagged, who holds it, and what is linked to
+it.
 
 **One case.** Dropnet flagged range `365-826` on Oct 19. Over the next 24 days, **323 numbers** from it appeared in
 complaints for the first time. No list of numbers could have held them; the range was already flagged.
 
-**Why a graph.** Each US range links to the carrier NANPA lists as its holder. One traversal shows that a few small
-holders hold 20 or more flagged ranges per 100 they hold, against about 1 for the largest wireless carriers, and that
-unflagged ranges of the leading holders became flagged later 3.7 times as often as others.
+**Why a graph.** Each US range links to the carrier NANPA lists as its holder. One traversal shows that four of the 15
+holders with the most flagged ranges hold 20 or more flagged ranges per 100 they hold, against about 1 for the three
+largest wireless carriers, and that unflagged ranges of the leading holders became flagged later 3.7 times as often as
+others.
 
 A range or a holder is a lead for a person to check, not proof: complaints are unverified, caller ID can be faked, and
 numbers can be ported. Dropnet never blocks anything.
@@ -43,7 +47,8 @@ Open [localhost:8000](http://127.0.0.1:8000):
    Run a what-if, or download the case as
    its own `.rl` file.
 
-`python -m dropnet ftc-eval` prints the hold-out table. `python -m pip install -e ".[dev]"` then `python -m pytest`
+`python -m dropnet ftc-eval` prints the hold-out table. `python -m dropnet check-claims` checks that the numbers in this README, EVIDENCE, the
+submission text and the diagram match it. `python -m pip install -e ".[dev]"` then `python -m pytest`
 runs the tests.
 
 ## How it uses Relate

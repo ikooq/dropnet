@@ -39,7 +39,7 @@ Both range methods start with the same repeat-number rules and add exactly 2,872
 | Repeat numbers + Dropnet geographic prefixes | 14,825 | 14.31% | 28,730,391 | 516.0 |
 | Repeat numbers + naive geographic prefixes | 15,043 | 14.52% | 28,730,239 | 523.6 |
 
-The prefix budgets are equal. The exact address-space capacities differ by 152 numbers because a repeat number already inside a selected prefix is counted once. The denominator is possible numbers covered by rules. Multiple complaints about one number can each count as a match. These figures measure complaint coverage, with no estimate of legitimate-call traffic or of verified fraud. The naive rule matched slightly more complaints on this hold-out. The comparison supports investigating prefixes and leaves the value of the area-code filter for analyst triage open.
+The prefix budgets are equal. The exact address-space capacities differ by 152 numbers because a repeat number already inside a selected prefix is counted once. The denominator is possible numbers covered by rules. Multiple complaints about one number can each count as a match. These figures measure complaint coverage, with no estimate of legitimate-call traffic or of verified fraud. The naive rule matched slightly more complaints on this hold-out, so Dropnet's ranking is not better at finding complaints: the gain over repeat numbers comes from watching prefixes at all. The comparison supports investigating prefixes and leaves the value of the area-code filter for analyst triage open. What Dropnet adds beyond the ranking is the graph around each prefix: the complaints that flagged it, its NANPA holder and 1,000-block assignee, and the other flagged prefixes that share that holder.
 
 ## Who holds flagged ranges
 

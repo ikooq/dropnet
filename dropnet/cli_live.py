@@ -92,6 +92,11 @@ def _print_eval(r: dict) -> None:
           f"risk: {d['spoofed_caught']:,} matching reports had matching caller and consumer area codes; this is not proof of spoofing.")
 
 
+def cmd_check_claims(a: argparse.Namespace) -> int:
+    from . import claims
+    return claims.main(graph=a.graph)
+
+
 def cmd_ftc_eval(a: argparse.Namespace) -> int:
     from . import store
     from .ftc import build, evaluate
@@ -292,6 +297,9 @@ def register(sub) -> None:
     fe = sub.add_parser("ftc-eval", help="temporal hold-out: blocklist vs Dropnet pool rules on real reports")
     fe.add_argument("--split", help="first test day, YYYY-MM-DD (default: 70%% of the days)")
     fe.set_defaults(fn=cmd_ftc_eval)
+    cc = sub.add_parser("check-claims", help="check the numbers in README, EVIDENCE, devpost and the diagram")
+    cc.add_argument("--graph", action="store_true", help="also recount reports in data/ftc.rl")
+    cc.set_defaults(fn=cmd_check_claims)
 
     s = sub.add_parser("serve", help="run the web UI + API on a working copy of data/ftc.rl")
     s.add_argument("--host", default="127.0.0.1")

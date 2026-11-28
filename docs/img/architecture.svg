@@ -63,8 +63,8 @@
   <rect class="box" x="290" y="274" width="310" height="156" rx="10"/>
   <text x="306" y="300" class="t">Evidence, measured (complaint matches)</text>
   <text x="306" y="322" class="s">hold-out: 4.3 % numbers → 14.3 % with ranges</text>
-  <text x="306" y="340" class="s">same budget, naive range ranking: 14.5 %</text>
-  <text x="306" y="358" class="s">holders: ~21 flagged per 100 ranges vs ~1</text>
+  <text x="306" y="340" class="s">same budget, naive range ranking: 14.5 % (a tie)</text>
+  <text x="306" y="358" class="s">holders: 4 of top 15 at ≥20 flagged per 100</text>
   <text x="306" y="376" class="s">leading holders' ranges flagged later: 3.7×</text>
   <text x="306" y="394" class="s">FCC: 49 of 50 top ranges (vs 9.2 % random)</text>
   <text x="306" y="412" class="s">price shown: 10,000 numbers per range rule</text>
